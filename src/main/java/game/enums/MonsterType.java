@@ -6,13 +6,13 @@ import java.util.Arrays;
 @Getter
 
 public enum MonsterType {
-    Goblin("Goblin", 100, null),
-    Dragon("Dragon", 120, null),
-    Wizzard("Wizzard", 110, null),
-    Ork("Org", 95, null),
-    Knight("Knight", 105, null),
-    Kraken("Kraken", 125, null),
-    FireElf("Fire Elf", 98, Dragon);
+    GOBLIN("Goblin", 100, null),
+    DRAGON("Dragon", 120, null),
+    WIZZARD("Wizzard", 110, null),
+    ORK("Org", 95, null),
+    KNIGHT("Knight", 105, null),
+    KRAKEN("Kraken", 125, null),
+    FIRE_ELF("Elf", 98, DRAGON);
 
     private String name;
     private int maxDamage;
@@ -23,8 +23,6 @@ public enum MonsterType {
         this.maxDamage = maxDamage;
         this.inmuneTo = monster;
     }
-
-
 
     //public List<MonsterType> monstersList = new ArrayList<>();
 

@@ -5,25 +5,28 @@ import lombok.Getter;
 @Getter
 
 public enum Element {
-    Fire("Fire", 110),
-    Water("Water", 100),
-    Normal("Normal", 95);
+    FIRE("Fire", 110),
+    WATER("Water", 103),
+    NORMAL("Normal", 95);
 
     private String elementName;
     private int maxDamage;
 
-    Element(String elementName, int maxDamage) {
-        this.elementName = elementName;
+    Element(String name, int maxDamage) {
+        this.elementName = name;
         this.maxDamage = maxDamage;
     }
 
-    public boolean elementDefeats(Element el){
-        if(this == Water && el == Fire) {
+    //checks if the element of the card receiving the attack is defeated by the attacker's element
+    public boolean elementDefeats(Element underAttackElement){
+        if(this == WATER && underAttackElement == FIRE) {
             return true;
-        } else if (this == Normal && el == Water) {
+        } else if (this == NORMAL && underAttackElement == WATER) {
             return true;
-        } else if (this == Fire && el == Normal) {
+        } else if (this == FIRE && underAttackElement == NORMAL) {
             return true;
+        } else if (underAttackElement == null || this == null){
+            throw new UnsupportedOperationException("Element not declared");
         } else {
             return false;
         }

@@ -1,5 +1,6 @@
 package game.interfaces;
 
 public interface Attackable {
-    public boolean attack(Card attacker);
+    public boolean receiveAttack(Card attacker);
+    public void receiveDamage();
 }

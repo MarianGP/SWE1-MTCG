@@ -2,6 +2,9 @@ package game.enums;
 
 import lombok.Getter;
 
+import java.util.List;
+import java.util.Random;
+
 @Getter
 
 public enum Name {
@@ -12,9 +15,17 @@ public enum Name {
     FIVE("Southern"),
     SIX("Norden");
 
-    String namePrefix;
+    String name;
 
     Name(String enhancer) {
-        this.namePrefix = enhancer;
+        this.name = enhancer;
+    }
+
+    private static final List<Name> listOfNames = List.of(values());
+    private static final int SIZE = listOfNames.size();
+    private static final Random RANDOM = new Random();
+
+    public static Name randomLetter()  {
+        return listOfNames.get(RANDOM.nextInt(SIZE));
     }
 }

@@ -3,6 +3,7 @@ package game.cards;
 import game.enums.Element;
 import game.enums.Name;
 import game.interfaces.Card;
+import game.interfaces.Attackable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 
-public class SpellCard implements Card {
+public class SpellCard implements Card, Attackable {
 
     private String name;
     private Element cardElement;
@@ -21,30 +22,59 @@ public class SpellCard implements Card {
     private boolean locked;
 
     SpellCard(Element cardElement) {
-        Name aName = Name.ONE;
+        String prefix = Name.ONE.getName();
         this.cardElement = cardElement;
-        this.name = aName + " " + cardElement.getElementName();
+        this.name = prefix + " " + cardElement.getElementName() + "-Spell";
+        this.damage = cardElement.getMaxDamage();
+        this.locked = false;
+    }
+
+    SpellCard(Element cardElement, Name randomName) {
+        String prefix = randomName.getName();
+        this.cardElement = cardElement;
+        this.name = prefix + " " + cardElement.getElementName() + "-Spell";
         this.damage = cardElement.getMaxDamage();
         this.locked = false;
     }
 
     @Override
-    public boolean attack(Card attacker) {
-        if(attacker instanceof MonsterCard) {
-            if(((MonsterCard) attacker).getDamage() > this.damage){
+    public String printCardStats() {
+        String stat = "Name: " + this.name + " - AP: " + this.damage;
+        System.out.println(stat);
+        return stat;
+    }
+
+    @Override
+    public void receiveDamage() {
+
+    }
+
+    @Override
+    public boolean receiveAttack(Card attacker) {
+        if((attacker instanceof SpellCard))
+        {
+            /* ***elementDefeats()*** checks if the element of the card receiving the attack is defeated by the attacker's element*/
+            return (((SpellCard) attacker).getCardElement().elementDefeats(this.cardElement));
+        }
+        else if((attacker instanceof MonsterCard))
+        {
+            if( ((MonsterCard) attacker).getCardElement().elementDefeats(this.cardElement))
+            {
                 return true;
-            } else {
-                return false;
             }
-        } else if (attacker instanceof SpellCard) {
-            return this.cardElement.elementDefeats(((SpellCard) attacker).cardElement);
-        } else {
+            else
+            {
+                if(((MonsterCard) attacker).getDamage() > this.damage)
+                {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else
+            {
             throw new UnsupportedOperationException("Not a spell nor a monster card");
         }
     }
 
-    @Override
-    public void printCardStats() {
-
-    }
 }
