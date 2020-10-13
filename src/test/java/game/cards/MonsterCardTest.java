@@ -3,7 +3,7 @@ package game.cards;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
-import game.interfaces.Card;
+import game.interfaces.CardInterface;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +12,13 @@ import java.rmi.UnexpectedException;
 
 class MonsterCardTest {
 
-    Card elf = new MonsterCard(MonsterType.FIRE_ELF,Element.FIRE);
-    Card knight = new MonsterCard(MonsterType.KNIGHT, Element.WATER);
-    Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.FIRE);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE);
-    Card water = new SpellCard(Element.WATER);
-    Card fire = new SpellCard(Element.FIRE);
-    Card normal = new SpellCard(Element.NORMAL);
+    CardInterface elf = new MonsterCard(MonsterType.FIRE_ELF,Element.FIRE);
+    CardInterface knight = new MonsterCard(MonsterType.KNIGHT, Element.WATER);
+    CardInterface kraken = new MonsterCard(MonsterType.KRAKEN, Element.FIRE);
+    CardInterface dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE);
+    CardInterface water = new SpellCard(Element.WATER);
+    CardInterface fire = new SpellCard(Element.FIRE);
+    CardInterface normal = new SpellCard(Element.NORMAL);
 
     @Test
     @DisplayName("DRAGONS miss attacks against ELVES")

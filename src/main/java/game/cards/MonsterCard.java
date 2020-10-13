@@ -4,7 +4,7 @@ import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
 import game.interfaces.Attackable;
-import game.interfaces.Card;
+import game.interfaces.CardInterface;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,11 +15,12 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 
-public class MonsterCard implements Card, Attackable {
+public class MonsterCard  {
     private String name;
     private MonsterType type;
     private Element cardElement;
     private int damage;
+    private boolean locked;
 
     MonsterCard(MonsterType type, Element cardElement) {
         String prefix = Name.SIX.getName();
@@ -30,9 +31,9 @@ public class MonsterCard implements Card, Attackable {
     }
 
 
-    MonsterCard(MonsterType type, Element cardElement, Name randomName) {
+    public MonsterCard(MonsterType type, Element cardElement, Name randomName) {
         String prefix = randomName.getName();
-        this.name = prefix + " " + cardElement.getElementName()  + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
+        this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
         this.type = type;
         this.cardElement = cardElement;
         this.damage = type.getMaxDamage();
@@ -50,7 +51,7 @@ public class MonsterCard implements Card, Attackable {
     }
 
     @Override
-    public boolean receiveAttack(Card attacker) {
+    public boolean receiveAttack(CardInterface attacker) {
         if(attacker instanceof MonsterCard) {
             if(((MonsterCard) attacker).damage > this.damage) {
                 //check if this card is immune to attackers's MonsterType

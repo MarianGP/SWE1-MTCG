@@ -2,6 +2,9 @@ package game.enums;
 
 import lombok.Getter;
 
+import java.util.List;
+import java.util.Random;
+
 @Getter
 
 public enum Element {
@@ -30,5 +33,13 @@ public enum Element {
         } else {
             return false;
         }
+    }
+
+    private static final List<Element> listOfNames = List.of(values());
+    private static final int SIZE = listOfNames.size();
+    private static final Random RANDOM = new Random();
+
+    public static Element randomElement()  {
+        return listOfNames.get(RANDOM.nextInt(SIZE));
     }
 }

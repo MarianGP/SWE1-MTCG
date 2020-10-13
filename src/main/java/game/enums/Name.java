@@ -25,7 +25,7 @@ public enum Name {
     private static final int SIZE = listOfNames.size();
     private static final Random RANDOM = new Random();
 
-    public static Name randomLetter()  {
+    public static Name randomName()  {
         return listOfNames.get(RANDOM.nextInt(SIZE));
     }
 }

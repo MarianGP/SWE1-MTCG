@@ -3,6 +3,9 @@ package game.enums;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 @Getter
 
 public enum MonsterType {
@@ -29,5 +32,14 @@ public enum MonsterType {
     public void randomMonster() {
         Arrays.asList(MonsterType.values())
                 .forEach(m -> System.out.println(m.name));
+    }
+
+
+    private static final List<MonsterType> listOfNames = List.of(values());
+    private static final int SIZE = listOfNames.size();
+    private static final Random RANDOM = new Random();
+
+    public static MonsterType randomMonsterType()  {
+        return listOfNames.get(RANDOM.nextInt(SIZE));
     }
 }

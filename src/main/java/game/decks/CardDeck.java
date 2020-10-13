@@ -1,4 +1,4 @@
-package game.cards;
+package game.decks;
 
 public class CardDeck {
 }
