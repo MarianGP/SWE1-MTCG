@@ -3,9 +3,6 @@ package game.cards;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
-import game.interfaces.Attackable;
-import game.interfaces.CardInterface;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,9 +10,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
 
-public class MonsterCard  {
+public class MonsterCard extends Card  {
     private String name;
     private MonsterType type;
     private Element cardElement;
@@ -39,19 +35,15 @@ public class MonsterCard  {
         this.damage = type.getMaxDamage();
     }
 
-    @Override
+
     public String printCardStats() {
-        String stat = "Name: " + this.name + " - AP: " + this.damage;
+        String stat = "Card: " + this.name + " - AP: " + this.damage;
+        System.out.println(stat);
         return stat;
     }
 
-    @Override
-    public void receiveDamage() {
 
-    }
-
-    @Override
-    public boolean receiveAttack(CardInterface attacker) {
+    public boolean receiveAttack(Card attacker) {
         if(attacker instanceof MonsterCard) {
             if(((MonsterCard) attacker).damage > this.damage) {
                 //check if this card is immune to attackers's MonsterType

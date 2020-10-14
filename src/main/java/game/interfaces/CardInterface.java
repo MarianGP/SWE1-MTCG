@@ -1,5 +1,6 @@
 package game.interfaces;
 
-public interface CardInterface extends Attackable {
+public interface CardInterface {
     public String printCardStats();
+
 }

@@ -3,20 +3,19 @@ package game.cards;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
-import game.interfaces.CardInterface;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class SpellCardTest {
 
-    CardInterface elf = new MonsterCard(MonsterType.FIRE_ELF,Element.NORMAL);
-    CardInterface knight = new MonsterCard(MonsterType.KNIGHT, Element.FIRE);
-    CardInterface kraken = new MonsterCard(MonsterType.KRAKEN, Element.WATER);
-    CardInterface dragon = new MonsterCard(MonsterType.DRAGON, Element.WATER);
-    CardInterface water = new SpellCard(Element.WATER, Name.FIVE);
-    CardInterface fire = new SpellCard(Element.FIRE);
-    CardInterface normal = new SpellCard(Element.NORMAL);
+    Card elf = new MonsterCard(MonsterType.FIRE_ELF,Element.NORMAL);
+    Card knight = new MonsterCard(MonsterType.KNIGHT, Element.FIRE);
+    Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.WATER);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.WATER);
+    Card water = new SpellCard(Element.WATER, Name.FIVE);
+    Card fire = new SpellCard(Element.FIRE);
+    Card normal = new SpellCard(Element.NORMAL);
 
     @Test
     @DisplayName("Spells Battle: Water defeats Fire")

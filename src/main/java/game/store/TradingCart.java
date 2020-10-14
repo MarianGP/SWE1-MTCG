@@ -1,10 +1,10 @@
 package game.store;
 
-import game.interfaces.CardInterface;
 
+import game.cards.Card;
 import java.util.List;
 
 
 public class TradingCart {
-    List<CardInterface> tradingCard;
+    List<Card> tradingCard;
 }

@@ -2,9 +2,6 @@ package game.cards;
 
 import game.enums.Element;
 import game.enums.Name;
-import game.interfaces.CardInterface;
-import game.interfaces.Attackable;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,9 +9,8 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-@EqualsAndHashCode
 
-public class SpellCard implements CardInterface, Attackable {
+public class SpellCard extends Card {
 
     private String name;
     private Element cardElement;
@@ -37,20 +33,13 @@ public class SpellCard implements CardInterface, Attackable {
         this.locked = false;
     }
 
-    @Override
     public String printCardStats() {
-        String stat = "Name: " + this.name + " - AP: " + this.damage;
+        String stat = "Card: " + this.name + " - AP: " + this.damage;
         System.out.println(stat);
         return stat;
     }
 
-    @Override
-    public void receiveDamage() {
-
-    }
-
-    @Override
-    public boolean receiveAttack(CardInterface attacker) {
+    public boolean receiveAttack(Card attacker) {
         if((attacker instanceof SpellCard))
         {
             /* ***elementDefeats()*** checks if the element of the card receiving the attack is defeated by the attacker's element*/

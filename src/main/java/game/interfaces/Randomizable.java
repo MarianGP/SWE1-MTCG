@@ -1,5 +1,9 @@
 package game.interfaces;
 
-public interface Randomizable {
+import game.cards.Card;
 
+import java.util.List;
+
+public interface Randomizable {
+    public Card randomCard(List<Card> cardList);
 }

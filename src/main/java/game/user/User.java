@@ -1,11 +1,13 @@
 package game.user;
 
+import game.cards.Card;
 import game.decks.Package;
-import game.interfaces.CardInterface;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @Getter
 @Setter
@@ -16,34 +18,74 @@ public class User {
     private String token;
     private int coins;
     private int ELO;
-    private ArrayList<CardInterface> stack;
+    private List<Card> stack;
+    private List<Card> deck;
+    private final static Random RANDOM = new Random();
+    private final static int DECKSIZE = 5;
 
     public User(String username, String password){
         this.username = username;
-        this.username = password;
+        this.password = password;
         this.token = username + "-mtcgToken";
         this.coins = 20;
         this.ELO = 100;
+        this.stack = new ArrayList<>();
+        this.deck = new ArrayList<>();
     }
 
     public void buyPackage(){
         Package newPackage = new Package();
+        Card temp;
         if(this.coins - newPackage.getPrice() > 0) {
-            this.coins = this.coins + newPackage.getPrice();
+            this.coins = this.coins - newPackage.getPrice();
             for (int i = 0; i < newPackage.getCardsInPackage().size(); i++) {
-                newPackage.getCardsInPackage().get(i).printCardStats();
+                this.stack.add(newPackage.getCardsInPackage().get(i));
             }
         }
-
     }
 
-    public void listCardsInStack() {
+    public void prepareDeck() {
+        for (int i = 0; i < DECKSIZE; i++) {
+            Card temp  = this.stack.get(RANDOM.nextInt(this.stack.size()));
+            this.deck.add(temp);
+            this.stack.remove(temp);
+            this.deck.get(i).printCardStats();
+        }
+    }
+
+    public Card chooseRandomCard() {
+        return this.deck.get(RANDOM.nextInt(this.stack.size()));
+    }
+
+    public void listCards(List<Card> aStack) {
         int i = 0;
         System.out.println("Your Card's Stack");
-        while (i < stack.size()) {
-            stack.get(i).printCardStats();
+        while (i < aStack.size()) {
+            aStack.get(i).printCardStats();
             i++;
         }
+    }
+
+    public void eloDown() {
+        int temp;
+        temp = this.ELO - 5;
+        if(temp >= 0) {
+            this.ELO = temp;
+        } else {
+            this.ELO = 0;
+        }
+    }
+
+    public void eloUp(){
+        this.ELO = this.ELO + 3;
+    }
+
+    public void printUserStats() {
+        System.out.println(
+            "User: " + this.username +
+            " - ELO: " + this.ELO +
+            " - cois: " + this.coins
+        );
     }
 
 
