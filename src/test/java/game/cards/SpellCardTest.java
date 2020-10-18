@@ -6,9 +6,12 @@ import game.enums.Name;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
 
 class SpellCardTest {
 
+    @Mock
     Card elf = new MonsterCard(MonsterType.FIRE_ELF,Element.NORMAL);
     Card knight = new MonsterCard(MonsterType.KNIGHT, Element.FIRE);
     Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.WATER);
@@ -19,7 +22,6 @@ class SpellCardTest {
 
     @Test
     @DisplayName("Spells Battle: Water defeats Fire")
-
     void fireWinsAgainstWater() {
         Assertions.assertTrue(fire.receiveAttack(water));
     }

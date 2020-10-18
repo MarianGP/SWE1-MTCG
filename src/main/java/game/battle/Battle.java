@@ -9,21 +9,21 @@ import lombok.Getter;
 
 public class Battle {
 
-    static User winner = null;
+    static private User winner = null;
     static private User loser = null;
     static private int rounds = 0;
-    static private int maxRounds;
+    private final int MAXROUNDS;
     private User currentPlayer;
     private User nextPlayer;
 
-    Battle(User player1, User player2, int maxR) {
+    Battle(User player1, User player2, int setMaxRounds) {
         this.currentPlayer = player1;
         this.nextPlayer = player2;
-        maxRounds = maxR;
+        MAXROUNDS = setMaxRounds;
     }
 
     public void startBattle() {
-        while (winner == null && rounds < maxRounds) {
+        while (winner == null && rounds < MAXROUNDS) {
             winner = playRound(this.currentPlayer, this.nextPlayer);
             rounds++;
         }
@@ -43,15 +43,20 @@ public class Battle {
         boolean cardWasDefeated = false;
         Card defendingCard = nextPlayer.chooseRandomCard();
         Card attackingCard = currentPlayer.chooseRandomCard();
-        cardWasDefeated = defendingCard.receiveAttack(attackingCard);
+
+        cardWasDefeated = defendingCard.receiveAttack(attackingCard); //pop?
         if(cardWasDefeated) {
-            currentPlayer.getDeck().add(defendingCard);
-            nextPlayer.getDeck().remove(defendingCard);
+            moveCard(defendingCard); //test: failed
         }
+
         winner = checkWinner(currentPlayer, nextPlayer);
         swapAttacker(currentPlayer, nextPlayer);
-        //no winner returns null
-        return winner;
+        return winner; //no winner returns null
+    }
+
+    public void moveCard(Card lostCard) {
+        this.currentPlayer.getDeck().add(lostCard);
+        this.nextPlayer.getDeck().remove(lostCard);
     }
 
     public void swapAttacker(User playerA, User playerB) {
@@ -60,7 +65,7 @@ public class Battle {
         this.nextPlayer = temp;
     }
 
-    private User checkWinner(User currentPlayer, User nextPlayer)  {
+    public User checkWinner(User currentPlayer, User nextPlayer)  {
         if(currentPlayer.getDeck().size() == 0) {
             winner = nextPlayer;
         } else if(nextPlayer.getDeck().size() == 0) {
@@ -71,7 +76,7 @@ public class Battle {
         return winner;
     }
 
-    private User getLoser(User currentPlayer, User nextPlayer) {
+    public User getLoser(User currentPlayer,User nextPlayer) {
         if(currentPlayer.getDeck().size() == 0) {
             return currentPlayer;
         } else if (nextPlayer.getDeck().size() == 0) {

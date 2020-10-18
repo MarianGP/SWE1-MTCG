@@ -49,7 +49,6 @@ public class User {
             Card temp  = this.stack.get(RANDOM.nextInt(this.stack.size()));
             this.deck.add(temp);
             this.stack.remove(temp);
-            this.deck.get(i).printCardStats();
         }
     }
 
