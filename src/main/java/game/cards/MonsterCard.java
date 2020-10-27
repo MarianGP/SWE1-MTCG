@@ -1,5 +1,6 @@
 package game.cards;
 
+import game.decks.CardStack;
 import game.enums.*;
 import lombok.Getter;
 import lombok.Setter;

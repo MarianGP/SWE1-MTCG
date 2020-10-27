@@ -1,5 +1,6 @@
 package game.user;
 
+import game.battle.Battle;
 import game.cards.Card;
 import game.decks.CardDeck;
 import game.decks.CardStack;
@@ -13,7 +14,7 @@ import java.util.Random;
 @Getter
 @Setter
 
-public class User {
+public class User extends Battle {
     private String username;
     private String password;
     private String token;

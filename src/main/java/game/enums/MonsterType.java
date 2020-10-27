@@ -1,5 +1,6 @@
 package game.enums;
 
+import game.cards.MonsterCard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import java.util.Random;
 @AllArgsConstructor
 @Getter
 
-public enum MonsterType {
+public enum MonsterType extends MonsterCard {
     GOBLIN  ("Goblin", 100),
     DRAGON  ("Dragon", 120),
     WIZZARD ("Wizzard", 110),
