@@ -1,5 +1,7 @@
 package game.enums;
 
+import game.cards.Card;
+import game.cards.SpellCard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,7 +11,7 @@ import java.util.Random;
 @AllArgsConstructor
 @Getter
 
-public enum Element {
+public enum Element extends SpellCard {
     FIRE("Fire", 110, "NORMAL"),
     WATER("Water", 103, "FIRE"),
     NORMAL("Normal", 95, "WATER");

@@ -1,5 +1,8 @@
 package game.enums;
 
+import game.cards.MonsterCard;
+import game.cards.SpellCard;
+import game.decks.CardStack;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,7 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 
-public enum MonsterEffectiveness {
+public enum MonsterEffectiveness extends CardStack {
     ONE(    MonsterType.ORK,    GeneralEffectiveness.MISSES, MonsterType.WIZZARD, null),
     TWO(    MonsterType.GOBLIN, GeneralEffectiveness.MISSES, MonsterType.DRAGON, null),
     THREE(  MonsterType.DRAGON, GeneralEffectiveness.MISSES, MonsterType.ELF, Element.FIRE);
