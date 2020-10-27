@@ -13,7 +13,7 @@ import java.util.Random;
 @Getter
 @Setter
 
-public class CardDeck extends User implements Randomizable {
+public class CardDeck implements Randomizable {
     private final static int DECKSIZE = 5;
     private List<Card> deck;
     Random RANDOM = new Random();

@@ -1,8 +1,6 @@
 package game.enums;
 
-import game.cards.MonsterCard;
-
-public enum GeneralEffectiveness extends MonsterCard {
+public enum GeneralEffectiveness {
     MISSES,
     ATTACKS,
     DEFEATES;

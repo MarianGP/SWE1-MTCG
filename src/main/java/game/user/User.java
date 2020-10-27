@@ -14,7 +14,7 @@ import java.util.Random;
 @Getter
 @Setter
 
-public class User extends Battle {
+public class User {
     private String username;
     private String password;
     private String token;

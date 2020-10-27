@@ -1,7 +1,5 @@
 package game.enums;
 
-import game.cards.MonsterCard;
-import game.cards.SpellCard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +8,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 
-public enum SpellEffectiveness extends SpellCard {
+public enum SpellEffectiveness  {
     ONE(    null, GeneralEffectiveness.MISSES,    MonsterType.KRAKEN), //immune to any spell
     TWO(   Element.WATER,  GeneralEffectiveness.DEFEATES,  MonsterType.KNIGHT);
 
