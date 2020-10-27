@@ -1,8 +1,6 @@
 package game.cards;
 
-import game.enums.Element;
-import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 
-public class MonsterCard extends Card  {
+public class MonsterCard extends Card {
     private String name;
     private MonsterType type;
     private Element cardElement;
@@ -26,7 +24,6 @@ public class MonsterCard extends Card  {
         this.damage = type.getMaxDamage();
     }
 
-
     public MonsterCard(MonsterType type, Element cardElement, Name randomName) {
         String prefix = randomName.getName();
         this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
@@ -35,6 +32,14 @@ public class MonsterCard extends Card  {
         this.damage = type.getMaxDamage();
     }
 
+    //for testing purpose
+    public MonsterCard(MonsterType type, Element cardElement, Name randomName, int damage) {
+        String prefix = randomName.getName();
+        this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
+        this.type = type;
+        this.cardElement = cardElement;
+        this.damage = damage;
+    }
 
     public String printCardStats() {
         String stat = "Card: " + this.name + " - AP: " + this.damage;
@@ -42,38 +47,56 @@ public class MonsterCard extends Card  {
         return stat;
     }
 
+    public GeneralEffectiveness checkEffectiveness(MonsterCard attacker) {
+        GeneralEffectiveness effectiveness;
+        for (int i = 0; i < MonsterEffectiveness.MonsterEffectivenessList.size(); i++) {
+            effectiveness = MonsterEffectiveness.MonsterEffectivenessList.get(i).getEffectiveness();
+            if (attacker.getType() == MonsterEffectiveness.MonsterEffectivenessList.get(i).getAttacker() &&
+                    this.type == MonsterEffectiveness.MonsterEffectivenessList.get(i).getDefender())
+            {
+                if (MonsterEffectiveness.MonsterEffectivenessList.get(i).getDefendersElement() == null) {
+                    return effectiveness;
+                }
+                else if(this.cardElement == MonsterEffectiveness.MonsterEffectivenessList.get(i).getDefendersElement() ){
+                    return effectiveness;
+                }
+            }
+        }
+        return GeneralEffectiveness.ATTACKS;
+    }
+
+    public boolean compareDamage(int attackerDP){
+        if (attackerDP > this.damage) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean result(GeneralEffectiveness effect, int attackerDP) {
+        if (effect == GeneralEffectiveness.ATTACKS) {
+            return compareDamage(attackerDP);
+        } else if (effect == GeneralEffectiveness.MISSES) {
+            return false;
+        } else if (effect == GeneralEffectiveness.DEFEATES) {
+            return true;
+        }
+        throw new UnsupportedOperationException("None allowed Effectiveness Value");
+    }
 
     public boolean receiveAttack(Card attacker) {
         if(attacker instanceof MonsterCard) {
-            if(((MonsterCard) attacker).damage > this.damage) {
-                //check if this card is immune to attackers's MonsterType
-                if( ((MonsterCard) attacker).type == this.type.getInmuneTo() ) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+            GeneralEffectiveness effect = checkEffectiveness((MonsterCard) attacker);
+            return result(effect, ((MonsterCard) attacker).getDamage());
         } else if (attacker instanceof SpellCard) {
-            if(this.type == MonsterType.KNIGHT && ((SpellCard) attacker).getCardElement() == Element.WATER){
+            GeneralEffectiveness effect = ((SpellCard) attacker).checkEffectiveness(this);
+            if(effect == GeneralEffectiveness.ATTACKS && ((SpellCard) attacker).getCardElement().elementDefeats(this.cardElement)) {
                 return true;
             } else {
-                if( ((SpellCard) attacker).getCardElement().elementDefeats(this.cardElement))
-                {
-                    return true;
-                }
-                else
-                {
-                    if( ((SpellCard) attacker).getDamage() > this.damage)
-                    {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
+                return result(effect, ((SpellCard) attacker).getDamage());
             }
         } else {
-            throw new UnsupportedOperationException("Not a spell nor a monster card");
+            throw new UnsupportedOperationException("Not a spell nor a monster card or null");
         }
-        return false;
     }
 }

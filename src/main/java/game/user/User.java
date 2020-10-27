@@ -1,11 +1,12 @@
 package game.user;
 
 import game.cards.Card;
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import game.decks.Package;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -18,8 +19,8 @@ public class User {
     private String token;
     private int coins;
     private int ELO;
-    private List<Card> stack;
-    private List<Card> deck;
+    private CardStack stack;
+    private CardDeck deck;
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
 
@@ -29,8 +30,7 @@ public class User {
         this.token = username + "-mtcgToken";
         this.coins = 20;
         this.ELO = 100;
-        this.stack = new ArrayList<>();
-        this.deck = new ArrayList<>();
+        this.stack = new CardStack();
     }
 
     public void buyPackage(){
@@ -38,22 +38,12 @@ public class User {
         Card temp;
         if(this.coins - newPackage.getPrice() > 0) {
             this.coins = this.coins - newPackage.getPrice();
-            for (int i = 0; i < newPackage.getCardsInPackage().size(); i++) {
-                this.stack.add(newPackage.getCardsInPackage().get(i));
-            }
+            this.stack.addListToStack(newPackage.getCardsInPackage());
         }
     }
 
     public void prepareDeck() {
-        for (int i = 0; i < DECKSIZE; i++) {
-            Card temp  = this.stack.get(RANDOM.nextInt(this.stack.size()));
-            this.deck.add(temp);
-            this.stack.remove(temp);
-        }
-    }
-
-    public Card chooseRandomCard() {
-        return this.deck.get(RANDOM.nextInt(this.stack.size()));
+        this.deck = new CardDeck(this);
     }
 
     public void listCards(List<Card> aStack) {
@@ -75,16 +65,22 @@ public class User {
         }
     }
 
+    public void reorganizeCards() {
+        this.stack.addListToStack(this.deck.getDeck());
+        this.deck.clearDeck();
+    }
+
     public void eloUp(){
         this.ELO = this.ELO + 3;
     }
 
     public void printUserStats() {
         System.out.println(
-            "User: " + this.username +
+            "\nUser: " + this.username +
             " - ELO: " + this.ELO +
             " - cois: " + this.coins
         );
+        this.getStack().listCardsInStack();
     }
 
 

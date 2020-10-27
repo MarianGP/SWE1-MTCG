@@ -5,4 +5,5 @@ import game.interfaces.CardInterface;
 
 public abstract class Card implements CardInterface, Attackable {
 
+
 }

@@ -13,7 +13,7 @@ public enum Name {
     THREE("Supreme"),
     FOUR("Giant"),
     FIVE("Southern"),
-    SIX("Norden");
+    SIX("Northern");
 
     String name;
 

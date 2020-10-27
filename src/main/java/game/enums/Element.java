@@ -1,24 +1,22 @@
 package game.enums;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 import java.util.Random;
 
+@AllArgsConstructor
 @Getter
 
 public enum Element {
-    FIRE("Fire", 110),
-    WATER("Water", 103),
-    NORMAL("Normal", 95);
+    FIRE("Fire", 110, "NORMAL"),
+    WATER("Water", 103, "FIRE"),
+    NORMAL("Normal", 95, "WATER");
 
     private String elementName;
     private int maxDamage;
-
-    Element(String name, int maxDamage) {
-        this.elementName = name;
-        this.maxDamage = maxDamage;
-    }
+    private String defeats;
 
     //checks if the element of the card receiving the attack is defeated by the attacker's element
     public boolean elementDefeats(Element underAttackElement){
@@ -28,7 +26,7 @@ public enum Element {
             return true;
         } else if (this == FIRE && underAttackElement == NORMAL) {
             return true;
-        } else if (underAttackElement == null || this == null){
+        } else if (underAttackElement == null){
             throw new UnsupportedOperationException("Element not declared");
         } else {
             return false;

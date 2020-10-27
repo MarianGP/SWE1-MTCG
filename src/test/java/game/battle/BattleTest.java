@@ -1,5 +1,11 @@
 package game.battle;
 
+import game.cards.Card;
+import game.cards.MonsterCard;
+import game.cards.SpellCard;
+import game.enums.Element;
+import game.enums.MonsterType;
+import game.enums.Name;
 import game.user.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,63 +22,88 @@ class BattleTest {
     User player1 = new User("Player 1", "0");
     User player2 = new User("Player 2", "0");
     User player3 = new User("Player 3", "0");
+    User player4 = new User("Player 4", "0");
+
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100);
+    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120);
+    Card water = new SpellCard(Element.WATER, Name.FIVE, 50);
+    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200);
+    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200);
 
     Battle newBattle = new Battle(player1, player2, 100);
-    Battle anotherBattle = new Battle(player2, player3, 100);
+    Battle anotherBattle = new Battle(player3, player4, 100);
+    Battle nextBattle = new Battle(player3, player2, 100);
 
     @BeforeEach
     void setUp() {
         player1.buyPackage();
         player2.buyPackage();
         player3.buyPackage();
+        player4.buyPackage();
+
         player1.buyPackage();
         player2.buyPackage();
         player3.buyPackage();
+        player4.buyPackage();
+        //10 cards in stack
 
         player1.prepareDeck();
         player2.prepareDeck();
         player3.prepareDeck();
+        player4.prepareDeck();
+        //5 cards in deck
     }
 
     @Test
-    @DisplayName("None winners this round. Both still cards in the deck")
-    void noWinnersYet() {
-        Assertions.assertEquals(null,newBattle.checkWinner(player3, player2));
-    }
-
-    @Test
-    @DisplayName("Winner Player2. Player1 has 0 cards")
+    @DisplayName("Check if their is a winner, loser, none yet")
     void returnWinnerPlayer2() {
-        player1.setDeck(null);
-        Assertions.assertEquals(player2,newBattle.checkWinner(player1, player2));
-        Assertions.assertEquals(player1,newBattle.getLoser(player1, player2));
+        Assertions.assertEquals(null,anotherBattle.checkWinner(player3, player4));
+        player4.getDeck().clearDeck();
+        Assertions.assertEquals(0, player4.getDeck().getDeck().size());
+        Assertions.assertEquals(5, player3.getDeck().getDeck().size());
+        Assertions.assertEquals(player3,anotherBattle.checkWinner(player3, player4));
+        Assertions.assertEquals(player4,anotherBattle.getLoser(player3, player4));
+
     }
 
     @Test
     @DisplayName("")
     void checkIfWinner() {
-        //when(newBattle.checkWinner(player1, player2).thenReturn(false));
-        //verify(newBattle.checkWinner(player1, player2);
+//        when(newBattle.checkWinner(player1, player2).thenReturn(false));
+//        verify(newBattle.checkWinner(player1, player2);
     }
 
     @Test
     @DisplayName("Swap Players: CurrentPlayer becomes NextPlayer")
     void tryToSwapAttackers() {
-        User temp = newBattle.getCurrentPlayer();
+        User current = newBattle.getCurrentPlayer();
+        User next = newBattle.getNextPlayer();
         newBattle.swapAttacker(newBattle.getCurrentPlayer(),newBattle.getNextPlayer());
-        Assertions.assertEquals(temp, newBattle.getNextPlayer());
+        Assertions.assertEquals(current, newBattle.getNextPlayer());
+        Assertions.assertEquals(next, newBattle.getCurrentPlayer());
     }
 
     @Test
-    @DisplayName("Move defeated Card to opponents Deck")
+    @DisplayName("Compare cards and move to round-winner: Player Next playes a stronger Card")
     void moveDefeatedCard() {
-        Assertions.assertEquals(5, anotherBattle.getCurrentPlayer().getDeck().size());
-        Assertions.assertEquals(5, anotherBattle.getNextPlayer().getDeck().size());
-        if(true) {
-            newBattle.moveCard(anotherBattle.getNextPlayer().getDeck().get(0));
-        }
-        Assertions.assertEquals(6, anotherBattle.getCurrentPlayer().getDeck().size());
-        Assertions.assertEquals(4, anotherBattle.getNextPlayer().getDeck().size());
+        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeck().size());
+
+        nextBattle.compareCards(wizzard,elf);
+        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeck().size());
+
+        nextBattle.compareCards(elf,wizzard);
+        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
+    }
+
+    @Test
+    @DisplayName ("One Round ")
+    void playOneRound() {
+        Battle newBattle = new Battle(player2, player3, 2);
+        newBattle.startBattle();
+        Assertions.assertEquals(2, newBattle.getRounds());
     }
 
 }

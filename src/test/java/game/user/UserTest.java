@@ -1,42 +1,60 @@
 package game.user;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-@ExtendWith(MockitoExtension.class)
 class UserTest {
+    @Mock
+    User player1 = new User("Player1", "1234");
+    User player2 = new User("Player2", "1234");
 
-    User mockUser = new User("usernameMock", "1234");
+    @BeforeEach
     void setUp() {
-        mockUser.buyPackage();
-        mockUser.buyPackage();
+        player1.buyPackage();
+        player1.buyPackage();
+    }
+
+    @Test
+    @DisplayName("ELO update")
+    void eloManipulation() {
+        player1.eloDown();
+        player1.eloUp();
+        assertAll("mockUser",
+                () -> assertEquals(98, player1.getELO())
+        );
     }
 
     @Test
     @DisplayName("Buy Package")
     void addPackageToStack() {
-        setUp();
         assertAll("mockUser",
-                () -> assertEquals(10, mockUser.getStack().size()),
-                () -> assertEquals(10, mockUser.getCoins())
+                () -> assertEquals(10, player1.getStack().getStack().size()),
+                () -> assertEquals(10, player1.getCoins())
         );
     }
 
     @Test
     @DisplayName("Create new Deck")
     void createNewDeck() {
-        setUp();
-        mockUser.prepareDeck();
-        Assertions.assertEquals(5,mockUser.getDeck().size());
-        Assertions.assertEquals(5,mockUser.getStack().size());
+        player1.prepareDeck();
+        Assertions.assertEquals(5, player1.getDeck().getDeck().size());
+        Assertions.assertEquals(5, player1.getStack().getStack().size());
     }
 
+    @Test
+    @DisplayName("compareTableCards")
+    void compareCards() {
+        player1.prepareDeck();
+        Assertions.assertEquals(5, player1.getDeck().getDeck().size());
+        player1.getDeck().randomCard();
+        Assertions.assertEquals(4, player1.getDeck().getDeck().size());
+    }
 
 }
