@@ -1,31 +1,23 @@
 package server.model;
 
 
+import lombok.AllArgsConstructor;
 import server.enums.StatusCode;
 
+@AllArgsConstructor
 public class HttpResponse {
 
-    //send()
-    private HttpRequest request;
+    private String version;
     private String response;
     private StatusCode status;
 
-    public HttpResponse(HttpRequest request, String response, StatusCode status) {
-        this.request = request;
-        this.response = response;
-        this.status = status;
-    }
-
     public String getResponse() {
         return
-            request.getVersion() + status.getCode() + status.getStatus() + "\r\n"
-            + request.getHeaderPais()
-            + "Content-Length: " + response.length()
-            + "\r\n"
+            version + status.getCode() + status.getStatus() + "\r\n"
+            + "Content-Length: " + response.length() + "\r\n"
+            + "\r\n" // 2?
             + this.response
             ;
     }
-
-
 
 }

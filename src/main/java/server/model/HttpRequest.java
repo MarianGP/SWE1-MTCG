@@ -2,6 +2,7 @@ package server.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import server.enums.HttpMethod;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @Getter
+@Setter
 
 //RequestContext
 public class HttpRequest {
@@ -55,6 +57,10 @@ public class HttpRequest {
             str.append(this.headerPairs.get(key));
         }
         return str.toString();
+    }
+
+    public Integer getBodyLength() {
+        return headerPairs.get("Content-Length");
     }
 
 //    Set<Map.Entry<String, Integer>> entries = headerPairs.entrySet();

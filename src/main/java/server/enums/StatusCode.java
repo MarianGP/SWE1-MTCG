@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public enum StatusCode {
     OK("OK", 200),
+    CREATED("Created", 201),
     NOCONTENT("No Content", 204),
     BADREQUEST("Bad Request", 400),
     NOTFOUND("Not Found", 404),
