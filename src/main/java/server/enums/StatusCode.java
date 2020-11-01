@@ -6,16 +6,16 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum StatusCode {
-    OK("OK", 200),
-    CREATED("Created", 201),
-    NOCONTENT("No Content", 204),
-    BADREQUEST("Bad Request", 400),
-    NOTFOUND("Not Found", 404),
-    INTERNALERROR("Internal Server Error", 500),
-    VERSIONNOTSUPPORTED("Version Not Supported", 505)
+    OK(200, "OK"),
+    CREATED(201, "Created"),
+    NOCONTENT(204, "No Content"),
+    BADREQUEST(400, "Bad Request"),
+    NOTFOUND(404, "Not Found"),
+    INTERNALERROR(500, "Internal Server Error"),
+    VERSIONNOTSUPPORTED(505, "Version Not Supported")
     ;
 
-    private String status;
     private Integer code;
+    private String status;
 
 }

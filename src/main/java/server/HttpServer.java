@@ -1,26 +1,24 @@
 package server;
 
 import lombok.Builder;
+import server.enums.HttpMethod;
 import server.enums.StatusCode;
 import server.model.HttpRequest;
 import server.model.HttpResponse;
 import server.model.RequestHandler;
 
-import javax.ws.rs.BadRequestException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 @Builder
 public class HttpServer implements Runnable {
 
     private static ServerSocket listener = null;
-    private static Map<Integer, String> messages = null; //temp no databank
+    private static Map<Integer, String> messages = new HashMap<Integer, String>(); //temp no databank
 
     public static void main(String[] args) {
         System.out.println("start server");
@@ -43,56 +41,71 @@ public class HttpServer implements Runnable {
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 String message;
+
+                //Read Header
                 do {
                     message = reader.readLine();
                     header.add(message);
-                    System.out.println("srv: received: " + message);
+                    System.out.println("received: " + message);
                 } while (!"quit".equals(message) && !message.isEmpty());
                 //(line != null && !line.isEmpty())
 
-                HttpRequest requestContext = new HttpRequest(header);
-
-                // Read Body
-                if (requestContext.getBodyLength() > 0) {
-                    int read;
-                    StringBuffer sb = new StringBuffer();
-                    while ((read = reader.read()) != -1) {
-                        sb.append((char) read);
-                        if (sb.length() == requestContext.getBodyLength())
-                            break;
-                    }
-                    requestContext.setBody(sb.toString());
-                } else {
-                    requestContext.setBody("");
-                }
-
                 try {
-                    RequestHandler requestHandler = RequestHandler.builder()
-                            .requestContext(requestContext)
-                            .status(StatusCode.OK)
-                            .messages(messages) //private static
-                            .newMessage(null)
-                            .build();
-                    HttpResponse response = requestHandler.handleRequest();
-                    if (requestHandler.getNewMessage() != null)
-                        messages.put(messages.size(), requestHandler.getNewMessage());
+                    HttpRequest requestContext = new HttpRequest(header);
 
-                    // Write Response to Client
+                    // Read Body
+                    if (
+                            requestContext.getBodyLength() != null
+                            && Integer.parseInt(requestContext.getBodyLength(), 10) > 0
+                            && (requestContext.getMethod() == HttpMethod.POST || requestContext.getMethod() == HttpMethod.PUT)
+                    )
+                    {
+                        int read;
+                        StringBuffer sb = new StringBuffer();
+                        while ((read = reader.read()) != -1) {
+                            sb.append((char) read);
+                            if (sb.length() == Integer.parseInt(requestContext.getBodyLength(),10)) {
+                                break;
+                            }
+                        }
+                        requestContext.setBody(sb.toString());
+                    } else {
+                        requestContext.setBody("");
+                    }
+
                     OutputStream outputStream = s.getOutputStream();
-                    outputStream.write(response.getResponse().getBytes());
+
+                    try {
+                        RequestHandler requestHandler = RequestHandler.builder()
+                                .requestContext(requestContext)
+                                .status(StatusCode.OK)
+                                .messages(messages)
+                                .objectName(null)
+                                .build();
+
+                        HttpResponse response = requestHandler.handleRequest();
+
+                        // Safe new message in messages
+                        try {
+                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST && requestHandler.getMessages().size() > 0)
+                                messages = requestHandler.getMessages();
+                        } catch (Exception e) {
+                            System.out.println("Error saving new msg");
+                        }
+
+                        // Write Response to Client
+                        outputStream.write(response.getResponse().getBytes());
+
+                    } catch (Exception e) {
+                        outputStream.write("Response with 500 Code & exception as body".getBytes()); // e.getMessage();
+                    }
                     outputStream.flush();
                     outputStream.close();
-                } catch (BadRequestException e) { // Auch eine NotFoundException hinzufügen
-                    OutputStream outputStream = s.getOutputStream();
-                    outputStream.write("HTTP/1.1 400 Bad Request\r\n\r\n".getBytes());
-                    outputStream.flush();
-                    outputStream.close();
-                } catch (Exception e) {
-                    OutputStream outputStream = s.getOutputStream();
-                    outputStream.write("Response with 500 Code & exception as body".getBytes()); // e.getMessage();
-                    outputStream.flush();
-                    outputStream.close();
+
+                } catch (IOException e){
+                    System.out.println("Error reading header request or body");
                 }
+                reader.close();
                 //close connection
             }
         } catch (Exception e) {
@@ -115,8 +128,6 @@ public class HttpServer implements Runnable {
 
 
 //    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-//                System.out.println("srv: sending welcome message");
-//                writer.write("Welcome to myserver!");
-//                writer.newLine();
-//                writer.write("Please enter your commands...");
-//                writer.flush();
+//    System.out.println("srv: sending welcome message");
+//    writer.newLine();
+//    writer.flush();

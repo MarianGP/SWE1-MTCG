@@ -1,23 +1,46 @@
 package server.model;
 
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import server.enums.StatusCode;
 
-@AllArgsConstructor
+import java.util.Map;
+import java.util.Set;
+
+@Builder
+@Getter
 public class HttpResponse {
 
     private String version;
     private String response;
     private StatusCode status;
+    private Map<String, String> headerPairs;
 
     public String getResponse() {
+        String len;
+
+        if(!response.isEmpty()) {
+            len = "Content-Length: " + response.length() + "\r\n";
+        } else {
+            len = "";
+        }
+
         return
-            version + status.getCode() + status.getStatus() + "\r\n"
-            + "Content-Length: " + response.length() + "\r\n"
-            + "\r\n" // 2?
-            + this.response
-            ;
+                this.version + " " + this.status.getCode() + " " + this.status.getStatus() + "\r\n"
+                + len
+                + "\r\n"
+                + response + "\r\n"
+                ;
     }
 
+    public String getHeaders() {
+        Set<Map.Entry<String, String>> entries = headerPairs.entrySet();
+        String result = "";
+        for (Map.Entry<String, String> entry : entries) {
+            result += entry.getKey() + ": " + entry.getValue() + "\r\n";
+        }
+        return result;
+    }
 }
+
