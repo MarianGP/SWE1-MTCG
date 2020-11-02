@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import server.enums.HttpMethod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Getter
@@ -29,7 +26,7 @@ public class HttpRequest {
         try {
             this.method = HttpMethod.valueOf(line[0]);
         } catch (Exception e) {
-            this.method = HttpMethod.NOTSUPPORTED;
+            this.method = null;
         }
 
         this.path = line[1];

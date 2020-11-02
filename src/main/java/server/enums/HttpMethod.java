@@ -10,4 +10,5 @@ public enum HttpMethod {
     DELETE,
     NOTSUPPORTED
     ;
+
 }

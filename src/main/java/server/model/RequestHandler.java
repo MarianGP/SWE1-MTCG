@@ -1,11 +1,13 @@
 package server.model;
 
+import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import server.enums.HttpMethod;
 import server.enums.StatusCode;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @Builder
@@ -14,86 +16,107 @@ import java.util.Map;
 public class RequestHandler {
     private StatusCode status;
     private HttpRequest requestContext;
-    private Map<Integer, String> messages;
+    private Map<String, String> objectsList;
     private HttpResponse response;
     private String objectName; // user, message, package
 
+
     public HttpResponse handleRequest() {
-        String message;
-        StringBuffer st = new StringBuffer();
-        String[] pathParts = this.requestContext.getPath().split("/");
-
-        for (int i = 0; i < pathParts[1].length() - 1; i++) {
-            st.append(pathParts[1].charAt(i));
-        }
-
-        objectName = st.toString();
+        String responseBody;
 
         //Http Method - Check
-        if(this.requestContext.getMethod() == HttpMethod.NOTSUPPORTED) {
+        if(this.requestContext.getMethod() == null) {
             this.status = StatusCode.BADREQUEST;
-            message = "Method not supported";
+            responseBody = "Method not supported";
         } else {
             //Http Version - Check
             if(this.requestContext.getVersion().equals("HTTP/1.1")) {
-
-                //URL Path "/messages/<Number>"
-                if(this.requestContext.getPath().matches("(/messages/)([0-9]+)(/?)")) {
-                    message = checkIfMessageExists(this.messages.size(), Integer.parseInt(pathParts[2], 10));
-
-                    if(getStatus() != StatusCode.NOCONTENT) { //exists
-                        message = crudMessage(Integer.parseInt(pathParts[2], 10));
-                    }
-
-                //URL Path "/messages/"
-                } else if(this.requestContext.getPath().matches("(/messages)(/?)")) {
-                    message = HandleMessages();
-                //URL Path "/another/Path"
-                } else {
-                    setStatus(StatusCode.BADREQUEST);
-                    message = "Usage: URL/messages OR URL/messages/{number}";
-                }
-
+                responseBody = handlePath();
             } else {
                 setStatus(StatusCode.VERSIONNOTSUPPORTED);
-                message = "Method not supported";
+                responseBody = "Version not supported";
             }
         }
 
         return HttpResponse.builder()
                 .version(this.requestContext.getVersion())
-                .response(message)
+                .response(responseBody)
                 .status(this.status)
                 .build();
     }
 
-    private String checkIfMessageExists(int size, Integer messageKey) {
+    public String handlePath() {
+        String table, key, message;
+        String[] pathParts = this.requestContext.getPath().split("/");
+        StringBuffer st = new StringBuffer();
+
+        for (int i = 0; i < pathParts[1].length(); i++) {
+            st.append(pathParts[1].charAt(i));
+        }
+
+        this.objectName = st.toString();
+
+        key = pathParts.length > 2 ? pathParts[2] : null;
+        table = pathParts.length > 1 ? pathParts[1] : null;
+
+        String[] allowedTables = {"messages", "users", "packages", "deck"};
+
+        //URL Path "/table/key"
+        if(     key != null
+                && table != null
+                && this.requestContext.getPath().matches("(/" + table + "/)([0-9]+)(/?)")
+                && Arrays.asList(allowedTables).contains(table)
+        ){
+            message = checkIfMessageExists(this.objectsList.size(), key);
+
+            if(this.status != StatusCode.NOCONTENT) {
+                message = crudMessage(key);
+            }
+
+        //URL Path "/table/
+        } else if(
+                table != null
+                && this.requestContext.getPath().matches("(/" + table + ")(/?)")
+                && Arrays.asList(allowedTables).contains(table)
+        ) {
+            message =  handleMessages();
+
+        //URL Path "/another/Path"
+        } else {
+            setStatus(StatusCode.BADREQUEST);
+            message =  "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
+        }
+        return message;
+    }
+
+    public String checkIfMessageExists(int size, String key) {
         boolean exists = false;
 
         if(this.requestContext.getMethod() != HttpMethod.POST) {
             if(size > 0) {
-                for (int i = 0; i < this.messages.size(); i++) { //check if key exists
-                    if(this.messages.get(messageKey) != null) {
+                for (int i = 0; i < this.objectsList.size(); i++) { //check if key exists
+                    if(this.objectsList.get(key) != null) {
                         exists = true;
                     }
-                    if(!exists) {
-                        setStatus(StatusCode.NOCONTENT);
-                        return this.objectName + " does not exist or was not found";
-                    }
+                }
+
+                if(!exists) {
+                    this.status = StatusCode.NOCONTENT;
+                    return this.objectName + " does not exist";
                 }
             } else {
-                setStatus(StatusCode.NOCONTENT);
+                this.status = StatusCode.NOCONTENT;
                 return "The " + this.objectName + " list is empty";
             }
             return this.objectName + " exit(s)";
         } else {
-            setStatus(StatusCode.BADREQUEST);
+            this.status = StatusCode.BADREQUEST;
             return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
         }
 
     }
 
-    private String HandleMessages() {
+    public String handleMessages() {
         switch (this.requestContext.getMethod()) {
             case GET:
                 return getAllMessages();
@@ -105,10 +128,10 @@ public class RequestHandler {
         }
     }
 
-    private String getAllMessages() {
+    public String getAllMessages() {
         StringBuffer st =new StringBuffer();
         int count = 0;
-        for (Map.Entry<Integer, String> entry : this.messages.entrySet()){
+        for (Map.Entry<String, String> entry : this.objectsList.entrySet()){
             st.append(entry.getKey());
             st.append(")  ");
             st.append(entry.getValue());
@@ -116,16 +139,17 @@ public class RequestHandler {
             count++;
         }
         if(count == 0) {
+            this.status = StatusCode.NOCONTENT;
             return "The " + this.objectName + " list is empty";
         } else {
             return st.toString();
         }
     }
 
-    private String addNewMessage(String body) {
+    public String addNewMessage(String body) {
         try {
             if(!body.isEmpty()) {
-                this.messages.put(this.messages.size()+1, body);
+                this.objectsList.put(Integer.toString((this.objectsList.size() + 1)), body);
                 setStatus(StatusCode.CREATED);
                 return "New " + this.objectName + " was created";
             } else {
@@ -139,19 +163,29 @@ public class RequestHandler {
         }
     }
 
-    private String crudMessage(Integer messageKey) { //message does exist
+    public String crudMessage(String key) {
+
         switch (this.requestContext.getMethod()) {
             case GET:
-                return this.messages.get(messageKey);
+                return this.objectsList.get(key);
             case PUT:
-                this.messages.put(messageKey,this.requestContext.getBody());
+                this.objectsList.put(key,this.requestContext.getBody());
                 return "The " + this.objectName + " was modified";
             case DELETE:
-                this.messages.remove(messageKey);
+                this.objectsList.remove(key);
                 return "The " + this.objectName + " was deleted";
             default:
                 setStatus(StatusCode.BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, PUT, DELETE, when indicating a " + this.objectName + " number/index";
+        }
+    }
+
+    private void convertToJson() {
+        if(this.requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
+            //convertToJson();
+            Gson g = new Gson();
+            //Player p = g.fromJson(this.requestContext.getBody(), Player.class);
+            //String str = g.toJson(p);
         }
     }
 }

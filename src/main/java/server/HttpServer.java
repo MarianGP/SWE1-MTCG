@@ -18,7 +18,7 @@ import java.util.Map;
 public class HttpServer implements Runnable {
 
     private static ServerSocket listener = null;
-    private static Map<Integer, String> messages = new HashMap<Integer, String>(); //temp no databank
+    private static Map<String, String> messages = new HashMap<String, String>(); //temp no databank
 
     public static void main(String[] args) {
         System.out.println("start server");
@@ -46,8 +46,8 @@ public class HttpServer implements Runnable {
                 do {
                     message = reader.readLine();
                     header.add(message);
-                    System.out.println("received: " + message);
-                } while (!"quit".equals(message) && !message.isEmpty());
+                    System.out.println(message);
+                } while (!message.isEmpty());
                 //(line != null && !line.isEmpty())
 
                 try {
@@ -79,7 +79,7 @@ public class HttpServer implements Runnable {
                         RequestHandler requestHandler = RequestHandler.builder()
                                 .requestContext(requestContext)
                                 .status(StatusCode.OK)
-                                .messages(messages)
+                                .objectsList(messages)
                                 .objectName(null)
                                 .build();
 
@@ -87,8 +87,8 @@ public class HttpServer implements Runnable {
 
                         // Safe new message in messages
                         try {
-                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST && requestHandler.getMessages().size() > 0)
-                                messages = requestHandler.getMessages();
+                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST && requestHandler.getObjectsList().size() > 0)
+                                messages = requestHandler.getObjectsList();
                         } catch (Exception e) {
                             System.out.println("Error saving new msg");
                         }
