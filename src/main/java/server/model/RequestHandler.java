@@ -102,13 +102,13 @@ public class RequestHandler {
 
                 if(!exists) {
                     this.status = StatusCode.NOCONTENT;
-                    return this.objectName + " does not exist";
+                    return "The " + this.objectName + " does not exist";
                 }
             } else {
                 this.status = StatusCode.NOCONTENT;
                 return "The " + this.objectName + " list is empty";
             }
-            return this.objectName + " exit(s)";
+            return "The " + this.objectName + " exits";
         } else {
             this.status = StatusCode.BADREQUEST;
             return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";

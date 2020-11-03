@@ -8,16 +8,16 @@
     <node x="512.0" y="987.0">game.interfaces.Login</node>
     <node x="820.75" y="0.0">game.battle.Battle</node>
     <node x="653.0" y="803.0">game.enums.Name</node>
+    <node x="0.0" y="597.0">game.enums.MonsterEffectiveness</node>
     <node x="455.75" y="79.0">game.decks.CardDeck</node>
     <node x="0.0" y="987.0">game.interfaces.Exchangeable</node>
-    <node x="0.0" y="597.0">game.enums.MonsterEffectiveness</node>
     <node x="0.0" y="336.0">game.cards.SpellCard</node>
     <node x="440.0" y="803.0">game.decks.Package</node>
     <node x="226.0" y="803.0">game.enums.MonsterType</node>
     <node x="31.75" y="123.0">game.interfaces.CardInterface</node>
     <node x="173.0" y="987.0">game.store.TradableCard</node>
-    <node x="346.0" y="987.0">game.store.TradingCart</node>
     <node x="205.375" y="246.0">game.cards.Card</node>
+    <node x="346.0" y="987.0">game.store.TradingCart</node>
     <node x="225.0" y="325.0">game.cards.MonsterCard</node>
     <node x="0.0" y="803.0">game.enums.Element</node>
     <node x="815.0" y="803.0">game.enums.GeneralEffectiveness</node>
@@ -45,17 +45,17 @@
       <point x="223.625" y="300.0" />
       <point x="-18.25" y="14.5" />
     </edge>
-    <edge source="game.cards.MonsterCard" target="game.cards.Card">
-      <point x="0.0" y="-113.5" />
-      <point x="375.0" y="300.0" />
-      <point x="260.125" y="300.0" />
-      <point x="18.25" y="14.5" />
-    </edge>
     <edge source="game.decks.CardStack" target="game.interfaces.Randomizable">
       <point x="0.0" y="-47.5" />
       <point x="378.25" y="54.0" />
       <point x="417.25" y="54.0" />
       <point x="-32.0" y="14.5" />
+    </edge>
+    <edge source="game.cards.MonsterCard" target="game.cards.Card">
+      <point x="0.0" y="-113.5" />
+      <point x="375.0" y="300.0" />
+      <point x="260.125" y="300.0" />
+      <point x="18.25" y="14.5" />
     </edge>
     <edge source="game.cards.Card" target="game.interfaces.CardInterface">
       <point x="-24.333333333333314" y="-14.5" />
@@ -70,7 +70,7 @@
       <point x="0.0" y="47.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.6886051080550099" x="499.0" y="508.0" />
+  <settings layout="Hierarchic Group" zoom="0.6586306653809064" x="511.5" y="508.5" />
   <SelectedNodes>
     <node>game.user.User</node>
   </SelectedNodes>

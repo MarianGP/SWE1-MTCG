@@ -1,6 +1,7 @@
 package server.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import server.enums.HttpMethod;
@@ -8,6 +9,7 @@ import server.enums.HttpMethod;
 import java.util.*;
 
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 
@@ -32,6 +34,7 @@ public class HttpRequest {
         this.path = line[1];
         this.version = line[2];
         this.headerPairs = new HashMap<String, String>();
+        this.body = "";
 
         for (int i = 1; i < request.size()-1; i++) {
             line = request.get(i).split(": ", 2);
@@ -57,5 +60,9 @@ public class HttpRequest {
         } else {
             return null;
         }
+    }
+
+    public void setHeaderPair(String key, String value) {
+        headerPairs.put(key, value);
     }
 }
