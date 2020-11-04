@@ -15,7 +15,7 @@ public class HttpResponse {
     private String version;
     private String response;
     private StatusCode status;
-    private Map<String, String> headerPairs;
+    private Map<String, String> reponseHeaderPairs;
 
     public String getResponse() {
         String len;
@@ -35,7 +35,7 @@ public class HttpResponse {
     }
 
     public String getHeaders() {
-        Set<Map.Entry<String, String>> entries = headerPairs.entrySet();
+        Set<Map.Entry<String, String>> entries = reponseHeaderPairs.entrySet();
         String result = "";
         for (Map.Entry<String, String> entry : entries) {
             result += entry.getKey() + ": " + entry.getValue() + "\r\n";

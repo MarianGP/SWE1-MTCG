@@ -1,15 +1,15 @@
 package server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import server.enums.HttpMethod;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-@AllArgsConstructor
-@Builder
+
 @Getter
 @Setter
 
@@ -19,10 +19,12 @@ public class HttpRequest {
     private HttpMethod method;
     private String path;
     private String version;
+    private ArrayList<String> request;
     private Map<String, String> headerPairs;
     private String body;
 
     public HttpRequest(ArrayList<String> request) {
+        this.request = request;
         String[] line;
         line = request.get(0).split(" ", 3);
         try {

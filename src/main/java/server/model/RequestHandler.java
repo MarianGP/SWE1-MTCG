@@ -1,12 +1,12 @@
 package server.model;
 
-import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import server.enums.HttpMethod;
 import server.enums.StatusCode;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -16,10 +16,10 @@ import java.util.Map;
 public class RequestHandler {
     private StatusCode status;
     private HttpRequest requestContext;
-    private Map<String, String> objectsList;
+    private Map<String, String> objectsList; // key, value
     private HttpResponse response;
     private String objectName; // user, message, package
-
+    AbstractMap.SimpleEntry<String, String> pathPair;
 
     public HttpResponse handleRequest() {
         String responseBody;
@@ -46,38 +46,30 @@ public class RequestHandler {
     }
 
     public String handlePath() {
-        String table, key, message;
-        String[] pathParts = this.requestContext.getPath().split("/");
-        StringBuffer st = new StringBuffer();
 
-        for (int i = 0; i < pathParts[1].length(); i++) {
-            st.append(pathParts[1].charAt(i));
-        }
+        String message;
+        String[] allowedTables = {"messages"}; //TODO: edit for next UE
 
-        this.objectName = st.toString();
-
-        key = pathParts.length > 2 ? pathParts[2] : null;
-        table = pathParts.length > 1 ? pathParts[1] : null;
-
-        String[] allowedTables = {"messages", "users", "packages", "deck"};
+        //URL table (Value) and index (key)
+        splitURL();
 
         //URL Path "/table/key"
-        if(     key != null
-                && table != null
-                && this.requestContext.getPath().matches("(/" + table + "/)([0-9]+)(/?)")
-                && Arrays.asList(allowedTables).contains(table)
+        if(     pathPair.getKey() != null
+                && pathPair.getValue() != null
+                && this.requestContext.getPath().matches("(/" + pathPair.getValue() + "/)([0-9]+)(/?)")
+                && Arrays.asList(allowedTables).contains(pathPair.getValue())
         ){
-            message = checkIfMessageExists(this.objectsList.size(), key);
+            message = checkIfMessageExists(this.objectsList.size(),  pathPair.getKey());
 
             if(this.status != StatusCode.NOCONTENT) {
-                message = crudMessage(key);
+                message = crudMessage(pathPair.getKey());
             }
 
         //URL Path "/table/
         } else if(
-                table != null
-                && this.requestContext.getPath().matches("(/" + table + ")(/?)")
-                && Arrays.asList(allowedTables).contains(table)
+                pathPair.getValue() != null
+                && this.requestContext.getPath().matches("(/" + pathPair.getValue() + ")(/?)")
+                && Arrays.asList(allowedTables).contains(pathPair.getValue())
         ) {
             message =  handleMessages();
 
@@ -87,6 +79,23 @@ public class RequestHandler {
             message =  "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
         }
         return message;
+    }
+
+    public void splitURL() {
+
+        String[] pathParts = this.requestContext.getPath().split("/");
+        StringBuffer st = new StringBuffer();
+
+        for (int i = 0; i < pathParts[1].length() -1; i++) {
+            st.append(pathParts[1].charAt(i));
+        }
+
+        this.objectName = st.toString();
+
+        String key = pathParts.length > 2 ? pathParts[2] : null;
+        String table = pathParts[1];
+
+        this.pathPair = new AbstractMap.SimpleEntry<>(key, table);
     }
 
     public String checkIfMessageExists(int size, String key) {
@@ -113,7 +122,6 @@ public class RequestHandler {
             this.status = StatusCode.BADREQUEST;
             return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
         }
-
     }
 
     public String handleMessages() {
@@ -121,7 +129,7 @@ public class RequestHandler {
             case GET:
                 return getAllMessages();
             case POST:
-                return addNewMessage(this.requestContext.getBody());
+                return addNewMessage();
             default:
                 setStatus(StatusCode.BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, PUT, DELETE";
@@ -146,7 +154,9 @@ public class RequestHandler {
         }
     }
 
-    public String addNewMessage(String body) {
+    public String addNewMessage() {
+        String body = this.requestContext.getBody();
+
         try {
             if(!body.isEmpty()) {
                 this.objectsList.put(Integer.toString((this.objectsList.size() + 1)), body);
@@ -169,7 +179,7 @@ public class RequestHandler {
             case GET:
                 return this.objectsList.get(key);
             case PUT:
-                this.objectsList.put(key,this.requestContext.getBody());
+                this.objectsList.put(key, this.requestContext.getBody());
                 return "The " + this.objectName + " was modified";
             case DELETE:
                 this.objectsList.remove(key);
@@ -180,12 +190,35 @@ public class RequestHandler {
         }
     }
 
-    private void convertToJson() {
-        if(this.requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
-            //convertToJson();
-            Gson g = new Gson();
-            //Player p = g.fromJson(this.requestContext.getBody(), Player.class);
-            //String str = g.toJson(p);
-        }
-    }
+
+
+//    private void convertToJson() {
+//        if(this.requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
+//            //convertToJson();
+//            Gson g = new Gson();
+//            //Player p = g.fromJson(this.requestContext.getBody(), Player.class);
+//            //String str = g.toJson(p);
+//        }
+//    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//String[] allowedTables = {"messages", "users", "packages", "deck"}; //next UE, just ignore

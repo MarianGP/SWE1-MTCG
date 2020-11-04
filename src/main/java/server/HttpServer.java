@@ -81,6 +81,7 @@ public class HttpServer implements Runnable {
                                 .status(StatusCode.OK)
                                 .objectsList(messages)
                                 .objectName(null)
+                                .pathPair(null)
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();

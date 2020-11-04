@@ -1,11 +1,9 @@
 package server.model;
 
-import lombok.Builder;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mock;
 import server.enums.HttpMethod;
 import server.enums.StatusCode;
 
@@ -14,60 +12,151 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@Builder
-@RunWith(MockitoJUnitRunner.class)
 class RequestHandlerTest {
-
-    public HttpRequest requestContext;
-    public RequestHandler requestHandler;
-    public Map<String, String> messages;
-    HttpMethod get;
-    HttpMethod post;
-    HttpMethod put;
-    HttpMethod delete;
-
-    @BeforeEach
-    void Setup() {
-        get = HttpMethod.GET;
-        post = HttpMethod.POST;
-        put = HttpMethod.PUT;
-        delete = HttpMethod.DELETE;
-    }
-
+    @Mock
+    RequestHandler requestHandler;
 
     @Test
     @DisplayName("check if message exists")
-    void checkIfOneMessageExists() {
-        initMock(get, "", "/messages");
-        //Setting expectation
-        when(requestHandler.checkIfMessageExists(1, "1"))
-                .thenReturn("The message exits");
+    public void checkIfOneMessageExists() {
 
-        when(requestHandler.checkIfMessageExists(1, "999"))
-                .thenReturn("The message does not exist");
+        requestHandler = getHandler(HttpMethod.GET, "", "/messages");
+        requestHandler.splitURL();
 
-        when(requestHandler.checkIfMessageExists(0, "1"))
-                .thenReturn("The message list is empty");
+        Assertions.assertEquals(
+                "The message exits",
+                requestHandler.checkIfMessageExists(1, "1")
+        );
 
+        Assertions.assertEquals(
+                "The message does not exist",
+                requestHandler.checkIfMessageExists(1, "999")
+        );
 
-        verify(requestHandler.checkIfMessageExists(0, "1"));
-        verify(requestHandler.checkIfMessageExists(0, "999"));
-        verify(requestHandler.checkIfMessageExists(0, "1"));
+        Assertions.assertEquals(
+                "The message list is empty",
+                requestHandler.checkIfMessageExists(0, "1")
+        );
+    }
+
+    @Test
+    @DisplayName("GET Message: Exits && does not Exist")
+    public void getMessage() {
+        requestHandler = getHandler(HttpMethod.GET, "", "/messages");
+        requestHandler.splitURL();
+        Assertions.assertEquals(
+                "Msg1",
+                requestHandler.crudMessage("1")
+        );
+
+        Assertions.assertNull(requestHandler.crudMessage("999"));
+    }
+
+    @Test
+    @DisplayName("DELETE - Edit Message: With body / With empty body")
+    public void deleteMessage() {
+        requestHandler = getHandler(HttpMethod.DELETE, "", "/messages/1");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "The message was deleted",
+                requestHandler.crudMessage("2")
+        );
+
+        requestHandler.getRequestContext().setMethod(HttpMethod.GET);
+        Assertions.assertNull(requestHandler.crudMessage("2"));
+    }
+
+    @Test
+    @DisplayName("PUT - Edit Message: With body / With empty body")
+    public void updateMessage() {
+        requestHandler = getHandler(HttpMethod.PUT, "New Msg2", "/messages/1");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "The message was modified",
+                requestHandler.crudMessage("2")
+        );
+
+        requestHandler.getRequestContext().setMethod(HttpMethod.GET);
+        Assertions.assertEquals(
+                "New Msg2",
+                requestHandler.crudMessage("2")
+        );
+    }
+
+    @Test
+    @DisplayName("POST - Edit Message: With body / With empty body")
+    public void addMessage() {
+        requestHandler = getHandler(HttpMethod.POST, "Msg3", "/messages");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "New message was created",
+                requestHandler.addNewMessage()
+        );
+
+        requestHandler.getRequestContext().setMethod(HttpMethod.GET);
+        Assertions.assertEquals(
+                "New Msg2",
+                requestHandler.crudMessage("2")
+        );
+    }
+
+    @Test
+    @DisplayName("Get all msg")
+    public void getALL() {
+        requestHandler = getHandler(HttpMethod.GET, "", "/messages");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "1)  Msg1\r\n" +
+                        "2)  Msg2\r\n",
+                requestHandler.getAllMessages()
+        );
+
+    }
+
+    @Test
+    @DisplayName("No ")
+    public void lalala() {
+        requestHandler = getHandler(HttpMethod.GET, "", "/messages");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "1)  Msg1\r\n" +
+                        "2)  Msg2\r\n",
+                requestHandler.getAllMessages()
+        );
+
+    }
+
+    @Test
+    @DisplayName("Error Handling")
+    public void errorHandling() {
+        requestHandler = getHandler(HttpMethod.GET, "", "/messages");
+        requestHandler.splitURL();
+
+        Assertions.assertEquals(
+                "1)  Msg1\r\n" +
+                        "2)  Msg2\r\n",
+                requestHandler.getAllMessages()
+        );
+
     }
 
 
 
-    public void initMock(HttpMethod method, String body, String path) {
-        Map<String, String> messages = Map.of("1", "Msg1");
 
-
+    public RequestHandler getHandler(HttpMethod method, String body, String path) {
+        Map<String, String> messages = new HashMap<>();
+        messages.put("1", "Msg1");
+        messages.put("2", "Msg2");
 
         ArrayList<String> header = new ArrayList<>(
                 List.of(
-                        "POST /messages HTTP/1.1",
+                        method + " " + path + " HTTP/1.1",
                         "Content-Type: text/plain",
                         "User-Agent: PostmanRuntime/7.26.5",
                         "Accept: */*",
@@ -75,30 +164,21 @@ class RequestHandlerTest {
                         "Host: 127.0.0.1:8000",
                         "Accept-Encoding: gzip, deflate, br",
                         "Connection: keep-alive",
-                        "Content-Length: 22"
+                        "Content-Length: " + body.length(),
+                        ""
                 )
         );
 
-        requestContext = HttpRequest.builder()
-                .body(body)
-                .method(method)
-                .version("Http/1.1")
-                .path(path)
-                .headerPairs(new HashMap<String, String>())
-                .build()
-        ;
+        HttpRequest requestContext = new HttpRequest(header);
 
-        requestContext.setHeaderPair("Content-Length", "10");
+//        Integer bodyLength = Integer.parseInt(requestContext.getBodyLength(), 10);
+        requestContext.setBody(body);
 
-        Integer bodyLength = Integer.parseInt(requestContext.getBodyLength(), 10);
-        requestContext.setPath("/messages");
-        requestContext.setMethod(get);
-
-        requestHandler = RequestHandler.builder()
+        return RequestHandler.builder()
                 .requestContext(requestContext)
                 .status(StatusCode.OK)
                 .objectsList(messages)
-                .objectName(null)
+                .objectName("")
                 .build();
 
     }
