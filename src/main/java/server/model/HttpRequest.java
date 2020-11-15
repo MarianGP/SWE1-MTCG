@@ -7,7 +7,6 @@ import server.enums.HttpMethod;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
 @Getter
@@ -19,9 +18,10 @@ public class HttpRequest {
     private HttpMethod method;
     private String path;
     private String version;
-    private ArrayList<String> request;
     private Map<String, String> headerPairs;
     private String body;
+
+    private ArrayList<String> request; //testen
 
     public HttpRequest(ArrayList<String> request) {
         this.request = request;
@@ -44,26 +44,14 @@ public class HttpRequest {
         }
     }
 
-    public String getHeader() {
-        StringBuffer str = new StringBuffer();
-        int i = 0;
-
-        Set<Map.Entry<String, String>> entries = headerPairs.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-            str.append(entry.getKey() + ": " + entry.getValue() + "\r\n");
+    public int getBodyLength() {
+        if(this.headerPairs.get("Content-Length") != null) {
+            return Integer.parseInt(this.headerPairs.get("Content-Length"),10);
         }
-
-        return str.toString();
+        return 0;
     }
 
-    public String getBodyLength() {
-        if (this.headerPairs.get("Content-Length") != null) {
-            return this.headerPairs.get("Content-Length");
-        } else {
-            return null;
-        }
-    }
-
+    // * might use in next UE
     public void setHeaderPair(String key, String value) {
         headerPairs.put(key, value);
     }

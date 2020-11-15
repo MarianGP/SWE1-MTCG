@@ -14,12 +14,12 @@ import java.util.Map;
 @Getter
 @Setter
 public class RequestHandler {
-    private StatusCode status;
+    private StatusCode status; // response
     private HttpRequest requestContext;
-    private Map<String, String> objectsList; // key, value
+    private Map<String, String> objectsList; // key, message
     private HttpResponse response;
     private String objectName; // user, message, package
-    AbstractMap.SimpleEntry<String, String> pathPair;
+    private AbstractMap.SimpleEntry<String, String> pathPair;
 
     public HttpResponse handleRequest() {
         String responseBody;
@@ -31,7 +31,7 @@ public class RequestHandler {
         } else {
             //Http Version - Check
             if(this.requestContext.getVersion().equals("HTTP/1.1")) {
-                responseBody = handlePath();
+                responseBody = getResponseBody();
             } else {
                 setStatus(StatusCode.VERSIONNOTSUPPORTED);
                 responseBody = "Version not supported";
@@ -42,82 +42,70 @@ public class RequestHandler {
                 .version(this.requestContext.getVersion())
                 .response(responseBody)
                 .status(this.status)
+                .requestHeaderPairs(this.requestContext.getHeaderPairs())
                 .build();
     }
 
-    public String handlePath() {
+    public String getResponseBody() {
+        String message = null; //response body
+        splitURL(); // * extract URL table (Value) and index (key)
 
-        String message;
-        String[] allowedTables = {"messages"}; //TODO: edit for next UE
+        if( this.status != StatusCode.BADREQUEST ) {
+            // * URL Path "/table/key"
+            if ( this.requestContext.getPath().matches("(/" + this.pathPair.getValue() + "/)([0-9]+)(/?)") ) {
+                message = checkIfMessageExists(this.objectsList.size(), this.pathPair.getKey());
 
-        //URL table (Value) and index (key)
-        splitURL();
+                if (this.status != StatusCode.NOCONTENT) {
+                    message = handleOneMessage(this.pathPair.getKey()); // ? GET, PUT, DELETE
+                }
+            // * URL Path "/table/ "messages"
+            } else if (  this.requestContext.getPath().matches("(/" + pathPair.getValue() + ")(/?)") ) {
+                message = handleMessages(); // ? GET: all entries || POST: create new entry
 
-        //URL Path "/table/key"
-        if(     pathPair.getKey() != null
-                && pathPair.getValue() != null
-                && this.requestContext.getPath().matches("(/" + pathPair.getValue() + "/)([0-9]+)(/?)")
-                && Arrays.asList(allowedTables).contains(pathPair.getValue())
-        ){
-            message = checkIfMessageExists(this.objectsList.size(),  pathPair.getKey());
-
-            if(this.status != StatusCode.NOCONTENT) {
-                message = crudMessage(pathPair.getKey());
+            // * Wrong URL Path"
+            } else {
+                setStatus(StatusCode.BADREQUEST);
             }
-
-        //URL Path "/table/
-        } else if(
-                pathPair.getValue() != null
-                && this.requestContext.getPath().matches("(/" + pathPair.getValue() + ")(/?)")
-                && Arrays.asList(allowedTables).contains(pathPair.getValue())
-        ) {
-            message =  handleMessages();
-
-        //URL Path "/another/Path"
-        } else {
-            setStatus(StatusCode.BADREQUEST);
-            message =  "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
         }
+
+        if(this.status == StatusCode.BADREQUEST) {
+            message = "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
+        }
+
         return message;
     }
 
     public void splitURL() {
-
+        String[] allowedTables = {"messages"}; //TODO: edit for next UE
         String[] pathParts = this.requestContext.getPath().split("/");
-        StringBuffer st = new StringBuffer();
 
-        for (int i = 0; i < pathParts[1].length() -1; i++) {
-            st.append(pathParts[1].charAt(i));
+        if( pathParts.length >= 2 && pathParts.length <= 3
+            && Arrays.asList(allowedTables).contains(pathParts[1])
+        ) {
+            this.objectName = pathParts[1].substring( 0, pathParts[1].length()-1 ); // messages -> message
+            this.pathPair = new AbstractMap.SimpleEntry<>(pathParts.length > 2 ? pathParts[2] : null, pathParts[1]);
+
+        } else {
+            this.pathPair = null;
+            this.status = StatusCode.BADREQUEST;
         }
-
-        this.objectName = st.toString();
-
-        String key = pathParts.length > 2 ? pathParts[2] : null;
-        String table = pathParts[1];
-
-        this.pathPair = new AbstractMap.SimpleEntry<>(key, table);
     }
 
     public String checkIfMessageExists(int size, String key) {
         boolean exists = false;
 
-        if(this.requestContext.getMethod() != HttpMethod.POST) {
+        if(this.requestContext.getMethod() != HttpMethod.POST && this.requestContext.getMethod() != HttpMethod.NOTSUPPORTED) {
             if(size > 0) {
-                for (int i = 0; i < this.objectsList.size(); i++) { //check if key exists
-                    if(this.objectsList.get(key) != null) {
-                        exists = true;
-                    }
-                }
-
-                if(!exists) {
+                if(!this.objectsList.containsKey(key)) {
                     this.status = StatusCode.NOCONTENT;
                     return "The " + this.objectName + " does not exist";
+                } else  {
+                    return "The " + this.objectName + " exits";
                 }
             } else {
                 this.status = StatusCode.NOCONTENT;
                 return "The " + this.objectName + " list is empty";
             }
-            return "The " + this.objectName + " exits";
         } else {
             this.status = StatusCode.BADREQUEST;
             return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
@@ -132,12 +120,12 @@ public class RequestHandler {
                 return addNewMessage();
             default:
                 setStatus(StatusCode.BADREQUEST);
-                return "Bad Request: Only Methods Accepted: GET, PUT, DELETE";
+                return "Bad Request: Only Methods Accepted: GET, POST";
         }
     }
 
     public String getAllMessages() {
-        StringBuffer st =new StringBuffer();
+        StringBuilder st =new StringBuilder();
         int count = 0;
         for (Map.Entry<String, String> entry : this.objectsList.entrySet()){
             st.append(entry.getKey());
@@ -173,7 +161,7 @@ public class RequestHandler {
         }
     }
 
-    public String crudMessage(String key) {
+    public String handleOneMessage(String key) {
 
         switch (this.requestContext.getMethod()) {
             case GET:
@@ -186,10 +174,10 @@ public class RequestHandler {
                 return "The " + this.objectName + " was deleted";
             default:
                 setStatus(StatusCode.BADREQUEST);
-                return "Bad Request: Only Methods Accepted: GET, PUT, DELETE, when indicating a " + this.objectName + " number/index";
+                return "Bad Request: Only Methods Accepted: GET, PUT, DELETE, when indicating a " + this.objectName + " number/index in URL";
         }
-    }
 
+    }
 
 
 //    private void convertToJson() {

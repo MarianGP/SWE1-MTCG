@@ -7,10 +7,14 @@ import server.model.HttpRequest;
 import server.model.HttpResponse;
 import server.model.RequestHandler;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +22,7 @@ import java.util.Map;
 public class HttpServer implements Runnable {
 
     private static ServerSocket listener = null;
-    private static Map<String, String> messages = new HashMap<String, String>(); //temp no databank
+    private static Map<String, String> messages = Collections.synchronizedMap(new HashMap<>()); //temp no DB, synchronized
 
     public static void main(String[] args) {
         System.out.println("start server");
@@ -40,31 +44,32 @@ public class HttpServer implements Runnable {
                 ArrayList<String> header = new ArrayList<>();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                String message;
+                String line;
 
                 //Read Header
                 do {
-                    message = reader.readLine();
-                    header.add(message);
-                    System.out.println(message);
-                } while (!message.isEmpty());
-                //(line != null && !line.isEmpty())
+                    line = reader.readLine();
+                    header.add(line);
+                    System.out.println(line);
+                } while (line != null && !line.isEmpty());
 
                 try {
                     HttpRequest requestContext = new HttpRequest(header);
 
                     // Read Body
                     if (
-                            requestContext.getBodyLength() != null
-                            && Integer.parseInt(requestContext.getBodyLength(), 10) > 0
-                            && (requestContext.getMethod() == HttpMethod.POST || requestContext.getMethod() == HttpMethod.PUT)
+                            requestContext.getBodyLength() > 0 &&
+                            (
+                                requestContext.getMethod() == HttpMethod.POST
+                                || requestContext.getMethod() == HttpMethod.PUT
+                            )
                     )
                     {
                         int read;
                         StringBuffer sb = new StringBuffer();
                         while ((read = reader.read()) != -1) {
                             sb.append((char) read);
-                            if (sb.length() == Integer.parseInt(requestContext.getBodyLength(),10)) {
+                            if (sb.length() == requestContext.getBodyLength()) {
                                 break;
                             }
                         }
@@ -88,7 +93,8 @@ public class HttpServer implements Runnable {
 
                         // Safe new message in messages
                         try {
-                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST && requestHandler.getObjectsList().size() > 0)
+                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST
+                                    && requestHandler.getObjectsList().size() > 0)
                                 messages = requestHandler.getObjectsList();
                         } catch (Exception e) {
                             System.out.println("Error saving new msg");
@@ -101,13 +107,12 @@ public class HttpServer implements Runnable {
                         outputStream.write("Response with 500 Code & exception as body".getBytes()); // e.getMessage();
                     }
                     outputStream.flush();
-                    outputStream.close();
+                    outputStream.close(); //close
 
                 } catch (IOException e){
                     System.out.println("Error reading header request or body");
                 }
-                reader.close();
-                //close connection
+                reader.close(); //close
             }
         } catch (Exception e) {
             e.printStackTrace();

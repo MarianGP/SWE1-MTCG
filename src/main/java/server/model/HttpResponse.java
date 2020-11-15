@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import server.enums.StatusCode;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,35 +13,47 @@ import java.util.Set;
 @Getter
 public class HttpResponse {
 
-    private String version;
-    private String response;
-    private StatusCode status;
-    private Map<String, String> reponseHeaderPairs;
+    private final String version;
+    private final String response;
+    private final StatusCode status;
+    private final Map<String, String> requestHeaderPairs;
+
+    private Map<String, String> responseHeaderPairs;
+
 
     public String getResponse() {
-        String len;
-
-        if(!response.isEmpty()) {
-            len = "Content-Length: " + response.length() + "\r\n";
-        } else {
-            len = "";
-        }
+        this.responseHeaderPairs = new HashMap<String, String>();
+        fillUpHeader();
 
         return
                 this.version + " " + this.status.getCode() + " " + this.status.getStatus() + "\r\n"
-                + len
+                + getHeaderPairs()
                 + "\r\n"
                 + response + "\r\n"
                 ;
     }
 
-    public String getHeaders() {
-        Set<Map.Entry<String, String>> entries = reponseHeaderPairs.entrySet();
+    public String getHeaderPairs() {
+        Set<Map.Entry<String, String>> entries = this.responseHeaderPairs.entrySet();
         String result = "";
         for (Map.Entry<String, String> entry : entries) {
             result += entry.getKey() + ": " + entry.getValue() + "\r\n";
         }
         return result;
+    }
+
+    public void fillUpHeader() {
+        if(!response.isEmpty()) {
+            addHeaderPair("Content-Length", Integer.toString(response.length()));
+            addHeaderPair("Content-Type", "text/plain");
+        } else {
+            addHeaderPair("Content-Length", "0");
+        }
+
+    }
+
+    public void addHeaderPair(String key, String value) {
+        this.responseHeaderPairs.put(key, value);
     }
 }
 
