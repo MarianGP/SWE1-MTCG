@@ -13,7 +13,7 @@
 					"script": {
 						"id": "95fc75fd-160a-491a-82c7-449dbc842f9c",
 						"exec": [
-							"pm.test(\"not allowed to add an object key\", function () {\r",
+							"pm.test(\"empty body. cant add new msg\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
 							"});"
 						],
@@ -71,13 +71,6 @@
 					"port": "8000",
 					"path": [
 						"mess"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -91,7 +84,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. table does not exist int the DB\", function () {\r",
+							"pm.test(\"no entries in table\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
 							"});"
 						],
@@ -113,13 +106,6 @@
 					"port": "8000",
 					"path": [
 						"messages"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -133,7 +119,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. table does not exist int the DB\", function () {\r",
+							"pm.test(\"message 1 does not exist\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
 							"});"
 						],
@@ -145,7 +131,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "127.0.0.1:8000/messages/1",
+					"raw": "127.0.0.1:8000/messages/5",
 					"host": [
 						"127",
 						"0",
@@ -155,14 +141,7 @@
 					"port": "8000",
 					"path": [
 						"messages",
-						"1"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
+						"5"
 					]
 				}
 			},
@@ -176,7 +155,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. table does not exist int the DB\", function () {\r",
+							"pm.test(\"message 1 does not exist. no msg to modify\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
 							"});"
 						],
@@ -199,13 +178,6 @@
 					"path": [
 						"messages",
 						"1"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -219,7 +191,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. table does not exist int the DB\", function () {\r",
+							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
 							"});"
 						],
@@ -242,20 +214,13 @@
 					"path": [
 						"messages",
 						"1"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "127.0.0.1:8000/messages/1 no key allowed",
+			"name": "127.0.0.1:8000/messages/?key=value",
 			"event": [
 				{
 					"listen": "test",
@@ -274,49 +239,7 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "127.0.0.1:8000/messages",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "8000",
-					"path": [
-						"messages"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "127.0.0.1:8000/messages",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
-						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
-							"    pm.response.to.have.status(400);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "127.0.0.1:8000/messages/?q=d",
+					"raw": "127.0.0.1:8000/messages/",
 					"host": [
 						"127",
 						"0",
@@ -327,12 +250,6 @@
 					"path": [
 						"messages",
 						""
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d"
-						}
 					]
 				},
 				"description": "usage. no json allowed"
@@ -347,7 +264,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"created new message\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
 						],
@@ -374,13 +291,6 @@
 					"path": [
 						"messages",
 						""
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -394,7 +304,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"created new message\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
 						],
@@ -421,13 +331,6 @@
 					"path": [
 						"messages",
 						""
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -441,7 +344,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"created new message\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
 						],
@@ -468,13 +371,6 @@
 					"path": [
 						"messages",
 						""
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -488,7 +384,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"show all msgs\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -518,13 +414,6 @@
 					"path": [
 						"messages",
 						""
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -538,7 +427,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"edit existing msg\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -565,13 +454,6 @@
 					"path": [
 						"messages",
 						"3"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -585,7 +467,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"read msg\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -601,7 +483,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "test3"
+					"raw": ""
 				},
 				"url": {
 					"raw": "127.0.0.1:8000/messages/3",
@@ -615,13 +497,6 @@
 					"path": [
 						"messages",
 						"3"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -635,7 +510,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"get unexiting message. not found\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
 							"});"
 						],
@@ -651,7 +526,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "test3"
+					"raw": ""
 				},
 				"url": {
 					"raw": "127.0.0.1:8000/messages/999999",
@@ -668,8 +543,8 @@
 					],
 					"query": [
 						{
-							"key": "q",
-							"value": "d",
+							"key": "",
+							"value": "",
 							"disabled": true
 						}
 					]
@@ -685,7 +560,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"edit unexiting msg. not found\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
 							"});"
 						],
@@ -715,13 +590,6 @@
 					"path": [
 						"messages",
 						"9999"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -735,7 +603,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"not allowed http method\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
 							"});"
 						],
@@ -751,7 +619,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "test3"
+					"raw": ""
 				},
 				"url": {
 					"raw": "127.0.0.1:8000/messages/999999",
@@ -765,13 +633,6 @@
 					"path": [
 						"messages",
 						"999999"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -785,7 +646,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"get all messages\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -807,13 +668,6 @@
 					"port": "8000",
 					"path": [
 						"messages"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -827,7 +681,7 @@
 					"script": {
 						"id": "7f24313a-c9ac-4d26-b066-dbce04b20a2b",
 						"exec": [
-							"pm.test(\"Show all messages\", function () {\r",
+							"pm.test(\"Delete msg 1\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -850,13 +704,6 @@
 					"path": [
 						"messages",
 						"1"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -870,7 +717,7 @@
 					"script": {
 						"id": "a2b1e921-512d-428e-a5d6-bb3d41f6958d",
 						"exec": [
-							"pm.test(\"wrong URL. Usage: /messages\", function () {\r",
+							"pm.test(\"Get all msgs\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
@@ -892,13 +739,6 @@
 					"port": "8000",
 					"path": [
 						"messages"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "d",
-							"disabled": true
-						}
 					]
 				}
 			},

@@ -20,9 +20,8 @@ public class HttpResponse {
 
     private Map<String, String> responseHeaderPairs;
 
-
     public String getResponse() {
-        this.responseHeaderPairs = new HashMap<String, String>();
+        this.responseHeaderPairs = new HashMap<>();
         fillUpHeader();
 
         return

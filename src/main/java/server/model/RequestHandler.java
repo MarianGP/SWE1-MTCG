@@ -94,7 +94,7 @@ public class RequestHandler {
     public String checkIfMessageExists(int size, String key) {
         boolean exists = false;
 
-        if(this.requestContext.getMethod() != HttpMethod.POST && this.requestContext.getMethod() != HttpMethod.NOTSUPPORTED) {
+        if(this.requestContext.getMethod() == HttpMethod.GET || this.requestContext.getMethod() == HttpMethod.PUT || this.requestContext.getMethod() == HttpMethod.DELETE) {
             if(size > 0) {
                 if(!this.objectsList.containsKey(key)) {
                     this.status = StatusCode.NOCONTENT;
