@@ -1,6 +1,5 @@
 package game.user;
 
-import game.battle.Battle;
 import game.cards.Card;
 import game.decks.CardDeck;
 import game.decks.CardStack;
@@ -18,6 +17,8 @@ public class User {
     private String username;
     private String password;
     private String token;
+    private String bio;
+    private String image;
     private int coins;
     private int ELO;
     private CardStack stack;

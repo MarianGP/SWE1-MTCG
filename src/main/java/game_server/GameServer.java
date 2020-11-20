@@ -1,11 +1,9 @@
-package server;
+package game_server;
 
+import game_server.model.HttpRequest;
+import game_server.model.HttpResponse;
+import game_server.model.RequestHandler;
 import lombok.Builder;
-import server.enums.HttpMethod;
-import server.enums.StatusCode;
-import server.model.HttpRequest;
-import server.model.HttpResponse;
-import server.model.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,8 +17,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static game_server.enums.HttpMethod.*;
+import static game_server.enums.StatusCode.*;
+
 @Builder
-public class HttpServer implements Runnable {
+public class GameServer implements Runnable {
 
     private static ServerSocket listener = null;
     private static Map<String, String> messages = Collections.synchronizedMap(new HashMap<>()); //temp no DB, synchronized
@@ -36,7 +37,7 @@ public class HttpServer implements Runnable {
         }
 
         //threads
-        Runtime.getRuntime().addShutdownHook(new Thread(new HttpServer()));
+        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
 
         try {
             while (true) {
@@ -54,15 +55,17 @@ public class HttpServer implements Runnable {
                     System.out.println(line);
                 } while (line != null && !line.isEmpty());
 
+
                 try {
+                    if(header.size() < 2) continue;
                     HttpRequest requestContext = new HttpRequest(header);
 
                     // Read Body
                     if (
                             requestContext.getBodyLength() > 0 &&
                             (
-                                requestContext.getMethod() == HttpMethod.POST
-                                || requestContext.getMethod() == HttpMethod.PUT
+                                requestContext.getMethod() == POST
+                                || requestContext.getMethod() == PUT
                             )
                     )
                     {
@@ -84,7 +87,7 @@ public class HttpServer implements Runnable {
                     try {
                         RequestHandler requestHandler = RequestHandler.builder()
                                 .requestContext(requestContext)
-                                .status(StatusCode.OK)
+                                .status(OK)
                                 .objectsList(messages)
                                 .objectName(null)
                                 .pathPair(null)
@@ -94,7 +97,7 @@ public class HttpServer implements Runnable {
 
                         // Safe new message in messages
                         try {
-                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == HttpMethod.POST
+                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == POST
                                     && requestHandler.getObjectsList().size() > 0)
                                 messages = requestHandler.getObjectsList();
                         } catch (Exception e) {

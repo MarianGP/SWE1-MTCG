@@ -1,14 +1,17 @@
-package server.model;
+package game_server.model;
 
+import game_server.enums.StatusCode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import server.enums.HttpMethod;
-import server.enums.StatusCode;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+
+import static game_server.enums.HttpMethod.*;
+import static game_server.enums.StatusCode.*;
 
 @Builder
 @Getter
@@ -26,14 +29,14 @@ public class RequestHandler {
 
         //Http Method - Check
         if(this.requestContext.getMethod() == null) {
-            this.status = StatusCode.BADREQUEST;
+            this.status = BADREQUEST;
             responseBody = "Method not supported";
         } else {
             //Http Version - Check
             if(this.requestContext.getVersion().equals("HTTP/1.1")) {
                 responseBody = getResponseBody();
             } else {
-                setStatus(StatusCode.VERSIONNOTSUPPORTED);
+                setStatus(VERSIONNOTSUPPORTED);
                 responseBody = "Version not supported";
             }
         }
@@ -50,12 +53,12 @@ public class RequestHandler {
         String message = null; //response body
         splitURL(); // * extract URL table (Value) and index (key)
 
-        if( this.status != StatusCode.BADREQUEST ) {
+        if( this.status != BADREQUEST ) {
             // * URL Path "/table/key"
             if ( this.requestContext.getPath().matches("(/" + this.pathPair.getValue() + "/)([0-9]+)(/?)") ) {
                 message = checkIfMessageExists(this.objectsList.size(), this.pathPair.getKey());
 
-                if (this.status != StatusCode.NOCONTENT) {
+                if (this.status != NOCONTENT) {
                     message = handleOneMessage(this.pathPair.getKey()); // ? GET, PUT, DELETE
                 }
             // * URL Path "/table/ "messages"
@@ -64,11 +67,11 @@ public class RequestHandler {
 
             // * Wrong URL Path"
             } else {
-                setStatus(StatusCode.BADREQUEST);
+                setStatus(BADREQUEST);
             }
         }
 
-        if(this.status == StatusCode.BADREQUEST) {
+        if(this.status == BADREQUEST) {
             message = "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
         }
 
@@ -76,40 +79,58 @@ public class RequestHandler {
     }
 
     public void splitURL() {
+        String[] allowedTables = {"messages", "users", "sessions", "transactions", "tradings", "score", "stats", "battles"}; //TODO: edit for next UE
+        if(this.requestContext.getPath().contains("\\?")) checkAction();
 
-        String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles"}; //TODO: edit for next UE
         String[] pathParts = this.requestContext.getPath().split("/");
 
         if( pathParts.length >= 2 && pathParts.length <= 3
             && Arrays.asList(allowedTables).contains(pathParts[1])
         ) {
-
             this.objectName = pathParts[1].substring( 0, pathParts[1].length()-1 ); // messages -> message
             this.pathPair = new AbstractMap.SimpleEntry<>(pathParts.length > 2 ? pathParts[2] : null, pathParts[1]);
 
         } else {
             this.pathPair = null;
-            this.status = StatusCode.BADREQUEST;
+            this.status = BADREQUEST;
         }
     }
 
-    public String checkIfMessageExists(int size, String key) {
-        boolean exists = false;
+    public void checkAction() {
+        Map<String, String> map = getQueryMap(requestContext.getPath());
+        if(map.get("format") != null) {
 
-        if(this.requestContext.getMethod() == HttpMethod.GET || this.requestContext.getMethod() == HttpMethod.PUT || this.requestContext.getMethod() == HttpMethod.DELETE) {
+        }
+    }
+
+    public static Map<String, String> getQueryMap(String query) {
+        String[] params = query.split("&");
+        Map<String, String> map = new HashMap<>();
+
+        for (String param : params) {
+            String key = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    public String checkIfMessageExists(int size, String key) {
+
+        if(this.requestContext.getMethod() == GET || this.requestContext.getMethod() == PUT || this.requestContext.getMethod() == DELETE) {
             if(size > 0) {
                 if(!this.objectsList.containsKey(key)) {
-                    this.status = StatusCode.NOCONTENT;
+                    this.status = NOCONTENT;
                     return "The " + this.objectName + " does not exist";
                 } else  {
                     return "The " + this.objectName + " exits";
                 }
             } else {
-                this.status = StatusCode.NOCONTENT;
+                this.status = NOCONTENT;
                 return "The " + this.objectName + " list is empty";
             }
         } else {
-            this.status = StatusCode.BADREQUEST;
+            this.status = BADREQUEST;
             return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
         }
     }
@@ -121,7 +142,7 @@ public class RequestHandler {
             case POST:
                 return addNewMessage();
             default:
-                setStatus(StatusCode.BADREQUEST);
+                setStatus(BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, POST";
         }
     }
@@ -137,7 +158,7 @@ public class RequestHandler {
             count++;
         }
         if(count == 0) {
-            this.status = StatusCode.NOCONTENT;
+            this.status = NOCONTENT;
             return "The " + this.objectName + " list is empty";
         } else {
             return st.toString();
@@ -150,15 +171,15 @@ public class RequestHandler {
         try {
             if(!body.isEmpty()) {
                 this.objectsList.put(Integer.toString((this.objectsList.size() + 1)), body);
-                setStatus(StatusCode.CREATED);
+                setStatus(CREATED);
                 return "New " + this.objectName + " was created";
             } else {
-                setStatus(StatusCode.BADREQUEST);
+                setStatus(BADREQUEST);
                 return "Couldn't create new "+ this.objectName +". Body was empty.";
             }
 
         } catch (Exception e){
-            setStatus(StatusCode.INTERNALERROR);
+            setStatus(INTERNALERROR);
             return "Internal Error";
         }
     }
@@ -175,7 +196,7 @@ public class RequestHandler {
                 this.objectsList.remove(key);
                 return "The " + this.objectName + " was deleted";
             default:
-                setStatus(StatusCode.BADREQUEST);
+                setStatus(BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, PUT, DELETE, when indicating a " + this.objectName + " number/index in URL";
         }
 
