@@ -1,6 +1,7 @@
 # Monster Trading Card Game
 
-
+### TODO:
+  * Check if user exists before creating new one
 
 ### Trading Card Game - Diagram
 
@@ -10,3 +11,4 @@
 ### Restfull
 
 ![Rest_Server Diagram](assets/img/rest_diagram.jpg)
+

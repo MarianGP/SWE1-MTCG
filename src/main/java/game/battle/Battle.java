@@ -114,17 +114,17 @@ public class Battle {
 
     }
 
-    public static void main(String[] args) {
-        User p1 = new User("Player1" , "0");
-        User p2 = new User("Player2" , "0");
-        p1.buyPackage();
-        p1.prepareDeck();
-        p2.buyPackage();
-        p2.prepareDeck();
-
-        Battle newBattle = new Battle(p1,p2,100);
-        newBattle.startBattle();
-        newBattle.gameStats();
-    }
+//    public static void main(String[] args) {
+//        User p1 = new User("Player1" , "0");
+//        User p2 = new User("Player2" , "0");
+//        p1.buyPackage();
+//        p1.prepareDeck();
+//        p2.buyPackage();
+//        p2.prepareDeck();
+//
+//        Battle newBattle = new Battle(p1,p2,100);
+//        newBattle.startBattle();
+//        newBattle.gameStats();
+//    }
 
 }

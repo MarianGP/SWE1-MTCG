@@ -16,10 +16,11 @@ import org.mockito.Mock;
 
 class BattleTest {
     @Mock
-    User player1 = new User("Player 1", "0");
-    User player2 = new User("Player 2", "0");
-    User player3 = new User("Player 3", "0");
-    User player4 = new User("Player 4", "0");
+    User player1 = User.builder().username("Player1").build();
+    User player2 = User.builder().username("Player2").build();
+    User player3 = User.builder().username("Player3").build();
+    User player4 = User.builder().username("Player4").build();
+
 
     Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100);
     Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100);

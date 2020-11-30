@@ -9,7 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 class MonsterTypeTest {
     @Mock
-    User user1 = new User("Hello", "10");
+    User user1 = User.builder().username("Hello").build();
+
 
 //    @DisplayName("Try to get MonsterElement out of String InmuneTo")
 //

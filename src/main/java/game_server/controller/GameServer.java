@@ -1,5 +1,6 @@
-package game_server;
+package game_server.controller;
 
+import game_server.enums.StatusCode;
 import game_server.model.HttpRequest;
 import game_server.model.HttpResponse;
 import game_server.model.RequestHandler;
@@ -13,18 +14,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static game_server.enums.HttpMethod.*;
-import static game_server.enums.StatusCode.*;
 
 @Builder
 public class GameServer implements Runnable {
-
     private static ServerSocket listener = null;
-    private static Map<String, String> messages = Collections.synchronizedMap(new HashMap<>()); //temp no DB, synchronized
+    private static UserController userController;
 
     public static void main(String[] args) {
         System.out.println("start server");
@@ -61,14 +55,7 @@ public class GameServer implements Runnable {
                     HttpRequest requestContext = new HttpRequest(header);
 
                     // Read Body
-                    if (
-                            requestContext.getBodyLength() > 0 &&
-                            (
-                                requestContext.getMethod() == POST
-                                || requestContext.getMethod() == PUT
-                            )
-                    )
-                    {
+                    if ( requestContext.getBodyLength() > 0 ) {
                         int read;
                         StringBuffer sb = new StringBuffer();
                         while ((read = reader.read()) != -1) {
@@ -87,19 +74,15 @@ public class GameServer implements Runnable {
                     try {
                         RequestHandler requestHandler = RequestHandler.builder()
                                 .requestContext(requestContext)
-                                .status(OK)
-                                .objectsList(messages)
-                                .objectName(null)
-                                .pathPair(null)
+                                .status(StatusCode.OK)
+                                .userController(userController)
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();
 
-                        // Safe new message in messages
-                        try {
-                            if (!requestContext.getBody().isEmpty() && requestContext.getMethod() == POST
-                                    && requestHandler.getObjectsList().size() > 0)
-                                messages = requestHandler.getObjectsList();
+
+                        try { // ! update with setter in requestHandler
+                            userController = requestHandler.getUserController();
                         } catch (Exception e) {
                             System.out.println("Error saving new msg");
                         }
@@ -108,7 +91,13 @@ public class GameServer implements Runnable {
                         outputStream.write(response.getResponse().getBytes());
 
                     } catch (Exception e) {
-                        outputStream.write("Response with 500 Code & exception as body".getBytes()); // e.getMessage();
+                        HttpResponse res = HttpResponse.builder()
+                                .version(requestContext.getVersion())
+                                .response(null)
+                                .status(StatusCode.INTERNALERROR)
+                                .requestHeaderPairs(null)
+                                .build();
+                        outputStream.write(res.getResponse().getBytes()); // e.getMessage();
                     }
                     outputStream.flush();
                     outputStream.close(); //close

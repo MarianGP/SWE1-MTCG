@@ -10,6 +10,7 @@ public enum StatusCode {
     CREATED(201, "Created"),
     NOCONTENT(204, "No Content"),
     BADREQUEST(400, "Bad Request"),
+    UNAUTHORIZED(401, "Unauthorized"),
     NOTFOUND(404, "Not Found"),
     INTERNALERROR(500, "Internal Server Error"),
     VERSIONNOTSUPPORTED(505, "Version Not Supported")

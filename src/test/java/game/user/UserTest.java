@@ -12,8 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserTest {
     @Mock
-    User player1 = new User("Player1", "1234");
-    User player2 = new User("Player2", "1234");
+    User player1 = User.builder().username("Player1").build();
 
     @BeforeEach
     void setUp() {

@@ -4,36 +4,28 @@ import game.cards.Card;
 import game.decks.CardDeck;
 import game.decks.CardStack;
 import game.decks.Package;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 import java.util.Random;
 
-@Getter
 @Setter
-
+@Getter
+@Builder
 public class User {
     private String username;
     private String password;
     private String token;
     private String bio;
     private String image;
-    private int coins;
-    private int ELO;
-    private CardStack stack;
+    private int coins = 20;
+    private int ELO = 100;
+    private CardStack stack = new CardStack();;
     private CardDeck deck;
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
-
-    public User(String username, String password){
-        this.username = username;
-        this.password = password;
-        this.token = username + "-mtcgToken";
-        this.coins = 20;
-        this.ELO = 100;
-        this.stack = new CardStack();
-    }
 
     public void buyPackage(){
         Package newPackage = new Package();

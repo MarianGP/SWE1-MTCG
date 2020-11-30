@@ -1,106 +1,143 @@
 package game_server.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import game.user.Credentials;
+import game.user.User;
+import game_server.controller.UserController;
+import game_server.enums.HttpMethod;
 import game_server.enums.StatusCode;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static game_server.enums.HttpMethod.*;
-import static game_server.enums.StatusCode.*;
 
 @Builder
-@Getter
-@Setter
+@Data
 public class RequestHandler {
     private StatusCode status; // response
     private HttpRequest requestContext;
     private Map<String, String> objectsList; // key, message
+    private String responseBody;
     private HttpResponse response;
-    private String objectName; // user, message, package
-    private AbstractMap.SimpleEntry<String, String> pathPair;
+    private String objectName;
+    private String path[];
+    private UserController userController;
 
-    public HttpResponse handleRequest() {
-        String responseBody;
+    public HttpResponse handleRequest() throws ClassNotFoundException {
 
-        //Http Method - Check
-        if(this.requestContext.getMethod() == null) {
-            this.status = BADREQUEST;
-            responseBody = "Method not supported";
+        if(HttpMethod.listOfMethods.contains(requestContext.getMethod())) {
+            this.status = StatusCode.BADREQUEST;
+            setResponseBody("Method not supported");
         } else {
-            //Http Version - Check
             if(this.requestContext.getVersion().equals("HTTP/1.1")) {
-                responseBody = getResponseBody();
+                handlePath();
             } else {
-                setStatus(VERSIONNOTSUPPORTED);
-                responseBody = "Version not supported";
+                setStatus(StatusCode.VERSIONNOTSUPPORTED);
+                setResponseBody("Version not supported");
             }
         }
 
         return HttpResponse.builder()
                 .version(this.requestContext.getVersion())
-                .response(responseBody)
+                .response(this.responseBody)
                 .status(this.status)
                 .requestHeaderPairs(this.requestContext.getHeaderPairs())
                 .build();
     }
 
-    public String getResponseBody() {
-        String message = null; //response body
-        splitURL(); // * extract URL table (Value) and index (key)
+    public void handlePath() throws ClassNotFoundException {
+        this.objectName = splitURL(this.requestContext.getPath());
 
-        if( this.status != BADREQUEST ) {
-            // * URL Path "/table/key"
-            if ( this.requestContext.getPath().matches("(/" + this.pathPair.getValue() + "/)([0-9]+)(/?)") ) {
-                message = checkIfMessageExists(this.objectsList.size(), this.pathPair.getKey());
+        if( this.status != StatusCode.BADREQUEST ) {
+            if ( !this.path[2].isEmpty() && this.requestContext.getPath().matches("(/" + this.path[1] + "/)("+ this.path[2] +")(/?)" )) {  // * URL Path "/table/table"
 
-                if (this.status != NOCONTENT) {
-                    message = handleOneMessage(this.pathPair.getKey()); // ? GET, PUT, DELETE
-                }
-            // * URL Path "/table/ "messages"
-            } else if (  this.requestContext.getPath().matches("(/" + pathPair.getValue() + ")(/?)") ) {
-                message = handleMessages(); // ? GET: all entries || POST: create new entry
-
-            // * Wrong URL Path"
-            } else {
-                setStatus(BADREQUEST);
+            } else if ( this.requestContext.getPath().matches("(/" + this.path[1] + ")(/?)") ) {  // * URL Path "/table
+                handleObject(this.path[1]);
+            } else {// * Wrong URL Path"
+                setStatus(StatusCode.BADREQUEST);
             }
         }
 
-        if(this.status == BADREQUEST) {
-            message = "Usage: URL/table OR URL/table/{number}. Only existing tables allowed";
+        if(this.status == StatusCode.BADREQUEST) {
+            setResponseBody("Usage: URL/table OR URL/table/{number}. Only existing tables allowed");
         }
-
-        return message;
+        setResponseBody("CHANGE ME LATER"); // TODO: CHANGE LATER
     }
 
-    public void splitURL() {
-        String[] allowedTables = {"messages", "users", "sessions", "transactions", "tradings", "score", "stats", "battles"}; //TODO: edit for next UE
-        if(this.requestContext.getPath().contains("\\?")) checkAction();
+    public String splitURL(String fullPath) {
+        String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles"};
 
-        String[] pathParts = this.requestContext.getPath().split("/");
+        this.path = fullPath.split("/");
 
-        if( pathParts.length >= 2 && pathParts.length <= 3
-            && Arrays.asList(allowedTables).contains(pathParts[1])
-        ) {
-            this.objectName = pathParts[1].substring( 0, pathParts[1].length()-1 ); // messages -> message
-            this.pathPair = new AbstractMap.SimpleEntry<>(pathParts.length > 2 ? pathParts[2] : null, pathParts[1]);
+        if( this.path.length >= 2 && Arrays.asList(allowedTables).contains(this.path[1]) ) {
+            if(this.requestContext.getPath().contains("\\?")) {
+                handleUrlParameters(fullPath.split("\\?")[1]);
+            }
+             return Character.toUpperCase(this.path[1].charAt(0)) + this.path[1].substring( 1, this.path[1].length()-1 ); // messages -> message
 
         } else {
-            this.pathPair = null;
-            this.status = BADREQUEST;
+            this.path = null;
+            this.status = StatusCode.BADREQUEST;
+            return null;
         }
     }
 
-    public void checkAction() {
-        Map<String, String> map = getQueryMap(requestContext.getPath());
-        if(map.get("format") != null) {
+    public void handleUser(String requestBody, HttpMethod method) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Credentials credentials = objectMapper.readValue(requestBody, Credentials.class);
 
+        switch(method) {
+            case POST:
+                addNewUser(credentials);
+                break;
+            case GET:
+                break;
+            default:
+                this.status = StatusCode.BADREQUEST;
         }
+    }
+
+    private void addNewUser(Credentials credentials){
+        try {
+            User newUser = User.builder()
+                    .username(credentials.getUsername())
+                    .password(credentials.getPassword())
+                    .token(credentials.getUsername() + "-mtcgToken")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleObject(String table) throws ClassNotFoundException {
+
+        switch (table) {
+            case "users":
+//                handleUser(requestContext.getBody(), requestContext.getMethod());
+                break;
+            case "sessions":
+                break;
+            case "transactions":
+                break;
+            case "score":
+                break;
+            case "stats":
+                break;
+            case "battles":
+                break;
+            default:
+                this.status = StatusCode.BADREQUEST;
+                break;
+        }
+
+    }
+
+    public void handleUrlParameters(String parameters) {
+        Map<String, String> map = getQueryMap(requestContext.getPath());
     }
 
     public static Map<String, String> getQueryMap(String query) {
@@ -108,6 +145,7 @@ public class RequestHandler {
         Map<String, String> map = new HashMap<>();
 
         for (String param : params) {
+            if(param.length() < 2) return null; // ! control later
             String key = param.split("=")[0];
             String value = param.split("=")[1];
             map.put(key, value);
@@ -115,40 +153,41 @@ public class RequestHandler {
         return map;
     }
 
-    public String checkIfMessageExists(int size, String key) {
-
-        if(this.requestContext.getMethod() == GET || this.requestContext.getMethod() == PUT || this.requestContext.getMethod() == DELETE) {
+    public boolean checkIfExists(int size, String key) { // ? PUT INTO ANOTHER INTERFACE LIKE: searchable
+        if(this.requestContext.getMethod() == HttpMethod.GET || this.requestContext.getMethod() == HttpMethod.PUT || this.requestContext.getMethod() == HttpMethod.DELETE) {
             if(size > 0) {
                 if(!this.objectsList.containsKey(key)) {
-                    this.status = NOCONTENT;
-                    return "The " + this.objectName + " does not exist";
+                    this.status = StatusCode.NOCONTENT;
+                    responseBody = "The " + this.objectName + " does not exist";
                 } else  {
-                    return "The " + this.objectName + " exits";
+                    responseBody = "The " + this.objectName + " exits";
+                    return true;
                 }
             } else {
-                this.status = NOCONTENT;
-                return "The " + this.objectName + " list is empty";
+                this.status = StatusCode.NOCONTENT;
+                responseBody = "The " + this.objectName + " list is empty";
             }
         } else {
-            this.status = BADREQUEST;
-            return "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
+            this.status = StatusCode.BADREQUEST;
+            responseBody = "Usage: To add new " + this.objectName + " use POST Method and URL: /messages";
         }
+        return false;
     }
 
-    public String handleMessages() {
+    public String modifyTable() {
         switch (this.requestContext.getMethod()) {
             case GET:
                 return getAllMessages();
             case POST:
                 return addNewMessage();
             default:
-                setStatus(BADREQUEST);
+                setStatus(StatusCode.BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, POST";
         }
     }
 
     public String getAllMessages() {
-        StringBuilder st =new StringBuilder();
+        StringBuilder st = new StringBuilder();
         int count = 0;
         for (Map.Entry<String, String> entry : this.objectsList.entrySet()){
             st.append(entry.getKey());
@@ -158,7 +197,7 @@ public class RequestHandler {
             count++;
         }
         if(count == 0) {
-            this.status = NOCONTENT;
+            this.status = StatusCode.NOCONTENT;
             return "The " + this.objectName + " list is empty";
         } else {
             return st.toString();
@@ -171,15 +210,15 @@ public class RequestHandler {
         try {
             if(!body.isEmpty()) {
                 this.objectsList.put(Integer.toString((this.objectsList.size() + 1)), body);
-                setStatus(CREATED);
+                setStatus(StatusCode.CREATED);
                 return "New " + this.objectName + " was created";
             } else {
-                setStatus(BADREQUEST);
+                setStatus(StatusCode.BADREQUEST);
                 return "Couldn't create new "+ this.objectName +". Body was empty.";
             }
 
         } catch (Exception e){
-            setStatus(INTERNALERROR);
+            setStatus(StatusCode.INTERNALERROR);
             return "Internal Error";
         }
     }
@@ -196,7 +235,7 @@ public class RequestHandler {
                 this.objectsList.remove(key);
                 return "The " + this.objectName + " was deleted";
             default:
-                setStatus(BADREQUEST);
+                setStatus(StatusCode.BADREQUEST);
                 return "Bad Request: Only Methods Accepted: GET, PUT, DELETE, when indicating a " + this.objectName + " number/index in URL";
         }
 

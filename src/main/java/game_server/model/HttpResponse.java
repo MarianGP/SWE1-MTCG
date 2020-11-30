@@ -4,6 +4,7 @@ package game_server.model;
 import lombok.Builder;
 import lombok.Getter;
 import game_server.enums.StatusCode;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Builder
 @Getter
+@Setter
 public class HttpResponse {
 
     private final String version;
@@ -42,13 +44,15 @@ public class HttpResponse {
     }
 
     public void fillUpHeader() {
+        if(this.status == StatusCode.UNAUTHORIZED) {
+            addHeaderPair("WWW-Authenticate", "Basic realm=\"User Visible Realm\", charset=\"UTF-8\"");
+        }
         if(!response.isEmpty()) {
             addHeaderPair("Content-Length", Integer.toString(response.length()));
             addHeaderPair("Content-Type", contentType); //"text/plain"
         } else {
             addHeaderPair("Content-Length", "0");
         }
-
     }
 
     public void addHeaderPair(String key, String value) {

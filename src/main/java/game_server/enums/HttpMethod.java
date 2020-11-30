@@ -2,6 +2,8 @@ package game_server.enums;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public enum HttpMethod {
     GET,
@@ -11,4 +13,5 @@ public enum HttpMethod {
     NOTSUPPORTED
     ;
 
+    public static final List<HttpMethod> listOfMethods = List.of(values());
 }
