@@ -1,10 +1,16 @@
 package game_server.db;
 
+import game.user.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 
+@Data
+@AllArgsConstructor
 public class PostgreSQLJDBC {
 
     public static void main( String args[] ) throws IOException {
@@ -23,9 +29,10 @@ public class PostgreSQLJDBC {
             Class.forName("org.postgresql.Driver");
             String fullPath = "jdbc:postgresql://" + dbUrl + ":"+ port +"/" + dbName;
             Connection c = DriverManager.getConnection( fullPath, username, password);
-
             c.setAutoCommit(false);
             System.out.println("-- Opened database successfully");
+
+
             String userName = "marian";
 
             try {
@@ -55,6 +62,10 @@ public class PostgreSQLJDBC {
             System.exit(0);
         }
         System.out.println("-- Operation done successfully");
+    }
+
+    public void insertUser(User player) {
+//        startConnection();
     }
 }
 

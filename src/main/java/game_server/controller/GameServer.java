@@ -1,5 +1,6 @@
 package game_server.controller;
 
+import game_server.db.PostgreSQLJDBC;
 import game_server.enums.StatusCode;
 import game_server.model.HttpRequest;
 import game_server.model.HttpResponse;
@@ -76,6 +77,7 @@ public class GameServer implements Runnable {
                                 .requestContext(requestContext)
                                 .status(StatusCode.OK)
                                 .userController(userController)
+                                .db(new PostgreSQLJDBC())
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();

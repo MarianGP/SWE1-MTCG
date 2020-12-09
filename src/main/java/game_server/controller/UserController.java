@@ -1,7 +1,10 @@
 package game_server.controller;
 
+import game.user.Credentials;
 import game.user.User;
-import lombok.*;
+import game_server.db.PostgreSQLJDBC;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,26 +12,35 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
+@Builder
 public class UserController {
-    public static ConcurrentHashMap<String, User> allUsers = new ConcurrentHashMap<>();
-    public static List<String> loggedUsers = Collections.synchronizedList(new ArrayList<>());
+    public static User user;
+    private PostgreSQLJDBC db;
 
-
-    public void addUser(String username, User newUser) {
-        allUsers.put(username,newUser);
+    public String addNewUser(Credentials credentials){
+        try {
+            user = User.builder()
+                    .username(credentials.getUsername())
+                    .password(credentials.getPassword())
+                    .token(credentials.getUsername() + "-mtcgToken")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Signup failed";
+        }
+        db.insertUser(user);
+        return "Signup was successful";
     }
 
-    public boolean login(String username, String password) {
+    public String login(String username, String password) {
         if(allUsers.get(username).getPassword().equals(password)) {
             loggedUsers.add(username + "-mtcgToken");
-            return true;
+            return "Login was successful";
         }
-        return false;
+        return "Login failer";
     }
 
-    public ConcurrentHashMap<String, User> getAllUsers() {
-        return allUsers;
-    }
+
 
 
 }

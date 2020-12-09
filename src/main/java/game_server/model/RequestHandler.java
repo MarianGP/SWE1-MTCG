@@ -1,10 +1,13 @@
 package game_server.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import game.user.Credentials;
 import game.user.User;
 import game_server.controller.UserController;
+import game_server.db.PostgreSQLJDBC;
 import game_server.enums.HttpMethod;
 import game_server.enums.StatusCode;
 import lombok.Builder;
@@ -88,6 +91,7 @@ public class RequestHandler {
 
     public void handleUser(String requestBody, HttpMethod method) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // also private attributes
         Credentials credentials = objectMapper.readValue(requestBody, Credentials.class);
 
         switch(method) {
@@ -95,6 +99,7 @@ public class RequestHandler {
                 addNewUser(credentials);
                 break;
             case GET:
+                logUserIn(credentials);
                 break;
             default:
                 this.status = StatusCode.BADREQUEST;
@@ -111,6 +116,11 @@ public class RequestHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.responseBody = userController.addNewUser(credentials);
+    }
+
+    private void logUserIn(Credentials credentials) {
+        this.responseBody = userController.getUser(credentials);
     }
 
     public void handleObject(String table) throws ClassNotFoundException {

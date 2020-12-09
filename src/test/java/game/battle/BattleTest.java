@@ -84,7 +84,7 @@ class BattleTest {
     }
 
     @Test
-    @DisplayName("Compare cards and move to round-winner: Player Next playes a stronger Card")
+    @DisplayName("Compare cards and move to round-winner: Player Next plays a stronger Card")
     void moveDefeatedCard() {
         Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
         Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeck().size());
