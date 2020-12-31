@@ -1,6 +1,5 @@
 package game.cards;
 
-import game.decks.CardStack;
 import game.enums.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,11 +10,16 @@ import lombok.ToString;
 @ToString
 
 public class MonsterCard extends Card {
+
     private String name;
     private MonsterType type;
     private Element cardElement;
-    private int damage;
+    private float damage;
     private boolean locked;
+
+    public String getName() {
+        return name;
+    }
 
     MonsterCard(MonsterType type, Element cardElement) {
         String prefix = Name.SIX.getName();
@@ -25,18 +29,17 @@ public class MonsterCard extends Card {
         this.damage = type.getMaxDamage();
     }
 
-    public MonsterCard(MonsterType type, Element cardElement, Name randomName) {
+    //for testing purpose
+    public MonsterCard(MonsterType type, Element cardElement, Name randomName, float damage) {
         String prefix = randomName.getName();
         this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
         this.type = type;
         this.cardElement = cardElement;
-        this.damage = type.getMaxDamage();
+        this.damage = damage;
     }
 
-    //for testing purpose
-    public MonsterCard(MonsterType type, Element cardElement, Name randomName, int damage) {
-        String prefix = randomName.getName();
-        this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
+    public MonsterCard(MonsterType type, Element cardElement, String name, float damage) {
+        this.name = name;
         this.type = type;
         this.cardElement = cardElement;
         this.damage = damage;
@@ -66,15 +69,11 @@ public class MonsterCard extends Card {
         return GeneralEffectiveness.ATTACKS;
     }
 
-    public boolean compareDamage(int attackerDP){
-        if (attackerDP > this.damage) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean compareDamage(float attackerDP){
+        return attackerDP > this.damage;
     }
 
-    public boolean result(GeneralEffectiveness effect, int attackerDP) {
+    public boolean result(GeneralEffectiveness effect, float attackerDP) {
         if (effect == GeneralEffectiveness.ATTACKS) {
             return compareDamage(attackerDP);
         } else if (effect == GeneralEffectiveness.MISSES) {

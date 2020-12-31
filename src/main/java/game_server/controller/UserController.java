@@ -2,20 +2,15 @@ package game_server.controller;
 
 import game.user.Credentials;
 import game.user.User;
-import game_server.db.PostgreSQLJDBC;
+import game_server.db.DbConnection;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Builder
 public class UserController {
-    public static User user;
-    private PostgreSQLJDBC db;
+    private static DbConnection db;
+    private User user;
 
     public String addNewUser(Credentials credentials){
         try {
@@ -23,24 +18,53 @@ public class UserController {
                     .username(credentials.getUsername())
                     .password(credentials.getPassword())
                     .token(credentials.getUsername() + "-mtcgToken")
+                    .image(":|")
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Signup failed";
+            return "Signup failed (UserController)";
         }
-        db.insertUser(user);
-        return "Signup was successful";
+
+        if(db.insertUser(user)) {
+            return "Signup was successful (UserController)";
+        } else {
+            return "Signup failed (UserController)";
+        }
     }
 
-    public String login(String username, String password) {
-        if(allUsers.get(username).getPassword().equals(password)) {
-            loggedUsers.add(username + "-mtcgToken");
-            return "Login was successful";
+    public String editUser(User user){
+        try {
+            user = User.builder()
+                    .username(credentials.getUsername())
+                    .password(credentials.getPassword())
+                    .token(credentials.getUsername() + "-mtcgToken")
+                    .image(":|")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Signup failed (UserController)";
         }
-        return "Login failer";
+
+        if(db.updateUser(user)) {
+            return "Data update was successful (UserController)";
+        } else {
+            return "Data update failed (UserController)";
+        }
     }
 
-
-
+    public User login(Credentials credentials) {
+        try {
+            User user = db.getUser(credentials.getUsername(), credentials.getPassword());
+//            if(user != null) {
+//                gameCtr.addToLoggedUsers(user);
+//            }
+            System.out.println("Login was successful (UserController)");
+            return user;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            System.out.println("Login failed (UserController)");
+            return null;
+        }
+    }
 
 }

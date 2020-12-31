@@ -65,13 +65,13 @@ class SpellCardTest {
     }
 
     @Test
-    @DisplayName("Monster vs Spell: Water-Knight(105) cant defeat Fire-Spell(120)")
+    @DisplayName("Monster vs Spell: Water-Knight(105) cant defeat Fire-Spell(120.0)")
     void waterKnightCantDefeatsFireSpell() {
         Assertions.assertFalse(fire.receiveAttack(knight));
     }
 
     @Test
-    @DisplayName("Monster vs Spell: Water-Kraken(125) defeats Fire-Spell(120)")
+    @DisplayName("Monster vs Spell: Water-Kraken(125) defeats Fire-Spell(120.0)")
     void KrakenDefeatsFireSpell() {
         Assertions.assertTrue(fire.receiveAttack(kraken));
     }
@@ -85,13 +85,13 @@ class SpellCardTest {
     @Test
     @DisplayName("Print Stats Fire")
     void printStatsFire() {
-        Assertions.assertEquals("Card: Ultimate Fire-Spell - AP: 110", fire.printCardStats());
+        Assertions.assertEquals("Card: Ultimate Fire-Spell - AP: 110.0", fire.printCardStats());
     }
 
     @Test
     @DisplayName("Print Stats Water")
     void printStatsWater() {
-        Assertions.assertEquals("Card: Southern Water-Spell - AP: 103", water.printCardStats());
+        Assertions.assertEquals("Card: Southern Water-Spell - AP: 103.0", water.printCardStats());
 
     }
 }

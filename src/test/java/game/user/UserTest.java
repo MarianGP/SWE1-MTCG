@@ -26,7 +26,7 @@ class UserTest {
         player1.eloDown();
         player1.eloUp();
         assertAll("mockUser",
-                () -> assertEquals(98, player1.getELO())
+                () -> assertEquals(98, player1.getElo())
         );
     }
 

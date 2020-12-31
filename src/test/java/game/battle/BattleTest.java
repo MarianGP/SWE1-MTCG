@@ -22,13 +22,13 @@ class BattleTest {
     User player4 = User.builder().username("Player4").build();
 
 
-    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100);
-    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120);
-    Card water = new SpellCard(Element.WATER, Name.FIVE, 50);
-    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200);
-    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200);
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100.0f);
+    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120.0f);
+    Card water = new SpellCard(Element.WATER, Name.FIVE, 50.0f);
+    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
+    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
 
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);

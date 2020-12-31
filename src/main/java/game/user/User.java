@@ -21,7 +21,7 @@ public class User {
     private String bio;
     private String image;
     private int coins = 20;
-    private int ELO = 100;
+    private int elo = 100;
     private CardStack stack = new CardStack();;
     private CardDeck deck;
     private final static Random RANDOM = new Random();
@@ -51,11 +51,11 @@ public class User {
 
     public void eloDown() {
         int temp;
-        temp = this.ELO - 5;
+        temp = this.elo - 5;
         if(temp >= 0) {
-            this.ELO = temp;
+            this.elo = temp;
         } else {
-            this.ELO = 0;
+            this.elo = 0;
         }
     }
 
@@ -65,13 +65,13 @@ public class User {
     }
 
     public void eloUp(){
-        this.ELO = this.ELO + 3;
+        this.elo = this.elo + 3;
     }
 
     public void printUserStats() {
         System.out.println(
             "\nUser: " + this.username +
-            " - ELO: " + this.ELO +
+            " - ELO: " + this.elo +
             " - cois: " + this.coins
         );
         this.getStack().listCardsInStack();

@@ -26,8 +26,10 @@ public class Package {
         this.cardsInPackage = new ArrayList<Card>();
 
         for (int i = 0; i < 5; i++) {
+
             if(random.nextInt(10)%2 == 0) {
-                temp = new MonsterCard(MonsterType.randomMonsterType(), Element.randomElement(),Name.randomName());
+                Element tempElement = Element.randomElement();
+                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement,Name.randomName(), tempElement.getMaxDamage());
             } else {
                 temp = new SpellCard(Element.randomElement(),Name.randomName());
             }

@@ -1,6 +1,6 @@
 package game_server.controller;
 
-import game_server.db.PostgreSQLJDBC;
+import game_server.db.DbConnection;
 import game_server.enums.StatusCode;
 import game_server.model.HttpRequest;
 import game_server.model.HttpResponse;
@@ -19,20 +19,22 @@ import java.util.ArrayList;
 @Builder
 public class GameServer implements Runnable {
     private static ServerSocket listener = null;
-    private static UserController userController;
+    private static GameController gameController;
+    private UserController userController;
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         System.out.println("start server");
 
         try {
-            listener = new ServerSocket(8080, 5);
+            listener = new ServerSocket(10001, 5); //8080
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
         //threads
-        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
+//        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
+        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer(new UserController(null))));
 
         try {
             while (true) {
@@ -76,15 +78,17 @@ public class GameServer implements Runnable {
                         RequestHandler requestHandler = RequestHandler.builder()
                                 .requestContext(requestContext)
                                 .status(StatusCode.OK)
-                                .userController(userController)
-                                .db(new PostgreSQLJDBC())
+                                .db(new DbConnection())
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();
 
 
                         try { // ! update with setter in requestHandler
-                            userController = requestHandler.getUserController();
+                            if(gameController.getLoggedUsers().contains(requestHandler.getUserController().getUser())) {
+                                gameController.addToLoggedUsers(requestHandler.getUserController().getUser());
+                            }
+
                         } catch (Exception e) {
                             System.out.println("Error saving new msg");
                         }

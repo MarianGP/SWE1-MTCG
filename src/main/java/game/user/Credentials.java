@@ -9,4 +9,5 @@ import lombok.Getter;
 public class Credentials {
     private final String username;
     private final String password;
+
 }

@@ -13,14 +13,15 @@ public class SpellCard extends Card {
 
     private String name;
     private Element cardElement;
-    private int damage;
+    private MonsterType type = null;
+    private float damage;
     private boolean locked;
 
     public SpellCard(Element cardElement) {
         String prefix = Name.ONE.getName();
         this.cardElement = cardElement;
         this.name = prefix + " " + cardElement.getElementName() + "-Spell";
-        this.damage = cardElement.getMaxDamage();
+        this.damage = (float) cardElement.getMaxDamage();
         this.locked = false;
     }
 
@@ -33,10 +34,17 @@ public class SpellCard extends Card {
     }
 
     //for testing purpose
-    public SpellCard(Element cardElement, Name aName, int damage) {
+    public SpellCard(Element cardElement, Name aName, float damage) {
         String prefix = aName.getName();
         this.cardElement = cardElement;
         this.name = prefix + " " + cardElement.getElementName() + "-Spell";
+        this.damage = damage;
+        this.locked = false;
+    }
+
+    public SpellCard(Element cardElement, String name, float damage) {
+        this.cardElement = cardElement;
+        this.name = name;
         this.damage = damage;
         this.locked = false;
     }
@@ -62,7 +70,7 @@ public class SpellCard extends Card {
     }
 
     //not implemented spell vs spell (only element is compared)
-    public boolean compareDamage(int attackerDP){
+    public boolean compareDamage(float attackerDP){
         if (attackerDP > this.damage) {
             return true;
         } else {

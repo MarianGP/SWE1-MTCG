@@ -1,5 +1,6 @@
 package game_server.controller;
 
+import game.user.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,16 +11,10 @@ import java.util.List;
 @Builder
 @Data
 public class GameController {
-    public static List<UserController> loggedUsers = Collections.synchronizedList(new ArrayList<>());
-    GameServer server;
+    public List<User> loggedUsers = Collections.synchronizedList(new ArrayList<>());
 
-    public static void main(String[] args) {
-        GameServer server = new GameServer();
-        server.run();
-    }
-
-    public void addUser(UserController userController) {
-        loggedUsers.add(userController);
+    public void addToLoggedUsers(User user) {
+        loggedUsers.add(user);
     }
 
 }

@@ -18,17 +18,17 @@ class MonsterCardTest {
     Card water_elf = new MonsterCard(MonsterType.ELF,Element.WATER);
     Card knight = new MonsterCard(MonsterType.KNIGHT, Element.WATER);
     Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.FIRE);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE);
-    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 120);
-    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, Name.ONE, 400);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE,120.0f);
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 120.0f);
+    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, Name.ONE, 400.0f);
 
     Card water = new SpellCard(Element.WATER);
     Card fire = new SpellCard(Element.FIRE);
     Card normal = new SpellCard(Element.NORMAL);
-    Card water2 = new SpellCard(Element.WATER, Name.FIVE, 200);
-    Card fire2 = new SpellCard(Element.FIRE, Name.FIVE, 200);
-    Card normal2 = new SpellCard(Element.NORMAL, Name.FIVE, 200);
+    Card water2 = new SpellCard(Element.WATER, Name.FIVE, 200.0f);
+    Card fire2 = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
+    Card normal2 = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
 
     @Test
     @DisplayName("checkEffectiveness Monster vs Monster")
@@ -49,8 +49,8 @@ class MonsterCardTest {
     @Test
     @DisplayName("result boolean")
     void result () {
-        Assertions.assertFalse( ( (MonsterCard) wizzard).result(GeneralEffectiveness.MISSES, 120) );
-        Assertions.assertTrue( ( (MonsterCard) wizzard).result(GeneralEffectiveness.DEFEATES, 110) );
+        Assertions.assertFalse( ( (MonsterCard) wizzard).result(GeneralEffectiveness.MISSES, 120f) );
+        Assertions.assertTrue( ( (MonsterCard) wizzard).result(GeneralEffectiveness.DEFEATES, 110f) );
     }
 
 
@@ -121,7 +121,7 @@ class MonsterCardTest {
     @Test
     @DisplayName("Print Stats Dragon")
     void printStats() throws UnexpectedException {
-        Assertions.assertEquals("Card: Southern Fire-Dragon - AP: 120",dragon.printCardStats());
+        Assertions.assertEquals("Card: Southern Fire-Dragon - AP: 120.0",dragon.printCardStats());
     }
 
 

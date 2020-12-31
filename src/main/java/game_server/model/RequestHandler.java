@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import game.user.Credentials;
 import game.user.User;
 import game_server.controller.UserController;
-import game_server.db.PostgreSQLJDBC;
+import game_server.db.DbConnection;
 import game_server.enums.HttpMethod;
 import game_server.enums.StatusCode;
 import lombok.Builder;
@@ -27,7 +27,8 @@ public class RequestHandler {
     private String responseBody;
     private HttpResponse response;
     private String objectName;
-    private String path[];
+    private String[] path;
+    private DbConnection db;
     private UserController userController;
 
     public HttpResponse handleRequest() throws ClassNotFoundException {
@@ -57,9 +58,11 @@ public class RequestHandler {
 
         if( this.status != StatusCode.BADREQUEST ) {
             if ( !this.path[2].isEmpty() && this.requestContext.getPath().matches("(/" + this.path[1] + "/)("+ this.path[2] +")(/?)" )) {  // * URL Path "/table/table"
+                System.out.println("TODO!!!!"); //TODO: do something
 
             } else if ( this.requestContext.getPath().matches("(/" + this.path[1] + ")(/?)") ) {  // * URL Path "/table
                 handleObject(this.path[1]);
+
             } else {// * Wrong URL Path"
                 setStatus(StatusCode.BADREQUEST);
             }
@@ -72,7 +75,7 @@ public class RequestHandler {
     }
 
     public String splitURL(String fullPath) {
-        String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles"};
+        String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles", "deck", "cards"};
 
         this.path = fullPath.split("/");
 
@@ -89,38 +92,51 @@ public class RequestHandler {
         }
     }
 
-    public void handleUser(String requestBody, HttpMethod method) throws JsonProcessingException {
+    public Credentials getCredentials(String requestBody) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // also private attributes
-        Credentials credentials = objectMapper.readValue(requestBody, Credentials.class);
+        return objectMapper.readValue(requestBody, Credentials.class);
+    }
+
+    public void handleUser(String requestBody, HttpMethod method) throws JsonProcessingException {
 
         switch(method) {
             case POST:
-                addNewUser(credentials);
+                signInUp(requestBody);
                 break;
             case GET:
-                logUserIn(credentials);
+                editUser(requestBody);
                 break;
             default:
                 this.status = StatusCode.BADREQUEST;
         }
     }
 
-    private void addNewUser(Credentials credentials){
-        try {
-            User newUser = User.builder()
-                    .username(credentials.getUsername())
-                    .password(credentials.getPassword())
-                    .token(credentials.getUsername() + "-mtcgToken")
-                    .build();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void editUser(String requestBody) {
+        if(!requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
+            this.status = StatusCode.BADREQUEST;
+        } else {
+            User user = convertFromJson(requestBody);
+            if(user != null) {
+                this.responseBody = "Data update was successful (UserController)";
+            } else {
+                this.responseBody = "Data update failed (UserController)";
+            }
+            userController.setUser(user);
         }
-        this.responseBody = userController.addNewUser(credentials);
     }
 
-    private void logUserIn(Credentials credentials) {
-        this.responseBody = userController.getUser(credentials);
+    private User signInUp(String requestBody) throws JsonProcessingException {
+        Credentials credentials = getCredentials(requestBody);
+        if(userController.getUser() != null) {
+            this.responseBody = userController.addNewUser(credentials);
+        } else {
+            if(userController.login(credentials) == null) {
+                System.out.println("logUserIn - RequestHandler Failed");
+            } else {
+                responseBody = "You are now logged in";
+            }
+        }
     }
 
     public void handleObject(String table) throws ClassNotFoundException {
@@ -254,10 +270,10 @@ public class RequestHandler {
 
 //    private void convertToJson() {
 //        if(this.requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
-//            //convertToJson();
+//            convertToJson();
 //            Gson g = new Gson();
-//            //Player p = g.fromJson(this.requestContext.getBody(), Player.class);
-//            //String str = g.toJson(p);
+//            Player p = g.fromJson(this.requestContext.getBody(), Player.class);
+//            String str = g.toJson(p);
 //        }
 //    }
 }
