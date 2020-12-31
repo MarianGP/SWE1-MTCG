@@ -21,7 +21,6 @@ class BattleTest {
     User player3 = User.builder().username("Player3").build();
     User player4 = User.builder().username("Player4").build();
 
-
     Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
     Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
     Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100.0f);
@@ -33,6 +32,8 @@ class BattleTest {
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);
     Battle nextBattle = new Battle(player3, player2, 100);
+
+
 
     @BeforeEach
     void setUp() {

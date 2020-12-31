@@ -6,13 +6,14 @@ import game.cards.SpellCard;
 import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.Name;
 import game.user.User;
 import lombok.Data;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -70,12 +71,17 @@ public class DbConnection {
         c = connect();
         int rows = 0;
         try {
-            String query = ("INSERT INTO PUBLIC.USER (username, password, token, image, coins, elo) VALUES (?, ?, ?, ?, 20, 100);");
+            String query = ("INSERT INTO PUBLIC.USER " +
+                            "(username, password, bio, token, image, coins, elo) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?);");
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setString(1, player.getUsername());
             stmt.setString(2, player.getPassword());
-            stmt.setString(3, player.getToken());
-            stmt.setString(4, player.getImage());
+            stmt.setString(3, player.getBio());
+            stmt.setString(4, player.getToken());
+            stmt.setString(5, player.getImage());
+            stmt.setInt(6, player.getCoins());
+            stmt.setInt(7, player.getElo());
             rows = stmt.executeUpdate();
 
             if (rows > 0) c.commit();
@@ -88,14 +94,49 @@ public class DbConnection {
         return rows > 0;
     }
 
-    public boolean insertMonster(Card card, Boolean toDeck, User user, String cid) {
+    public boolean isLogged(String token) {
+        try {
+            c = connect();
+            String query = ( "SELECT * FROM PUBLIC.SESSION WHERE token = ?;" );
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, token);
+            ResultSet rs = stmt.executeQuery();
+            try {
+                if(rs.next()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    public User getLoggedUser(String token) {
+        User user = null;
+        try {
+            if(isLogged(token)) {
+                String[] strs = token.split("-");
+                user = getUser(strs[0]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    public boolean insertCard(Card card, Boolean toDeck, User user, String cid) {
         c = connect();
         int rows = 0;
         try {
             String query = (
-                    "INSERT INTO public.card" +
-                    " (\"cardId\", name, \"monsterType\", element, damage, deck, owner, \"packageId\")" +
-                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+            "INSERT INTO public.card" +
+            " (\"cardId\", name, \"monsterType\", element, damage, deck, owner, \"packageId\")" +
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setString(1, cid);
             stmt.setString(2, card.getName());
@@ -105,6 +146,57 @@ public class DbConnection {
             stmt.setBoolean(6, toDeck);
             stmt.setString(7, user.getUsername());
             stmt.setInt(8, getMaxPackageId() + 1);
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rows > 0;
+    }
+
+    public boolean editUserData(User user, String oldUsername) {
+        c = connect();
+        int rows = 0;
+        try {
+            String query = (
+                "UPDATE public.user " +
+                "SET username = ?, password = ?, token = ?, " +
+                "    bio      = ?, image    = ?  WHERE username = ?;");
+
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getToken());
+            stmt.setString(4,  user.getBio());
+            stmt.setString(5, user.getImage());
+            stmt.setString(6, oldUsername);
+
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rows > 0;
+    }
+
+    public boolean editUserStats(User user, int coinsDelta, int eloDelta) {
+        c = connect();
+        int rows = 0;
+        try {
+            String query = (
+                    "UPDATE public.user SET coins = ?, elo = ? WHERE username LIKE ?;");
+
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1, user.getCoins() + coinsDelta );
+            stmt.setInt(2, user.getElo() + eloDelta );
+            stmt.setString(3, user.getUsername());
+
             rows = stmt.executeUpdate();
 
             if (rows > 0) c.commit();
@@ -134,54 +226,40 @@ public class DbConnection {
         return 0;
     }
 
-    public boolean editUser(User player) {
+    public boolean addSession(String token){
         c = connect();
         int rows = 0;
-//        try {
-//            String query = ("UPDATE FROM PUBLIC.USER (username, password, token, image, coins, elo) VALUES (?, ?, ?, ?, 20, 100);");
-//            PreparedStatement stmt = c.prepareStatement(query);
-//            stmt.setString(1, player.getUsername());
-//            stmt.setString(2, player.getPassword());
-//            stmt.setString(3, player.getToken());
-//            stmt.setString(4, player.getImage());
-//            rows = stmt.executeUpdate();
-//
-//            if (rows > 0) c.commit();
-//            stmt.close();
-//            c.close();
-//            if(c.isClosed()) System.out.println("is closed");
-//            c = null;
-//
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-        return rows > 0;
-    }
-
-    public boolean test(String username) { // test; userName = "marian"
-        c = connect();
-
         try {
-            String query = ( "SELECT * FROM PUBLIC.USER WHERE username = ?;" );
+            String query = ("INSERT INTO PUBLIC.SESSION (token) VALUES (?);");
             PreparedStatement stmt = c.prepareStatement(query);
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            try {
-                if(rs.next()) {
-                    System.out.println(rs.getString("username"));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            stmt.setString(1, token);
+            rows = stmt.executeUpdate();
 
-            closeConnection(stmt); // to test: if(c.isClosed())
-            c = null;
+            if (rows > 0) c.commit();
+            closeConnection(stmt);
 
-            return true;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return false;
+        return rows > 0;
+    }
+
+    public boolean deleteSession(String token) {
+        c = connect();
+        int rows = 0;
+        try {
+            String query = ("DELETE FROM public.session WHERE token LIKE ?;");
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, token);
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rows > 0;
     }
 
     public User getUser(String username, String pass) {
@@ -195,14 +273,7 @@ public class DbConnection {
             ResultSet rs = stmt.executeQuery();
             try {
                 if(rs.next()) {
-                    user = User.builder()
-                            .username( rs.getString("username") )
-                            .password( rs.getString("password") )
-                            .token( rs.getString("token") )
-                            .bio( rs.getString("bio") )
-                            .coins( rs.getInt("coins") )
-                            .elo( rs.getInt("elo") )
-                            .build();
+                    user = buildUser(rs);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -214,7 +285,29 @@ public class DbConnection {
         return user;
     }
 
-    public Card getCard(String cid) throws SQLException {
+    public User getUser(String username) {
+        User user = null;
+        try {
+            c = connect();
+            String query = ( "SELECT * FROM PUBLIC.USER WHERE username = ?;" );
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            try {
+                if(rs.next()) {
+                    user = buildUser(rs);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return user;
+    }
+
+    public Card getCardById(String cid) throws SQLException {
         Card card = null;
 
         try {
@@ -237,12 +330,37 @@ public class DbConnection {
         return card;
     }
 
+    public List<Card> getCardByOwner(String username) throws SQLException {
+        List<Card> cardList = new ArrayList<>();
+        Card temp;
+
+        try {
+            c = connect();
+            String query = ( "SELECT * FROM PUBLIC.CARD WHERE \"owner\" = ?;" );
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                do {
+                    temp = initCard(rs);
+                    cardList.add(temp);
+                } while (rs.next());
+            }
+
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return cardList;
+    }
+
     private Card initCard(ResultSet rs) throws SQLException {
-        Card card = null;
+        Card card;
 
         if ( rs.getString("monsterType") == null) {
             card = new SpellCard(
-                    Objects.requireNonNull(Element.find(rs.getString("element"))),
+                    Element.find(rs.getString("element")),
                     rs.getString("name"),
                     rs.getFloat("damage"));
         } else {
@@ -256,23 +374,25 @@ public class DbConnection {
     }
 
     public User buildUser(ResultSet rs) throws SQLException {
-        User user = null;
-        user = User.builder()
+        User user = User.builder()
                 .username( rs.getString("username") )
                 .password( rs.getString("password") )
                 .token( rs.getString("token") )
                 .bio( rs.getString("bio") )
                 .coins( rs.getInt("coins") )
                 .elo( rs.getInt("elo") )
+                .stack(new CardStack())
                 .build();
-//        loadStack(user);
+        List<Card> list = getCardByOwner(user.getUsername());
+        user.getStack().addListToStack(list);
         return user;
     }
 
-    public CardStack loadStack(String username,Element cardElement, Name aName, float damage) throws SQLException {
-        String query = ("SELECT * FROM PUBLIC.CARD WHERE owner = ?;");
+    public CardStack loadDeck(String username, String CardId) throws SQLException {
+        String query = ("SELECT * FROM PUBLIC.CARD WHERE owner = ? AND \"cardId\" = ?;");
         PreparedStatement stmt = c.prepareStatement(query);
         stmt.setString(1, username);
+        stmt.setString(2, CardId);
         ResultSet rs = stmt.executeQuery();
 //        Card card;
 //        try {

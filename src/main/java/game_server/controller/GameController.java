@@ -15,6 +15,7 @@ public class GameController {
 
     public void addToLoggedUsers(User user) {
         loggedUsers.add(user);
+
     }
 
 }

@@ -21,17 +21,23 @@ class DbConnectionTest {
             .username("JohnDoe")
             .password("1234")
             .token("JohnDoe" + "-mtcgToken")
+            .bio(":/")
             .image(":/")
+            .coins(20)
+            .elo(100)
             .build();
+
+    User updatedUser = User.builder()
+            .username("JohnDowwww")
+            .password("12345")
+            .token("JohnDowwww" + "-mtcgToken")
+            .image(":D")
+            .build();
+
     Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE, 120.0f);
 
-
     @Test
-    void testConnect() {
-        Assertions.assertTrue(db.test("marian"));
-    }
-
-    @Test
+    @DisplayName("Insert User into DB")
     void testInsertUser() {
         Assertions.assertTrue(db.insertUser(user));
         Assertions.assertEquals("JohnDoe", db.getUser("JohnDoe", "1234").getUsername());
@@ -40,20 +46,51 @@ class DbConnectionTest {
     }
 
     @Test
-    @DisplayName("Get one user from DB")
+    @DisplayName("Get User from DB")
     void testGetUser() {
         Assertions.assertEquals("marian", db.getUser("marian", "1234").getUsername());
         Assertions.assertNull(db.getUser("marian", "."));
     }
 
     @Test
-    @DisplayName("Insert MonsterCard")
-    void testInsertMonsterCard() throws SQLException {
-        Assertions.assertTrue(db.insertMonster((MonsterCard) dragon, false, db.getUser("marian", "1234"), "bla-bla-1234"));
-        Assertions.assertEquals(120.0f, db.getCard("bla-bla-1234").getDamage());
+    @DisplayName("Insert and Delete MonsterCard")
+    void testInsertandDeleteMonsterCard() throws SQLException {
+        Assertions.assertTrue(db.insertCard((MonsterCard) dragon, false, db.getUser("marian", "1234"), "bla-bla-1234"));
+        Assertions.assertEquals(120.0f, db.getCardById("bla-bla-1234").getDamage());
         Assertions.assertTrue(db.deleteCard("bla-bla-1234"));
-        if(db.getCard("bla-bla-1234") == null) {
+        if(db.getCardById("bla-bla-1234") == null) {
             System.out.println("nullpointer");
         }
+    }
+
+    @Test
+    @DisplayName("Return one logged user")
+    void testGetLoggedUser() {
+        Assertions.assertEquals("stefan", db.getLoggedUser("stefan-mtcgToken").getUsername());
+    }
+
+    @Test
+    @DisplayName("Add and delete Session")
+    void testAddAndDeleteSession() {
+        Assertions.assertTrue(db.addSession("test-token"));
+        Assertions.assertTrue(db.deleteSession("test-token"));
+    }
+
+    @Test
+    @DisplayName("Edit user stats and Data")
+    void testEditUserInfo() {
+        db.insertUser(user);
+
+        //edit stats
+        Assertions.assertEquals(true, db.editUserStats(user, -5,+1));
+        Assertions.assertEquals(15, db.getUser("JohnDoe").getCoins());
+        Assertions.assertEquals(101, db.getUser("JohnDoe").getElo());
+
+        //edit user information
+        Assertions.assertTrue(db.editUserData(updatedUser, "JohnDoe"));
+        user = db.getUser("JohnDowwww");
+        Assertions.assertEquals("JohnDowwww-mtcgToken", user.getToken());
+
+        db.deleteUser(db.getUser("JohnDowwww"));
     }
 }

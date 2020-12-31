@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import game.cards.Card;
 import game.user.Credentials;
 import game.user.User;
 import game_server.controller.UserController;
@@ -13,14 +14,13 @@ import game_server.enums.StatusCode;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @Builder
 @Data
 public class RequestHandler {
+
     private StatusCode status; // response
     private HttpRequest requestContext;
     private Map<String, String> objectsList; // key, message
@@ -28,10 +28,11 @@ public class RequestHandler {
     private HttpResponse response;
     private String objectName;
     private String[] path;
+
     private DbConnection db;
     private UserController userController;
 
-    public HttpResponse handleRequest() throws ClassNotFoundException {
+    public HttpResponse handleRequest() throws JsonProcessingException {
 
         if(HttpMethod.listOfMethods.contains(requestContext.getMethod())) {
             this.status = StatusCode.BADREQUEST;
@@ -53,15 +54,15 @@ public class RequestHandler {
                 .build();
     }
 
-    public void handlePath() throws ClassNotFoundException {
+    public void handlePath() throws JsonProcessingException {
         this.objectName = splitURL(this.requestContext.getPath());
 
         if( this.status != StatusCode.BADREQUEST ) {
             if ( !this.path[2].isEmpty() && this.requestContext.getPath().matches("(/" + this.path[1] + "/)("+ this.path[2] +")(/?)" )) {  // * URL Path "/table/table"
-                System.out.println("TODO!!!!"); //TODO: do something
+                selectAction(this.path[1],this.path[2]);
 
             } else if ( this.requestContext.getPath().matches("(/" + this.path[1] + ")(/?)") ) {  // * URL Path "/table
-                handleObject(this.path[1]);
+                selectAction(this.path[1]);
 
             } else {// * Wrong URL Path"
                 setStatus(StatusCode.BADREQUEST);
@@ -74,6 +75,74 @@ public class RequestHandler {
         setResponseBody("CHANGE ME LATER"); // TODO: CHANGE LATER
     }
 
+    public void selectAction(String section) throws JsonProcessingException {
+        switch (section) {
+            case "users":
+                handleUser(requestContext.getBody(), requestContext.getMethod());
+                break;
+            case "sessions":
+                singIn(this.requestContext.getBody());
+                break;
+            case "transactions":
+                break;
+            case "score":
+                userController.getUser().printUserStats(); //TODO: kA
+                break;
+            case "stats":
+                break;
+            case "battles":
+                break;
+            default:
+                this.status = StatusCode.BADREQUEST;
+                break;
+        }
+    }
+
+    public void selectAction(String first, String second) {
+        switch(first) {
+            case "users":
+                if(requestContext.getMethod() == HttpMethod.GET) {
+                    getUserInfo(second, getClientToken());
+                } else if (requestContext.getMethod() == HttpMethod.PUT) {
+                    editUser();
+                } else {
+                    this.status = StatusCode.BADREQUEST;
+                }
+                break;
+
+            case "transactions":
+                if(requestContext.getMethod() == HttpMethod.POST){
+                    List<Card> buyRandomPackage = new ArrayList<>();
+                    if(second.equals("packages")) {
+                        userController.buyNewPackage(buyRandomPackage);
+                    } else if(second.equals("randomPackages")){
+                        userController.buyNewPackage(buyRandomPackage);
+                    }
+
+                    break;
+                }
+                this.status = StatusCode.BADREQUEST;
+                this.responseBody = "URL or Method are not alowed";
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public String getClientToken() {
+        String[] auths = requestContext.getHeaderPairs().get("Authorization").split(" ");
+        return auths[1];
+    }
+
+    public void getUserInfo(String username, String token) {
+        if(db.getUser( username ).getToken().equals( token )) { //if token-user = url-user show user detail
+            this.responseBody = userController.getUser().printUserDetails();
+        } else {
+            this.responseBody = "You don't have access to others' accounts";
+        }
+    }
+
     public String splitURL(String fullPath) {
         String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles", "deck", "cards"};
 
@@ -83,7 +152,8 @@ public class RequestHandler {
             if(this.requestContext.getPath().contains("\\?")) {
                 handleUrlParameters(fullPath.split("\\?")[1]);
             }
-             return Character.toUpperCase(this.path[1].charAt(0)) + this.path[1].substring( 1, this.path[1].length()-1 ); // messages -> message
+
+            return Character.toUpperCase(this.path[1].charAt(0)) + this.path[1].substring( 1, this.path[1].length()-1 ); // messages -> message
 
         } else {
             this.path = null;
@@ -99,24 +169,61 @@ public class RequestHandler {
     }
 
     public void handleUser(String requestBody, HttpMethod method) throws JsonProcessingException {
-
         switch(method) {
             case POST:
-                signInUp(requestBody);
-                break;
-            case GET:
-                editUser(requestBody);
+                signUp(requestBody, getClientToken()); //descartar que ya exista
                 break;
             default:
                 this.status = StatusCode.BADREQUEST;
         }
     }
 
-    private void editUser(String requestBody) {
+    public void getUserInfo(HttpMethod method, String username) {
+        switch(method) {
+            case GET:
+                userController.getUser().printUserDetails();
+                break;
+            default:
+                this.status = StatusCode.BADREQUEST;
+        }
+    }
+
+    private void signUp(String requestBody, String token) throws JsonProcessingException {
+        Credentials credentials = getCredentials(requestBody);
+        User user;
+
+        if(token.isEmpty()) { //client is not logged in
+            this.responseBody = userController.login(credentials);
+            if(userController.getUser() == null) {
+               this.responseBody = userController.addNewUser(credentials);
+            }
+        } else { //client is logged
+            this.responseBody  = userController.getLoggedUser(token);
+        }
+//        if(userController.getUser() != null) {
+//            this.responseBody = userController.addNewUser(credentials);
+//        } else {
+//            this.responseBody = userController.login(credentials);
+//            if(userController.getUser() == null) {
+//                System.out.println("logUserIn - RequestHandler Failed");
+//            } else {
+//                //TODO: add to game controller list
+//                this.responseBody = "You are now logged in";
+//            }
+//        }
+    }
+
+    public void singIn(String requestBody) throws JsonProcessingException {
+        Credentials credentials = getCredentials(requestBody);
+        this.responseBody = userController.login(credentials);
+    }
+
+    private void editUser() {
         if(!requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
             this.status = StatusCode.BADREQUEST;
         } else {
-            User user = convertFromJson(requestBody);
+//            User user = convertFromJson(requestContext.getBody());
+            User user = null;
             if(user != null) {
                 this.responseBody = "Data update was successful (UserController)";
             } else {
@@ -124,42 +231,6 @@ public class RequestHandler {
             }
             userController.setUser(user);
         }
-    }
-
-    private User signInUp(String requestBody) throws JsonProcessingException {
-        Credentials credentials = getCredentials(requestBody);
-        if(userController.getUser() != null) {
-            this.responseBody = userController.addNewUser(credentials);
-        } else {
-            if(userController.login(credentials) == null) {
-                System.out.println("logUserIn - RequestHandler Failed");
-            } else {
-                responseBody = "You are now logged in";
-            }
-        }
-    }
-
-    public void handleObject(String table) throws ClassNotFoundException {
-
-        switch (table) {
-            case "users":
-//                handleUser(requestContext.getBody(), requestContext.getMethod());
-                break;
-            case "sessions":
-                break;
-            case "transactions":
-                break;
-            case "score":
-                break;
-            case "stats":
-                break;
-            case "battles":
-                break;
-            default:
-                this.status = StatusCode.BADREQUEST;
-                break;
-        }
-
     }
 
     public void handleUrlParameters(String parameters) {

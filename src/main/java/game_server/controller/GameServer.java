@@ -34,7 +34,12 @@ public class GameServer implements Runnable {
 
         //threads
 //        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
-        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer(new UserController(null))));
+        UserController userCtr = UserController.builder()
+                .db(new DbConnection())
+                .user(null)
+                .build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer(userCtr)));
 
         try {
             while (true) {

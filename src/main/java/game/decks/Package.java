@@ -23,7 +23,7 @@ public class Package {
         this.price = 5;
         Random random = new Random();
         Card temp;
-        this.cardsInPackage = new ArrayList<Card>();
+        this.cardsInPackage = new ArrayList<>();
 
         for (int i = 0; i < 5; i++) {
 
@@ -35,6 +35,22 @@ public class Package {
             }
             this.cardsInPackage.add(temp);
         }
+
+    }
+
+    public Package(List<Card> packageDB){
+        this.price = 5;
+        this.cardsInPackage = new ArrayList<>();
+
+        packageDB.forEach((temp) -> {
+            if(temp.getType() != null) {
+                Element tempElement = Element.randomElement();
+                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement,Name.randomName(), tempElement.getMaxDamage());
+            } else {
+                temp = new SpellCard(Element.randomElement(),Name.randomName());
+            }
+            this.cardsInPackage.add(temp);
+        });
 
     }
 

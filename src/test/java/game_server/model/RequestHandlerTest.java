@@ -29,7 +29,6 @@ class RequestHandlerTest {
     void TestGetQueryMap() {
     }
 
-
     public RequestHandler getHandler(HttpMethod method, String body, String path) {
         ArrayList<String> header = new ArrayList<>(
                 List.of(

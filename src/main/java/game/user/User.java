@@ -27,9 +27,17 @@ public class User {
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
 
-    public void buyPackage(){
+    public void buyPackage(){ //for testing purposes
         Package newPackage = new Package();
         Card temp;
+        if(this.coins - newPackage.getPrice() > 0) {
+            this.coins = this.coins - newPackage.getPrice();
+            this.stack.addListToStack(newPackage.getCardsInPackage());
+        }
+    }
+
+    public void buyPackage(List<Card> list){
+        Package newPackage = new Package(list);
         if(this.coins - newPackage.getPrice() > 0) {
             this.coins = this.coins - newPackage.getPrice();
             this.stack.addListToStack(newPackage.getCardsInPackage());
@@ -74,7 +82,15 @@ public class User {
             " - ELO: " + this.elo +
             " - cois: " + this.coins
         );
-        this.getStack().listCardsInStack();
+        this.stack.listCardsInStack();
+    }
+
+    public String printUserDetails() {
+        return  "\nUser: " + this.username +
+                " - ELO: " + this.elo + " - cois: " + this.coins +
+                "\nBio: "+ this.bio +
+                "\nImage: "+ this.image +
+                "\nToken: "+ this.token + " ";
     }
 
 
