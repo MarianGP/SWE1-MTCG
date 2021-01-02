@@ -85,13 +85,13 @@ class SpellCardTest {
     @Test
     @DisplayName("Print Stats Fire")
     void printStatsFire() {
-        Assertions.assertEquals("Card: Ultimate Fire-Spell - AP: 110.0", fire.printCardStats());
+        Assertions.assertEquals("Card: Ultimate Fire-Spell - AP: 110.0", fire.getCardStats());
     }
 
     @Test
     @DisplayName("Print Stats Water")
     void printStatsWater() {
-        Assertions.assertEquals("Card: Southern Water-Spell - AP: 103.0", water.printCardStats());
+        Assertions.assertEquals("Card: Southern Water-Spell - AP: 103.0", water.getCardStats());
 
     }
 }

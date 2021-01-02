@@ -1,19 +1,23 @@
 package game_server.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import game.cards.Card;
 import game.cards.MonsterCard;
 import game.cards.SpellCard;
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
-import game.user.Credentials;
 import game.user.User;
 import game_server.db.DbConnection;
+import game_server.model.RequestHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,12 +31,25 @@ class UserControllerTest {
             .image(":/")
             .coins(20)
             .elo(100)
+            .stack(new CardStack())
+            .deck(new CardDeck())
+            .isAdmin(false)
             .build();
+
     UserController userController = UserController.builder()
             .db(new DbConnection())
             .user(user)
             .build();
-    Credentials credentials1 = new Credentials("marian","1234");
+
+    String correctJson = "{\n" +
+            "    \"username\": \"marian\",\n" +
+            "    \"password\": \"1234\"\n" +
+            "}";
+
+    String wrongJson = "{\n" +
+            "    \"username\": \"marian\",\n" +
+            "    \"password\": \"999\"\n" +
+            "}";
 
     List<Card> cardsList = new ArrayList<>();
     Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
@@ -41,22 +58,27 @@ class UserControllerTest {
     Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
     Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
 
+    boolean isLogged = userController.getDb().deleteSession("marian-mtcgToken");
 
     @Test
-    void testLogin() {
-        Assertions.assertEquals("Login was successful", userController.login(credentials1));
-        Assertions.assertTrue(userController.getDb().isLogged("marian-mtcgToken"));
-        Assertions.assertTrue(userController.getDb().deleteSession("marian-mtcgToken"));
+    @DisplayName("Log In: Wrong/Correct Pass, Logged")
+    void testLogin() throws JsonProcessingException, SQLException {
+        Assertions.assertEquals("Wrong user or password",
+                userController.login(RequestHandler.getCredentials(wrongJson)));
+        Assertions.assertEquals("Login was successful",
+                userController.login(RequestHandler.getCredentials(correctJson)));
+        Assertions.assertEquals("User is already logged in",
+                userController.login(RequestHandler.getCredentials(correctJson)));
     }
 
     @Test
     void testGetLoggedUser() {
-        Assertions.assertEquals("Session opened",userController.getLoggedUser("stefan-mtcgToken"));
+        Assertions.assertEquals("Session was opened",userController.setUser("stefan-mtcgToken"));
     }
 
     @Test
-    @DisplayName("Add package")
-    void testPackage() {
+    @DisplayName("Buy new package")
+    void testBuyPackage() {
         createList();
         userController.buyNewPackage(cardsList);
     }

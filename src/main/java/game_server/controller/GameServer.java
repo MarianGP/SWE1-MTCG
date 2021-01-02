@@ -18,11 +18,10 @@ import java.util.ArrayList;
 
 @Builder
 public class GameServer implements Runnable {
-    private static ServerSocket listener = null;
-    private static GameController gameController;
-    private UserController userController;
 
-    public void main(String[] args) {
+    private static ServerSocket listener = null;
+
+    public static void main(String[] args) {
         System.out.println("start server");
 
         try {
@@ -33,21 +32,15 @@ public class GameServer implements Runnable {
         }
 
         //threads
-//        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
-        UserController userCtr = UserController.builder()
-                .db(new DbConnection())
-                .user(null)
-                .build();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer(userCtr)));
+        Runtime.getRuntime().addShutdownHook(new Thread(new GameServer()));
 
         try {
             while (true) {
                 Socket s = listener.accept();
-
                 ArrayList<String> header = new ArrayList<>();
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8) );
                 String line;
 
                 //Read Header
@@ -56,7 +49,6 @@ public class GameServer implements Runnable {
                     header.add(line);
                     System.out.println(line);
                 } while (line != null && !line.isEmpty());
-
 
                 try {
                     if(header.size() < 2) continue;
@@ -84,27 +76,22 @@ public class GameServer implements Runnable {
                                 .requestContext(requestContext)
                                 .status(StatusCode.OK)
                                 .db(new DbConnection())
+                                .userController(new UserController(
+                                        new DbConnection(), null))
+                                .cardController(new CardController(
+                                        new DbConnection(), null, new ArrayList<>()))
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();
 
-
-                        try { // ! update with setter in requestHandler
-                            if(gameController.getLoggedUsers().contains(requestHandler.getUserController().getUser())) {
-                                gameController.addToLoggedUsers(requestHandler.getUserController().getUser());
-                            }
-
-                        } catch (Exception e) {
-                            System.out.println("Error saving new msg");
-                        }
-
                         // Write Response to Client
                         outputStream.write(response.getResponse().getBytes());
 
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
                         HttpResponse res = HttpResponse.builder()
                                 .version(requestContext.getVersion())
-                                .response(null)
+                                .response("Internal Server Error")
                                 .status(StatusCode.INTERNALERROR)
                                 .requestHeaderPairs(null)
                                 .build();

@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 
 public class MonsterCard extends Card {
-
+    private String cid;
     private String name;
     private MonsterType type;
     private Element cardElement;
@@ -38,16 +38,21 @@ public class MonsterCard extends Card {
         this.damage = damage;
     }
 
-    public MonsterCard(MonsterType type, Element cardElement, String name, float damage) {
+    public MonsterCard(String cid, MonsterType type, Element cardElement, String name, float damage) {
+        this.cid = cid;
         this.name = name;
         this.type = type;
         this.cardElement = cardElement;
         this.damage = damage;
     }
 
-    public String printCardStats() {
-        String stat = "Card: " + this.name + " - AP: " + this.damage;
-        System.out.println(stat);
+    public String getCardStats() {
+        String stat =   "CardId: " + this.cid +
+                        " - Name: " + this.name +
+                        " - AP: " + this.damage +
+                        " - Element: " + this.cardElement.getElementName() +
+                        " - Type : " + this.type.getName() + "\n";
+        System.out.print(stat);
         return stat;
     }
 

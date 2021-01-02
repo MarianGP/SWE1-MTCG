@@ -2,6 +2,8 @@ package game_server.db;
 
 import game.cards.Card;
 import game.cards.MonsterCard;
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
@@ -25,6 +27,9 @@ class DbConnectionTest {
             .image(":/")
             .coins(20)
             .elo(100)
+            .stack(new CardStack())
+            .deck(new CardDeck())
+            .isAdmin(false)
             .build();
 
     User updatedUser = User.builder()
@@ -38,7 +43,7 @@ class DbConnectionTest {
 
     @Test
     @DisplayName("Insert User into DB")
-    void testInsertUser() {
+    void testInsertUser() throws SQLException {
         Assertions.assertTrue(db.insertUser(user));
         Assertions.assertEquals("JohnDoe", db.getUser("JohnDoe", "1234").getUsername());
         Assertions.assertTrue(db.deleteUser(user));
@@ -55,7 +60,7 @@ class DbConnectionTest {
     @Test
     @DisplayName("Insert and Delete MonsterCard")
     void testInsertandDeleteMonsterCard() throws SQLException {
-        Assertions.assertTrue(db.insertCard((MonsterCard) dragon, false, db.getUser("marian", "1234"), "bla-bla-1234"));
+        Assertions.assertTrue(db.insertCard((MonsterCard) dragon, false, db.getUser("marian", "1234"), "bla-bla-1234", 9999));
         Assertions.assertEquals(120.0f, db.getCardById("bla-bla-1234").getDamage());
         Assertions.assertTrue(db.deleteCard("bla-bla-1234"));
         if(db.getCardById("bla-bla-1234") == null) {
@@ -78,7 +83,7 @@ class DbConnectionTest {
 
     @Test
     @DisplayName("Edit user stats and Data")
-    void testEditUserInfo() {
+    void testEditUserInfo() throws SQLException {
         db.insertUser(user);
 
         //edit stats

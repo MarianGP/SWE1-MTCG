@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 
 public abstract class Card extends CardStack implements CardInterface, Attackable {
+    private String cid;
     private String name;
     private MonsterType type;
     private Element cardElement;

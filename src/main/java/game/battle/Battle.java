@@ -109,8 +109,8 @@ public class Battle {
             System.out.println("Nobody won the game");
         }
         System.out.println("Rounds: " + rounds);
-        currentPlayer.printUserStats();
-        nextPlayer.printUserStats();
+        currentPlayer.userStats("");
+        nextPlayer.userStats("");
 
     }
 

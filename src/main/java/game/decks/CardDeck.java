@@ -18,8 +18,12 @@ public class CardDeck implements Randomizable {
     private List<Card> deck;
     Random RANDOM = new Random();
 
+    public CardDeck() {
+        this.deck = new ArrayList<>();
+    }
+
     public CardDeck(User player) {
-        this.deck = new ArrayList<Card>();
+        this.deck = new ArrayList<>();
         for (int i = 0; i < DECKSIZE; i++) {
             this.deck.add( player.getStack().randomCard() ); //deletes from stack and adds to deck
         }

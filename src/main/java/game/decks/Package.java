@@ -17,16 +17,14 @@ import java.util.Random;
 public class Package {
 
     private List<Card> cardsInPackage;
-    private int price;
+    private final int PRICE = 5;
 
     public Package(){
-        this.price = 5;
         Random random = new Random();
         Card temp;
         this.cardsInPackage = new ArrayList<>();
 
         for (int i = 0; i < 5; i++) {
-
             if(random.nextInt(10)%2 == 0) {
                 Element tempElement = Element.randomElement();
                 temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement,Name.randomName(), tempElement.getMaxDamage());
@@ -39,7 +37,6 @@ public class Package {
     }
 
     public Package(List<Card> packageDB){
-        this.price = 5;
         this.cardsInPackage = new ArrayList<>();
 
         packageDB.forEach((temp) -> {

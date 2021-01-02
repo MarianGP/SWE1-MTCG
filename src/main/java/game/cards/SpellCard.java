@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 
 public class SpellCard extends Card {
-
+    private String cid;
     private String name;
     private Element cardElement;
     private MonsterType type = null;
@@ -42,16 +42,20 @@ public class SpellCard extends Card {
         this.locked = false;
     }
 
-    public SpellCard(Element cardElement, String name, float damage) {
+    public SpellCard(String cid, Element cardElement, String name, float damage) {
+        this.cid = cid;
         this.cardElement = cardElement;
         this.name = name;
         this.damage = damage;
         this.locked = false;
     }
 
-    public String printCardStats() {
-        String stat = "Card: " + this.name + " - AP: " + this.damage;
-        System.out.println(stat);
+    public String getCardStats() {
+        String stat =   "CardId: " + this.cid +
+                        " - Name: " + this.name +
+                        " - AP: " + this.damage +
+                        " - Element: " + this.cardElement.getElementName() + "\n";
+        System.out.print(stat);
         return stat;
     }
 
@@ -92,6 +96,10 @@ public class SpellCard extends Card {
         } else {
             throw new UnsupportedOperationException("Not a spell nor a monster card");
         }
+    }
+
+    public MonsterType geType(){
+        return null;
     }
 
 }

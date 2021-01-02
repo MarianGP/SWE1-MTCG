@@ -14,32 +14,33 @@ import java.util.Random;
 @Setter
 @Getter
 @Builder
-public class User {
+public class User implements Comparable<User> {
     private String username;
     private String password;
     private String token;
     private String bio;
     private String image;
-    private int coins = 20;
-    private int elo = 100;
-    private CardStack stack = new CardStack();;
+    private int coins;
+    private int elo;
+    private CardStack stack;
     private CardDeck deck;
+    private boolean isAdmin;
+
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
 
     public void buyPackage(){ //for testing purposes
         Package newPackage = new Package();
-        Card temp;
-        if(this.coins - newPackage.getPrice() > 0) {
-            this.coins = this.coins - newPackage.getPrice();
+        if(this.coins - newPackage.getPRICE() > 0) {
+            this.coins = this.coins - newPackage.getPRICE();
             this.stack.addListToStack(newPackage.getCardsInPackage());
         }
     }
 
     public void buyPackage(List<Card> list){
         Package newPackage = new Package(list);
-        if(this.coins - newPackage.getPrice() > 0) {
-            this.coins = this.coins - newPackage.getPrice();
+        if(this.coins - newPackage.getPRICE() > 0) {
+            this.coins = this.coins - newPackage.getPRICE();
             this.stack.addListToStack(newPackage.getCardsInPackage());
         }
     }
@@ -52,7 +53,7 @@ public class User {
         int i = 0;
         System.out.println("Your Card's Stack");
         while (i < aStack.size()) {
-            aStack.get(i).printCardStats();
+            aStack.get(i).getCardStats();
             i++;
         }
     }
@@ -76,13 +77,20 @@ public class User {
         this.elo = this.elo + 3;
     }
 
-    public void printUserStats() {
-        System.out.println(
-            "\nUser: " + this.username +
-            " - ELO: " + this.elo +
-            " - cois: " + this.coins
-        );
-        this.stack.listCardsInStack();
+    public String userStats(String rank) {
+        if(!this.isAdmin) {
+            if(rank.isEmpty()) {
+                return  "\n" + rank +
+                        " User: " + this.username +
+                        " Coins: " + this.coins +
+                        " - ELO: " + this.elo;
+            }
+            return  "\n" + rank +
+                    " User: " + this.username +
+                    " - ELO: " + this.elo;
+        } else {
+            return "";
+        }
     }
 
     public String printUserDetails() {
@@ -93,6 +101,17 @@ public class User {
                 "\nToken: "+ this.token + " ";
     }
 
+    @Override
+    public int compareTo(User user) {
+        return this.elo - user.getElo();
+    }
 
+//    public boolean isAdmin() {
+//        return isAdmin;
+//    }
+//
+//    public void setAdmin(boolean admin) {
+//        this.isAdmin = admin;
+//    }
 
 }

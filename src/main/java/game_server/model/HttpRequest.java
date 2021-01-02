@@ -35,7 +35,7 @@ public class HttpRequest {
 
         this.path = line[1];
         this.version = line[2];
-        this.headerPairs = new HashMap<String, String>();
+        this.headerPairs = new HashMap<>();
         this.body = "";
 
         for (int i = 1; i < request.size()-1; i++) {

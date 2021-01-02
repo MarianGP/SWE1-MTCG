@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 
@@ -24,8 +25,8 @@ public enum MonsterType {
     private static final int SIZE = listOfNames.size();
     private static final Random RANDOM = new Random();
 
-    private final String name;
-    private final float maxDamage;
+    private String name;
+    private float maxDamage;
 
     public static MonsterType randomMonsterType() {
         return listOfNames.get(RANDOM.nextInt(SIZE));
@@ -38,7 +39,8 @@ public enum MonsterType {
 
     public static MonsterType find(String name) {
         for (MonsterType type : listOfNames) {
-            if (type.getName().contains(name)) {
+            String typeName = type.getName();
+            if (Objects.equals(typeName, name)) {
                 return type;
             }
         }
