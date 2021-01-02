@@ -92,7 +92,7 @@ class DbConnectionTest {
         Assertions.assertEquals(101, db.getUser("JohnDoe").getElo());
 
         //edit user information
-        Assertions.assertTrue(db.editUserData(updatedUser, "JohnDoe"));
+        Assertions.assertTrue(db.editUser(updatedUser, "JohnDoe"));
         user = db.getUser("JohnDowwww");
         Assertions.assertEquals("JohnDowwww-mtcgToken", user.getToken());
 

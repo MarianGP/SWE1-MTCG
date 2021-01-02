@@ -60,7 +60,7 @@ public class GameServer implements Runnable {
                         StringBuffer sb = new StringBuffer();
                         while ((read = reader.read()) != -1) {
                             sb.append((char) read);
-                            if (sb.length() == requestContext.getBodyLength()) { // till last character from body
+                            if (sb.length() == requestContext.getBodyLength()) {
                                 break;
                             }
                         }
@@ -78,8 +78,7 @@ public class GameServer implements Runnable {
                                 .db(new DbConnection())
                                 .userController(new UserController(
                                         new DbConnection(), null))
-                                .cardController(new CardController(
-                                        new DbConnection(), null, new ArrayList<>()))
+                                .cardController( new CardController( new DbConnection() ) )
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();

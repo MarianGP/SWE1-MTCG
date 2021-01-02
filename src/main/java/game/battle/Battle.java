@@ -66,8 +66,8 @@ public class Battle {
             temp = nextPlayer;
         }
 
-        temp.getDeck().getDeck().add(this.table.get(0));
-        temp2.getDeck().getDeck().add(this.table.get(1));
+        temp.getDeck().getDeckList().add(this.table.get(0));
+        temp2.getDeck().getDeckList().add(this.table.get(1));
 
         this.table.clear(); //empty tableList for next round
     }
@@ -79,8 +79,8 @@ public class Battle {
     }
 
     public User checkWinner(User currentPlayer, User nextPlayer)  {
-        int i = currentPlayer.getDeck().getDeck().size();
-        int j = nextPlayer.getDeck().getDeck().size();
+        int i = currentPlayer.getDeck().getDeckList().size();
+        int j = nextPlayer.getDeck().getDeckList().size();
 
         if (i == 0) {
             winner = nextPlayer;
@@ -94,9 +94,9 @@ public class Battle {
     }
 
     public User getLoser(User currentPlayer,User nextPlayer) {
-        if(currentPlayer.getDeck().getDeck().size() == 0) {
+        if(currentPlayer.getDeck().getDeckList().size() == 0) {
             return currentPlayer;
-        } else if (nextPlayer.getDeck().getDeck().size() == 0) {
+        } else if (nextPlayer.getDeck().getDeckList().size() == 0) {
             return nextPlayer;
         }
         throw new UnsupportedOperationException("ERR: there is a winner, but not a loser");

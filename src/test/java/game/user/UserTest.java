@@ -43,7 +43,7 @@ class UserTest {
     @DisplayName("Create new Deck")
     void createNewDeck() {
         player1.prepareDeck();
-        Assertions.assertEquals(5, player1.getDeck().getDeck().size());
+        Assertions.assertEquals(5, player1.getDeck().getDeckList().size());
         Assertions.assertEquals(5, player1.getStack().getStack().size());
     }
 
@@ -51,9 +51,9 @@ class UserTest {
     @DisplayName("compareTableCards")
     void compareCards() {
         player1.prepareDeck();
-        Assertions.assertEquals(5, player1.getDeck().getDeck().size());
+        Assertions.assertEquals(5, player1.getDeck().getDeckList().size());
         player1.getDeck().randomCard();
-        Assertions.assertEquals(4, player1.getDeck().getDeck().size());
+        Assertions.assertEquals(4, player1.getDeck().getDeckList().size());
     }
 
 }

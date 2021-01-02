@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import game.cards.Card;
 import game.user.Credentials;
 import game.user.User;
 import game_server.controller.CardController;
@@ -22,12 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public class RequestHandler {
 
-    private StatusCode status; // response
+    private StatusCode status; // * response
     private HttpRequest requestContext;
-    private Map<String, String> objectsList; // key, message
     private String responseBody;
-    private HttpResponse response;
-
     private String[] path;
 
     private DbConnection db;
@@ -88,34 +86,29 @@ public class RequestHandler {
 
     public void validateURLActions(String first, String second) {
         String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles", "deck", "cards", "", "packages", null};
-        if( !Arrays.asList( allowedTables ).contains( first )
-                || !Arrays.asList( allowedTables ).contains( second ) ) {
+        if( !Arrays.asList( allowedTables ).contains( first ) ) {
             this.path = null;
             setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
         }
     }
 
     public void selectAction(String first, String second, String token) throws JsonProcessingException {
-        if(userController.setUser(token)) {
-            switch (first) { //localhost:8008/first/second
-                case "users":
-                    manageUserInformation(token, second);
-                    break;
-                case "transactions":
-                    buyNewPackage(second, requestContext.getBody(), token);
-                    break;
-                default:
-                    setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
-                    break;
+        //! localhost:8008/first/second
+
+        if(this.userController.setUser(token)) {
+            switch (first) {
+                case "users"        -> manipulateUserAccount(this.userController.getUser().getUsername(), second);
+                case "transactions" -> buyNewPackage(second, requestContext.getBody(), token);
+                default             -> setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
             }
         } else {
             setResponseStatus("Need to login to access any functionality", StatusCode.BADREQUEST);
         }
     }
 
-    public void selectAction(String section, String token) throws JsonProcessingException, SQLException { // /users/
+    public void selectAction(String section, String token) throws JsonProcessingException, SQLException {
 
-        if(!userController.setUser(token)) {
+        if(!this.userController.setUser(token)) {
             anonymUserAction(section);
         } else { // logged in
             loggedUserAction(section);
@@ -123,50 +116,45 @@ public class RequestHandler {
     }
 
     public void anonymUserAction(String action) throws JsonProcessingException, SQLException {
+
         switch (action) {
-            case "users":
-                handleUser(this.requestContext.getBody(), this.requestContext.getMethod());
-                break;
-            case "sessions":
-                singIn(this.requestContext.getBody());
-                break;
-            default:
-                setResponseStatus("Unauthorized. Log in to access all functionalities",
-                        StatusCode.UNAUTHORIZED);
-                break;
+            case "users"    -> handleUser(this.requestContext.getBody(), this.requestContext.getMethod());
+            case "sessions" -> singIn(this.requestContext.getBody());
+            default         -> setResponseStatus("Unauthorized. Log in to access all functionalities",
+                                    StatusCode.UNAUTHORIZED);
         }
     }
 
     public void loggedUserAction(String action) throws JsonProcessingException {
         switch (action) {
-            case "score":
-                getScoreBoard();
-                break;
-            case "stats":
-                this.responseBody = userController.getUser().userStats("");
-                break;
-            case "battles":
-                break;
-            case "packages":
-                insertNewPackage();
-                break;
-            case "cards":
-                showUserCards(getClientToken());
-                break;
-            case "deck":
-                manipulateDeck(getClientToken(), requestContext.getBody());
-                break;
-            default:
-                setResponseStatus("Wrong URL", StatusCode.BADREQUEST);
-                break;
+            case "score"    -> getScoreBoard();
+            case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
+            case "battles"  -> initBattle();
+            case "packages" -> insertNewPackage();
+            case "cards"    -> showUserCards(getClientToken());
+            case "deck"     -> manipulateDeck(getClientToken(), requestContext.getBody());
+            case "tradings" -> handleTradings(getClientToken());
+            default         -> setResponseStatus("Wrong URL", StatusCode.BADREQUEST);
         }
     }
 
-    public void showUserCards(String token) { // ! not admins
-        if(userController.setUser(token) && !userController.getUser().isAdmin()) {
-            if(userController.initializeStack()) {
+    public void handleTradings(String token) {
+        if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
+
+        } else {
+            setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void initBattle() {
+        System.out.println("TODO");
+    }
+
+    public void showUserCards(String token) { // ! none-admin users
+        if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
+            if(this.userController.initializeStack()) {
                 this.responseBody = String.valueOf(cardController
-                        .getAllCardsStats(userController.getUser().getStack().getStack()));
+                    .getCardListStats(this.userController.getUser().getStack().getStack(),"Stack"));
             } else {
                 this.responseBody = "Stack is empty";
             }
@@ -175,22 +163,22 @@ public class RequestHandler {
         }
     }
 
+    public List<String> parseJsonArray(String json) {
+        String replaceStr = json.replaceAll("[\\[\\] \\n\\r\"]", "");
+        List<String> array = Arrays.asList(replaceStr.split(","));
+        return array;
+    }
+
     public void  manipulateDeck(String token, String requestBody) {
-        if(userController.setUser(token) && !userController.getUser().isAdmin()) {
-            if(userController.initializeStack()) {
-                switch (requestContext.getMethod()) {
-                    case PUT:
-                        userController.addCardsToDeck(requestBody);
-                        break;
-                    case GET:
-                        userController.showDeck();
-                        break;
-                    default:
-                        setResponseStatus("Deck - This method is not allowed", StatusCode.BADREQUEST);
-                        break;
+
+        if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
+            if(this.userController.initializeStack()) {
+                switch (this.requestContext.getMethod()) {
+                    case PUT -> initializeDeck(requestBody);
+                    case GET -> displayDeck(false); //TODO: show in json
+                    default  -> setResponseStatus("Deck - This method is not allowed", StatusCode.BADREQUEST);
                 }
-            }
-            else {
+            } else {
                 this.responseBody = "Stack is empty";
             }
         } else {
@@ -198,9 +186,42 @@ public class RequestHandler {
         }
     }
 
+    public void displayDeck(boolean formatJson) {
+        if(!this.userController.getUser().isAdmin()) {
+            if(this.userController.getUser().getDeck().getDeckList() != null) {
+                List<Card> deck = this.userController.getUser().getDeck().getDeckList();
+                if(!deck.isEmpty()) {
+                    if(!formatJson) {
+                        this.responseBody = String.valueOf(cardController
+                                .getCardListStats(deck, "Deck"));
+                    }
+                } else {
+                    this.responseBody = "Deck is empty";
+                }
+            }
+        } else {
+            setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void initializeDeck(String requestBody) {
+        List<String> ids = parseJsonArray(requestBody);
+        if(ids.size() == 4) {
+            if(this.userController.addCardsToDeck(ids)) {
+                this.responseBody = "New deck prepared";
+            } else {
+                setResponseStatus(  "4 cards couldn't be addded. " +
+                                "Only user cards can be added to the deck",
+                        StatusCode.BADREQUEST);
+            }
+        } else {
+            setResponseStatus("4 cards needs to be added to stack", StatusCode.BADREQUEST);
+        }
+    }
+
     public void insertNewPackage() throws JsonProcessingException {
-        if(userController.getUser().isAdmin()) {
-            if( ! cardController.insertJSONCards( this.requestContext.getBody(), userController.getUser() ) ) {
+        if(this.userController.getUser().isAdmin()) {
+            if( ! this.cardController.insertJSONCards( this.requestContext.getBody(), this.userController.getUser() ) ) {
                 setResponseStatus( "This card already exists in DB", StatusCode.BADREQUEST);
             } else {
                 setResponseStatus( "Cards added to DB", StatusCode.BADREQUEST);
@@ -212,9 +233,9 @@ public class RequestHandler {
 
     public void buyNewPackage(String urlAction, String requestBody, String token) {
 
-        if(requestContext.getMethod() == HttpMethod.POST && userController.setUser(token) ){
+        if(this.requestContext.getMethod() == HttpMethod.POST && this.userController.setUser(token) ){
             if(urlAction.equals("packages") && requestBody.isEmpty()) {
-                this.responseBody = userController.buyNewPackage(null);
+                this.responseBody = this.userController.buyNewPackage(null);
             } else {
                 setResponseStatus("Wrong URL. Usage: URL/transactions/packages", StatusCode.BADREQUEST);
             }
@@ -235,18 +256,20 @@ public class RequestHandler {
         });
     }
 
-    public void manageUserInformation(String username, String token) {
-        if( userController.setUser(token) && token.equals( userController.getUser().getToken() ) ) { //token = user to be accessed
-            if( requestContext.getMethod() == HttpMethod.GET ) { //get user info
-                this.responseBody = userController.getUser().printUserDetails();
-            } else if ( requestContext.getMethod() == HttpMethod.PUT ) { //modify user
-//                editUser();
+    public void manipulateUserAccount(String token, String userNameURL) throws JsonProcessingException {
+        if( userNameURL.equals(token) ) { // * token = user
+
+            if( requestContext.getMethod() == HttpMethod.GET ) { // ! show user info
+                this.responseBody = this.userController.getUser().printUserDetails();
+
+            } else if ( requestContext.getMethod() == HttpMethod.PUT ) { // ! modify user info
+                this.responseBody = this.userController.editUser(this.requestContext.getBody());
             } else {
                 setResponseStatus("Method not allowed", StatusCode.BADREQUEST);
             }
-        } else {
 
-            this.responseBody = "You don't have access to other users' account";
+        } else {
+            setResponseStatus("You don't have access to other users' account", StatusCode.UNAUTHORIZED);
         }
     }
 
@@ -285,7 +308,7 @@ public class RequestHandler {
                 this.responseBody = "This user already exist in DB";
             }
         } else { // ! already logged
-            if(userController.setUser(token)) {
+            if(this.userController.setUser(token)) {
                 this.responseBody = "Can't include token";
             };
         }
@@ -293,7 +316,7 @@ public class RequestHandler {
 
     public void singIn(String requestBody) throws JsonProcessingException {
         Credentials credentials = getCredentials(requestBody);
-        this.responseBody = userController.login(credentials);
+        this.responseBody = this.userController.login(credentials);
         if(this.userController.getUser() == null) {
             this.status = StatusCode.UNAUTHORIZED;
         }
@@ -307,7 +330,7 @@ public class RequestHandler {
 //            } else {
 //                this.responseBody = "Data update failed (UserController)";
 //            }
-//            userController.setUser(user);
+//            this.userController.setUser(user);
 //        }
 //    }
 
@@ -341,17 +364,6 @@ public class RequestHandler {
         }
         return map;
     }
-
-
-//    private void convertToJson() {
-//        if(this.requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
-//            convertToJson();
-//            Gson g = new Gson();
-//            Player p = g.fromJson(this.requestContext.getBody(), Player.class);
-//            String str = g.toJson(p);
-//        }
-//    }
-
 
 }
 

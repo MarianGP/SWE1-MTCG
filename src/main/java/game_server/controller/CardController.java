@@ -10,10 +10,10 @@ import game.enums.Element;
 import game.enums.MonsterType;
 import game.user.User;
 import game_server.db.DbConnection;
+import game_server.serializer.CustomCardSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import game_server.serializer.CustomCardSerializer;
 
 import java.util.List;
 
@@ -22,9 +22,6 @@ import java.util.List;
 @Builder
 public class CardController {
     private DbConnection db;
-    private Card card;
-    private List<Card> cardList;
-
 
     public CustomCardSerializer[] serializeCard(String jsonCardsArray) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -45,7 +42,7 @@ public class CardController {
         return true;
     }
 
-    private  Card buildCustomCard(CustomCardSerializer customCard) {
+    private Card buildCustomCard(CustomCardSerializer customCard) {
         Card card;
         if ( customCard.getMonsterType() == null || customCard.getMonsterType().isEmpty()) {
             card = new SpellCard(
@@ -64,15 +61,23 @@ public class CardController {
         return card;
     }
 
-    public StringBuilder getAllCardsStats(List<Card> stackList) {
+    public StringBuilder getCardListStats(List<Card> cardList, String deckName) {
         StringBuilder all = new StringBuilder();
 
-        System.out.println("Your Card's Stack");
-        for (Card temp: stackList) {
+        System.out.println("Your "+ deckName + " Cards: " );
+        for (Card temp: cardList) {
             all.append(temp.getCardStats());
         }
 
         return all;
+    }
+
+    public boolean deleteCardsList(List <Card> cardList)  {
+        for(Card temp: cardList) {
+            db.deleteCard(temp.getCid());
+        }
+        //TODO: maybe use it
+        return false;
     }
 
 }

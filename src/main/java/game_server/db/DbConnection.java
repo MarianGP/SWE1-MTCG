@@ -106,41 +106,7 @@ public class DbConnection {
         return user;
     }
 
-    public boolean insertCard(Card card, Boolean toDeck, User user, String cid, int packageId) {
-        this.c = connect();
-        int rows = 0;
-
-        try {
-            String query = (
-            "INSERT INTO public.card" +
-            " (\"cardId\", name, \"monsterType\", element, damage, deck, owner, \"packageId\")" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-
-            PreparedStatement stmt = this.c.prepareStatement(query);
-            stmt.setString(1, cid);
-            stmt.setString(2, card.getName());
-
-            String type = (card.getType() == null) ? null : card.getType().getName();
-            stmt.setString(3, type);
-            stmt.setString(4,  card.getCardElement().getElementName());
-            stmt.setFloat(5, card.getDamage());
-            stmt.setBoolean(6, toDeck);
-
-            String owner = (user.isAdmin()) ? null : user.getUsername();
-            stmt.setString(7, owner);
-            stmt.setInt(8, packageId);
-            rows = stmt.executeUpdate();
-
-            if (rows > 0) this.c.commit();
-            closeConnection(stmt);
-
-        } catch (SQLException throwables) {
-            System.out.println("This card were already loaded to DB");
-        }
-        return rows > 0;
-    }
-
-    public boolean editUserData(User user, String oldUsername) {
+    public boolean editUser(User user, String oldUsername) {
         c = connect();
         int rows = 0;
         try {
@@ -159,7 +125,7 @@ public class DbConnection {
 
             rows = stmt.executeUpdate();
 
-            if (rows > 0) c.commit();
+            if (rows > 0) this.c.commit();
             closeConnection(stmt);
 
         } catch (SQLException throwables) {
@@ -182,35 +148,13 @@ public class DbConnection {
 
             rows = stmt.executeUpdate();
 
-            if (rows > 0) c.commit();
+            if (rows > 0) this.c.commit();
             closeConnection(stmt);
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         return rows > 0;
-    }
-
-    public int getMaxPackageId() {
-        try {
-            this.c = connect();
-            String query = ("SELECT max(\"packageId\") as maxId FROM PUBLIC.CARD;");
-            PreparedStatement stmt = this.c.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            try {
-                if(rs.next()) {
-                    return rs.getInt("maxId");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return 0;
-            }
-            closeConnection(rs,stmt);
-        } catch (RuntimeException | SQLException e) {
-            System.out.println("Get max packageId exception");
-            return 0;
-        }
-        return 0;
     }
 
     public boolean addSession(String token){
@@ -335,6 +279,145 @@ public class DbConnection {
         return userList;
     }
 
+    public User buildUser(ResultSet rs, boolean withPass) throws SQLException {
+        String pass;
+        if(withPass) {
+            pass = rs.getString("password");
+        } else {
+            pass = "";
+        }
+        User user = User.builder()
+                .username( rs.getString("username") )
+                .password( pass )
+                .token( rs.getString("token") )
+                .bio( rs.getString("bio") )
+                .coins( rs.getInt("coins") )
+                .elo( rs.getInt("elo") )
+                .image( rs.getString("image") )
+                .stack(new CardStack())
+                .deck(new CardDeck())
+                .isAdmin( rs.getBoolean("admin") )
+                .build();
+        List<Card> list = getCardListByOwner(user.getUsername());
+        user.getStack().addListToStack(list);
+        return user;
+    }
+
+    public boolean deleteUser(User user) { // for testing purposes
+        try {
+            this.c = connect();
+            String query = ( "DELETE FROM PUBLIC.USER WHERE username = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, user.getUsername());
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+            this.c = null;
+
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean logOut(String token) {
+        try {
+            this.c = connect();
+            String query = ( "DELETE FROM PUBLIC.session WHERE token = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, token);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+            this.c = null;
+
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // ! CARDS
+
+    public boolean insertCard(Card card, Boolean toDeck, User user, String cid, int packageId) {
+        this.c = connect();
+        int rows = 0;
+
+        try {
+            String query = (
+                    "INSERT INTO public.card" +
+                            " (\"cardId\", name, \"monsterType\", element, damage, deck, owner, \"packageId\")" +
+                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, cid);
+            stmt.setString(2, card.getName());
+
+            String type = (card.getType() == null) ? null : card.getType().getName();
+            stmt.setString(3, type);
+            stmt.setString(4,  card.getCardElement().getElementName());
+            stmt.setFloat(5, card.getDamage());
+            stmt.setBoolean(6, toDeck);
+
+            String owner = (user.isAdmin()) ? null : user.getUsername();
+            stmt.setString(7, owner);
+            stmt.setInt(8, packageId);
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            System.out.println("This card were already loaded to DB");
+        }
+        return rows > 0;
+    }
+
+    public boolean deleteCard(String cid) {
+        try {
+            this.c = connect();
+            String query = ( "DELETE FROM PUBLIC.CARD WHERE \"cardId\" = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, cid);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    public int getMaxPackageId() {
+        try {
+            this.c = connect();
+            String query = ("SELECT max(\"packageId\") as maxId FROM PUBLIC.CARD;");
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            try {
+                if(rs.next()) {
+                    return rs.getInt("maxId");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
+            closeConnection(rs,stmt);
+        } catch (RuntimeException | SQLException e) {
+            System.out.println("Get max packageId exception");
+            return 0;
+        }
+        return 0;
+    }
+
     public Card getCardById(String cid) {
         Card card = null;
 
@@ -358,7 +441,7 @@ public class DbConnection {
         return card;
     }
 
-    public List<Card> getCardByOwner(String username) {
+    public List<Card> getCardListByOwner(String username) {
         List<Card> cardList = new ArrayList<>();
         Card temp;
 
@@ -417,12 +500,75 @@ public class DbConnection {
             stmt.setString(1, username);
             stmt.setInt(2, packageId);
             int rows = stmt.executeUpdate();
-            if (rows > 0) c.commit();
+            if (rows > 0) this.c.commit();
 
             closeConnection(stmt);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+
+    public void cleanupDeck(String username) {
+        try {
+            this.c = connect();
+            String query = (
+                    "UPDATE public.card SET deck = false WHERE owner = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, username);
+
+            int rows = stmt.executeUpdate();
+            if (rows > 0) this.c.commit();
+
+            closeConnection(stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public boolean addToDeck(String cardId, String username) {
+        try {
+            this.c = connect();
+            String query = (
+                    "UPDATE public.card SET deck = true WHERE \"cardId\" = ? AND owner = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, cardId);
+            stmt.setString(2, username);
+
+            int rows = stmt.executeUpdate();
+            if (rows > 0) this.c.commit();
+
+            this.c.commit();
+            closeConnection(stmt);
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Card> getDeckCards(String username) {
+        List<Card> cardList = new ArrayList<>();
+        Card temp;
+
+        try {
+            this.c = connect();
+            String query = ( "SELECT * FROM PUBLIC.CARD WHERE \"owner\" = ? AND deck = true;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                do {
+                    temp = buildCard(rs);
+                    cardList.add(temp);
+                } while (rs.next());
+            }
+
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return cardList;
     }
 
     private Card buildCard(ResultSet rs) throws SQLException {
@@ -443,89 +589,6 @@ public class DbConnection {
                     rs.getFloat("damage"));
         }
         return card;
-    }
-
-    public User buildUser(ResultSet rs, boolean withPass) throws SQLException {
-        String pass;
-        if(withPass) {
-            pass = rs.getString("password");
-        } else {
-            pass = "";
-        }
-        User user = User.builder()
-                .username( rs.getString("username") )
-                .password( pass )
-                .token( rs.getString("token") )
-                .bio( rs.getString("bio") )
-                .coins( rs.getInt("coins") )
-                .elo( rs.getInt("elo") )
-                .stack(new CardStack())
-                .deck(new CardDeck())
-                .isAdmin( rs.getBoolean("admin") )
-                .build();
-        List<Card> list = getCardByOwner(user.getUsername());
-        user.getStack().addListToStack(list);
-        return user;
-    }
-
-    public CardStack loadDeck(String username, String CardId) throws SQLException {
-        String query = ("SELECT * FROM PUBLIC.CARD WHERE owner = ? AND \"cardId\" = ?;");
-        PreparedStatement stmt = c.prepareStatement(query);
-        stmt.setString(1, username);
-        stmt.setString(2, CardId);
-        ResultSet rs = stmt.executeQuery();
-//        Card card;
-//        try {
-//            CardStack stack = new CardStack();
-//            while ( rs.next() ) {
-//                if(rs.getString("name").contains("Spell")) {
-//                    card = new SpellCard(cardElement, aName, (int) damage);
-//                } else {
-//                    card = new MonsterCard(cardElement, aName, (int) damage);
-//                }
-//            }
-//        } catch (RuntimeException e) {
-//            System.out.println("Unable to create stack");
-//        }
-
-        return null;
-    }
-
-    public boolean deleteUser(User user) {
-        try {
-            this.c = connect();
-            String query = ( "DELETE FROM PUBLIC.USER WHERE username = ?;" );
-            PreparedStatement stmt = this.c.prepareStatement(query);
-            stmt.setString(1, user.getUsername());
-            int rows = stmt.executeUpdate();
-
-            if (rows > 0) this.c.commit();
-            closeConnection(stmt);
-            this.c = null;
-
-            return true;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean deleteCard(String cid) {
-        try {
-            this.c = connect();
-            String query = ( "DELETE FROM PUBLIC.CARD WHERE \"cardId\" = ?;" );
-            PreparedStatement stmt = this.c.prepareStatement(query);
-            stmt.setString(1, cid);
-            int rows = stmt.executeUpdate();
-
-            if (rows > 0) this.c.commit();
-            closeConnection(stmt);
-
-            return true;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return false;
-        }
     }
 
     public void closeConnection(ResultSet rs, PreparedStatement stmt) throws SQLException {

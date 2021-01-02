@@ -69,7 +69,7 @@ public class User implements Comparable<User> {
     }
 
     public void reorganizeCards() {
-        this.stack.addListToStack(this.deck.getDeck());
+        this.stack.addListToStack(this.deck.getDeckList());
         this.deck.clearDeck();
     }
 
@@ -80,25 +80,26 @@ public class User implements Comparable<User> {
     public String userStats(String rank) {
         if(!this.isAdmin) {
             if(rank.isEmpty()) {
-                return  "\n" + rank +
+                return  rank +
                         " User: " + this.username +
                         " Coins: " + this.coins +
-                        " - ELO: " + this.elo;
+                        " - ELO: " + this.elo + "\n";
             }
-            return  "\n" + rank +
+            return  rank +
                     " User: " + this.username +
-                    " - ELO: " + this.elo;
+                    " - ELO: " + this.elo + "\n";
         } else {
             return "";
         }
     }
 
     public String printUserDetails() {
-        return  "\nUser: " + this.username +
+        return  "-- User Account Summary -- \n" +
+                "User: " + this.username +
                 " - ELO: " + this.elo + " - cois: " + this.coins +
                 "\nBio: "+ this.bio +
                 "\nImage: "+ this.image +
-                "\nToken: "+ this.token + " ";
+                "\nToken: "+ this.token + " \n";
     }
 
     @Override

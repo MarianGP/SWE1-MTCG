@@ -60,8 +60,8 @@ class BattleTest {
     void returnWinnerPlayer2() {
         Assertions.assertEquals(null,anotherBattle.checkWinner(player3, player4));
         player4.getDeck().clearDeck();
-        Assertions.assertEquals(0, player4.getDeck().getDeck().size());
-        Assertions.assertEquals(5, player3.getDeck().getDeck().size());
+        Assertions.assertEquals(0, player4.getDeck().getDeckList().size());
+        Assertions.assertEquals(5, player3.getDeck().getDeckList().size());
         Assertions.assertEquals(player3,anotherBattle.checkWinner(player3, player4));
         Assertions.assertEquals(player4,anotherBattle.getLoser(player3, player4));
 
@@ -87,14 +87,14 @@ class BattleTest {
     @Test
     @DisplayName("Compare cards and move to round-winner: Player Next plays a stronger Card")
     void moveDefeatedCard() {
-        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
-        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(wizzard,elf);
-        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(elf,wizzard);
-        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
     }
 
     @Test

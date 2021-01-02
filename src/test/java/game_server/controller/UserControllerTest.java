@@ -58,29 +58,29 @@ class UserControllerTest {
     Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
     Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
 
-    boolean isLogged = userController.getDb().deleteSession("marian-mtcgToken");
+    boolean isLogged = this.userController.getDb().deleteSession("marian-mtcgToken");
 
     @Test
     @DisplayName("Log In: Wrong/Correct Pass, Logged")
     void testLogin() throws JsonProcessingException, SQLException {
         Assertions.assertEquals("Wrong user or password",
-                userController.login(RequestHandler.getCredentials(wrongJson)));
+                this.userController.login(RequestHandler.getCredentials(wrongJson)));
         Assertions.assertEquals("Login was successful",
-                userController.login(RequestHandler.getCredentials(correctJson)));
+                this.userController.login(RequestHandler.getCredentials(correctJson)));
         Assertions.assertEquals("User is already logged in",
-                userController.login(RequestHandler.getCredentials(correctJson)));
+                this.userController.login(RequestHandler.getCredentials(correctJson)));
     }
 
     @Test
     void testGetLoggedUser() {
-        Assertions.assertEquals("Session was opened",userController.setUser("stefan-mtcgToken"));
+        Assertions.assertEquals("Session was opened",this.userController.setUser("stefan-mtcgToken"));
     }
 
     @Test
     @DisplayName("Buy new package")
     void testBuyPackage() {
         createList();
-        userController.buyNewPackage(cardsList);
+        this.userController.buyNewPackage(cardsList);
     }
 
 

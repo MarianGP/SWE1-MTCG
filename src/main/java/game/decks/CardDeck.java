@@ -15,29 +15,36 @@ import java.util.Random;
 
 public class CardDeck implements Randomizable {
     private final static int DECKSIZE = 5;
-    private List<Card> deck;
+    private List<Card> deckList;
     Random RANDOM = new Random();
 
     public CardDeck() {
-        this.deck = new ArrayList<>();
+        this.deckList = new ArrayList<>();
     }
 
+//    public CardDeck(List<Card> cardList) {
+//        this.deck = new ArrayList<>();
+//        for(Card temp: cardList) {
+//            this.deck.
+//        }
+//    }
+
     public CardDeck(User player) {
-        this.deck = new ArrayList<>();
+        this.deckList = new ArrayList<>();
         for (int i = 0; i < DECKSIZE; i++) {
-            this.deck.add( player.getStack().randomCard() ); //deletes from stack and adds to deck
+            this.deckList.add( player.getStack().randomCard() ); //deletes from stack and adds to deck
         }
     }
 
     public Card randomCard() {
-        int randomPosition = RANDOM.nextInt(this.deck.size());
-        Card dropped = this.deck.get(randomPosition);
-        this.deck.remove(randomPosition);
+        int randomPosition = RANDOM.nextInt(this.deckList.size());
+        Card dropped = this.deckList.get(randomPosition);
+        this.deckList.remove(randomPosition);
         return dropped;
     }
 
     public void clearDeck() {
-        this.deck.clear();
+        this.deckList.clear();
     }
 
     //adding cards defeated during battle
@@ -46,7 +53,5 @@ public class CardDeck implements Randomizable {
             oneList.add(oneList.get(i));
         }
     }
-
-
 
 }
