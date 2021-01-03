@@ -3,6 +3,8 @@ package game.battle;
 import game.cards.Card;
 import game.cards.MonsterCard;
 import game.cards.SpellCard;
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
@@ -16,10 +18,23 @@ import org.mockito.Mock;
 
 class BattleTest {
     @Mock
-    User player1 = User.builder().username("Player1").build();
-    User player2 = User.builder().username("Player2").build();
-    User player3 = User.builder().username("Player3").build();
-    User player4 = User.builder().username("Player4").build();
+
+    User player1 = User.builder().username("Player1").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player2 = User.builder().username("Player2").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player3 = User.builder().username("Player3").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player4 = User.builder().username("Player4").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
 
     Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
     Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
@@ -32,8 +47,6 @@ class BattleTest {
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);
     Battle nextBattle = new Battle(player3, player2, 100);
-
-
 
     @BeforeEach
     void setUp() {
@@ -98,10 +111,9 @@ class BattleTest {
     }
 
     @Test
-    @DisplayName ("One Round ")
+    @DisplayName ("A few rounds Round")
     void playOneRound() {
-        Battle newBattle = new Battle(player2, player3, 2);
-        newBattle.startBattle();
+        nextBattle.startBattle();
         Assertions.assertEquals(2, newBattle.getRounds());
     }
 

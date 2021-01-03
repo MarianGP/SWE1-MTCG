@@ -32,6 +32,12 @@ class DbConnectionTest {
             .isAdmin(false)
             .build();
 
+    User user2 = User.builder()
+            .username("JohnDoe")
+            .coins(15)
+            .elo(101)
+            .build();
+
     User updatedUser = User.builder()
             .username("JohnDowwww")
             .password("12345")
@@ -87,7 +93,7 @@ class DbConnectionTest {
         db.insertUser(user);
 
         //edit stats
-        Assertions.assertEquals(true, db.editUserStats(user, -5,+1));
+        Assertions.assertEquals(true, db.editUserStats(user2));
         Assertions.assertEquals(15, db.getUser("JohnDoe").getCoins());
         Assertions.assertEquals(101, db.getUser("JohnDoe").getElo());
 

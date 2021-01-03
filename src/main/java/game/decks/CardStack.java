@@ -12,23 +12,23 @@ import java.util.Random;
 @Getter
 @Setter
 public class CardStack implements Randomizable {
-    List<Card> stack;
+    List<Card> stackList;
     private static final Random RANDOM = new Random();
 
     public CardStack() {
-        this.stack = new ArrayList<>();
+        this.stackList = new ArrayList<>();
     }
 
     public Card randomCard() {
-        int rand = RANDOM.nextInt(this.stack.size());
-        Card temp = this.stack.get(rand);
-        this.stack.remove(rand);
+        int rand = RANDOM.nextInt(this.stackList.size());
+        Card temp = this.stackList.get(rand);
+        this.stackList.remove(rand);
         return temp;
     }
 
     public void addListToStack(List<Card> list) {
         for (int i = 0; i < list.size(); i++) {
-            this.stack.add(list.get(i));
+            this.stackList.add(list.get(i));
         }
     }
 

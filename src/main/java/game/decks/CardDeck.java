@@ -22,17 +22,11 @@ public class CardDeck implements Randomizable {
         this.deckList = new ArrayList<>();
     }
 
-//    public CardDeck(List<Card> cardList) {
-//        this.deck = new ArrayList<>();
-//        for(Card temp: cardList) {
-//            this.deck.
-//        }
-//    }
-
+    //  ! random Deck from stack
     public CardDeck(User player) {
         this.deckList = new ArrayList<>();
         for (int i = 0; i < DECKSIZE; i++) {
-            this.deckList.add( player.getStack().randomCard() ); //deletes from stack and adds to deck
+            this.deckList.add( player.getStack().randomCard() );
         }
     }
 

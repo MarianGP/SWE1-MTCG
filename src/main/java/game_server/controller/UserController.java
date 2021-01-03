@@ -54,7 +54,7 @@ public class UserController {
         if(list.isEmpty() || list == null) {
             return false;
         } else {
-            this.user.getStack().setStack(list);
+            this.user.getStack().setStackList(list);
             this.user.getDeck().setDeckList(db.getDeckCards(this.user.getUsername()));
             return true;
         }
@@ -121,6 +121,7 @@ public class UserController {
             db.addOwnerToPackage(this.user.getUsername(), db.getMaxPackageId());
         }
         this.user.buyPackage(packageDB);
+        db.editUserStats(this.user); // ! CAREFUL last minute change
         return "Package bought";
     }
 

@@ -29,7 +29,7 @@ public class User implements Comparable<User> {
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
 
-    public void buyPackage(){ //for testing purposes
+    public void buyPackage(){ // ! random package for testing
         Package newPackage = new Package();
         if(this.coins - newPackage.getPRICE() > 0) {
             this.coins = this.coins - newPackage.getPRICE();
@@ -37,7 +37,7 @@ public class User implements Comparable<User> {
         }
     }
 
-    public void buyPackage(List<Card> list){
+    public void buyPackage(List<Card> list){ // ! DB cards
         Package newPackage = new Package(list);
         if(this.coins - newPackage.getPRICE() > 0) {
             this.coins = this.coins - newPackage.getPRICE();
@@ -47,15 +47,6 @@ public class User implements Comparable<User> {
 
     public void prepareDeck() {
         this.deck = new CardDeck(this);
-    }
-
-    public void listCards(List<Card> aStack) {
-        int i = 0;
-        System.out.println("Your Card's Stack");
-        while (i < aStack.size()) {
-            aStack.get(i).getCardStats();
-            i++;
-        }
     }
 
     public void eloDown() {
@@ -96,7 +87,7 @@ public class User implements Comparable<User> {
     public String printUserDetails() {
         return  "-- User Account Summary -- \n" +
                 "User: " + this.username +
-                " - ELO: " + this.elo + " - cois: " + this.coins +
+                " - ELO: " + this.elo + " - coins: " + this.coins +
                 "\nBio: "+ this.bio +
                 "\nImage: "+ this.image +
                 "\nToken: "+ this.token + " \n";
@@ -106,13 +97,5 @@ public class User implements Comparable<User> {
     public int compareTo(User user) {
         return this.elo - user.getElo();
     }
-
-//    public boolean isAdmin() {
-//        return isAdmin;
-//    }
-//
-//    public void setAdmin(boolean admin) {
-//        this.isAdmin = admin;
-//    }
 
 }

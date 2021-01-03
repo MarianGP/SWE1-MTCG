@@ -2,6 +2,7 @@ package game.battle;
 
 import game.cards.Card;
 import game.user.User;
+import game_server.db.DbConnection;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.List;
 
 public class Battle {
 
+    private static DbConnection db = new DbConnection();
+
     static private User winner = null;
     static private User loser = null;
     private int rounds = 0;
@@ -19,10 +22,10 @@ public class Battle {
     private User nextPlayer;
     private List<Card> table;
 
-    Battle(User player1, User player2, int setMaxRounds) {
+    public Battle(User player1, User player2, int setMaxRounds) {
         this.currentPlayer = player1;
         this.nextPlayer = player2;
-        this.table = new ArrayList<Card>();
+        this.table = new ArrayList<>();
         MAXROUNDS = setMaxRounds;
     }
 
@@ -38,8 +41,8 @@ public class Battle {
             winner.eloUp();     //+3 pts
             loser.eloDown();    //-5 pts
         }
-        this.currentPlayer.reorganizeCards();
-        this.nextPlayer.reorganizeCards();
+//        this.currentPlayer.reorganizeCards();
+//        this.nextPlayer.reorganizeCards();
     }
 
     private User playRound(User currentPlayer, User nextPlayer) {
@@ -111,20 +114,27 @@ public class Battle {
         System.out.println("Rounds: " + rounds);
         currentPlayer.userStats("");
         nextPlayer.userStats("");
-
     }
 
 //    public static void main(String[] args) {
-//        User p1 = new User("Player1" , "0");
-//        User p2 = new User("Player2" , "0");
+//        User p1 = User.builder().username("Player1").password("").token("")
+//                .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+//                .deck(new CardDeck()).isAdmin(false).build();
+//
+//        User p2 = User.builder().username("Player2").password("").token("")
+//                .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+//                .deck(new CardDeck()).isAdmin(false).build();
+//
 //        p1.buyPackage();
 //        p1.prepareDeck();
 //        p2.buyPackage();
 //        p2.prepareDeck();
 //
-//        Battle newBattle = new Battle(p1,p2,100);
+//        Battle newBattle = new Battle(p1,p2,1000);
+//
 //        newBattle.startBattle();
 //        newBattle.gameStats();
+//
 //    }
 
 }

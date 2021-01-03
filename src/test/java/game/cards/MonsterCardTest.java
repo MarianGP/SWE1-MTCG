@@ -121,7 +121,7 @@ class MonsterCardTest {
     @Test
     @DisplayName("Print Stats Dragon")
     void printStats() throws UnexpectedException {
-        Assertions.assertEquals("Card: Southern Fire-Dragon - AP: 120.0",dragon.getCardStats());
+        Assertions.assertEquals("\tCardId: null - Name: Southern Fire-Dragon - AP: 120.0 - Element: Fire - Type : Dragon\n",dragon.getCardStats());
     }
 
 

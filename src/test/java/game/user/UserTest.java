@@ -1,18 +1,28 @@
 package game.user;
 
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 class UserTest {
     @Mock
-    User player1 = User.builder().username("Player1").build();
+    User player1 = User.builder()
+            .username("Player1")
+            .password("")
+            .token("JohnDoe" + "-mtcgToken")
+            .bio(":/")
+            .image(":/")
+            .coins(20)
+            .elo(100)
+            .stack(new CardStack())
+            .deck(new CardDeck())
+            .isAdmin(false)
+            .build();
 
     @BeforeEach
     void setUp() {
@@ -25,17 +35,17 @@ class UserTest {
     void eloManipulation() {
         player1.eloDown();
         player1.eloUp();
-        assertAll("mockUser",
-                () -> assertEquals(98, player1.getElo())
+        Assertions.assertAll("mockUser",
+                () ->  Assertions.assertEquals(98, player1.getElo())
         );
     }
 
     @Test
     @DisplayName("Buy Package")
     void addPackageToStack() {
-        assertAll("mockUser",
-                () -> assertEquals(10, player1.getStack().getStack().size()),
-                () -> assertEquals(10, player1.getCoins())
+        Assertions.assertAll("mockUser",
+                () ->  Assertions.assertEquals(10, player1.getStack().getStackList().size()),
+                () ->  Assertions.assertEquals(10, player1.getCoins())
         );
     }
 
@@ -44,7 +54,7 @@ class UserTest {
     void createNewDeck() {
         player1.prepareDeck();
         Assertions.assertEquals(5, player1.getDeck().getDeckList().size());
-        Assertions.assertEquals(5, player1.getStack().getStack().size());
+        Assertions.assertEquals(5, player1.getStack().getStackList().size());
     }
 
     @Test

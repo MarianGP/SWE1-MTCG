@@ -194,7 +194,7 @@ public class RequestHandler {
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
             if(this.userController.initializeStack()) {
                 this.responseBody = String.valueOf(cardController
-                    .getCardListStats(this.userController.getUser().getStack().getStack(),"Stack"));
+                    .getCardListStats(this.userController.getUser().getStack().getStackList(),"Stack"));
             } else {
                 setResponseStatus("Stack is empty", StatusCode.NOCONTENT);
             }
@@ -360,18 +360,6 @@ public class RequestHandler {
             this.status = StatusCode.UNAUTHORIZED;
         }
     }
-
-//    private void editUser() {
-//        if(isContentJson()) {
-//            //            User user = convertFromJson(requestContext.getBody());
-//            if(user != null) {
-//                this.responseBody = "Data update was successful (UserController)";
-//            } else {
-//                this.responseBody = "Data update failed (UserController)";
-//            }
-//            this.userController.setUser(user);
-//        }
-//    }
 
     public void setResponseStatus(String responseMsg, StatusCode code) {
         this.status = code;

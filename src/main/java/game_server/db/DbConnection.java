@@ -157,6 +157,29 @@ public class DbConnection {
         return rows > 0;
     }
 
+    public boolean editUserStats(User user) {
+        c = connect();
+        int rows = 0;
+        try {
+            String query = (
+                    "UPDATE public.user SET coins = ?, elo = ? WHERE username LIKE ?;");
+
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setInt(1, user.getCoins() );
+            stmt.setInt(2, user.getElo() );
+            stmt.setString(3, user.getUsername());
+
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rows > 0;
+    }
+
     public boolean addSession(String token){
         int rows = 0;
         try {
@@ -608,7 +631,7 @@ public class DbConnection {
         this.c.close();
     }
 
-    public boolean setCardOwner(String cardId, String newOwner) {
+    public void setCardOwner(String cardId, String newOwner) {
         c = connect();
         int rows = 0;
         try {
@@ -627,7 +650,6 @@ public class DbConnection {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return rows > 0;
     }
 
     // ! TRADES
@@ -683,7 +705,7 @@ public class DbConnection {
         return allTradesId;
     }
 
-    public boolean deleteTrade(String cardId) {
+    public void deleteTrade(String cardId) {
         try {
             this.c = connect();
             String query = ( "DELETE FROM PUBLIC.TRADE WHERE \"cardId\" = ?;" );
@@ -695,10 +717,8 @@ public class DbConnection {
             closeConnection(stmt);
             this.c = null;
 
-            return true;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            return false;
         }
     }
 
