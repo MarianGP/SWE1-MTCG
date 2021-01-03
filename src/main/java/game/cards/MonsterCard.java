@@ -16,6 +16,7 @@ public class MonsterCard extends Card {
     private Element cardElement;
     private float damage;
     private boolean locked;
+    private String owner;
 
     public String getName() {
         return name;
@@ -38,21 +39,23 @@ public class MonsterCard extends Card {
         this.damage = damage;
     }
 
-    public MonsterCard(String cid, MonsterType type, Element cardElement, String name, float damage) {
+    public MonsterCard(String cid, MonsterType type, Element cardElement,
+                       String name, float damage, boolean inDeck, String owner) {
         this.cid = cid;
         this.name = name;
         this.type = type;
         this.cardElement = cardElement;
         this.damage = damage;
+        this.locked = inDeck;
+        this.owner = owner;
     }
 
     public String getCardStats() {
-        String stat =   "CardId: " + this.cid +
+        String stat =   "\tCardId: " + this.cid +
                         " - Name: " + this.name +
                         " - AP: " + this.damage +
                         " - Element: " + this.cardElement.getElementName() +
                         " - Type : " + this.type.getName() + "\n";
-        System.out.print(stat);
         return stat;
     }
 

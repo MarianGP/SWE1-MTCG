@@ -8,6 +8,7 @@ import game.cards.Card;
 import game.user.Credentials;
 import game.user.User;
 import game_server.controller.CardController;
+import game_server.controller.TradeController;
 import game_server.controller.UserController;
 import game_server.db.DbConnection;
 import game_server.enums.HttpMethod;
@@ -31,6 +32,7 @@ public class RequestHandler {
     private DbConnection db;
     private UserController userController;
     private CardController cardController;
+    private TradeController tradeController;
 
     public HttpResponse handleRequest() throws JsonProcessingException, SQLException {
 
@@ -99,6 +101,7 @@ public class RequestHandler {
             switch (first) {
                 case "users"        -> manipulateUserAccount(this.userController.getUser().getUsername(), second);
                 case "transactions" -> buyNewPackage(second, requestContext.getBody(), token);
+                case "tradings"     -> tradeCards(second, this.requestContext.getBody()); //TODO
                 default             -> setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
             }
         } else {
@@ -106,18 +109,29 @@ public class RequestHandler {
         }
     }
 
-    public void selectAction(String section, String token) throws JsonProcessingException, SQLException {
-
-        if(!this.userController.setUser(token)) {
-            anonymUserAction(section);
-        } else { // logged in
-            loggedUserAction(section);
+    public void tradeCards(String wantedCardId, String requestBody) {
+        String offeredCardId = requestBody.replaceAll("[\"]", "");
+        String errorMsg = tradeController.tradeCards(wantedCardId, offeredCardId, userController.getUser().getUsername());
+        if(errorMsg == null) {
+            this.responseBody = "Trade was successful";
+        } else {
+            setResponseStatus(errorMsg, StatusCode.BADREQUEST);
         }
     }
 
-    public void anonymUserAction(String action) throws JsonProcessingException, SQLException {
+    public void selectAction(String first, String token) throws JsonProcessingException, SQLException {
 
-        switch (action) {
+        if(!this.userController.setUser(token)) { // ! user is not logged in
+            anonymousUserAction(first);
+        } else {
+            loggedUserAction(first);
+        }
+
+    }
+
+    public void anonymousUserAction(String first) throws JsonProcessingException, SQLException {
+
+        switch (first) {
             case "users"    -> handleUser(this.requestContext.getBody(), this.requestContext.getMethod());
             case "sessions" -> singIn(this.requestContext.getBody());
             default         -> setResponseStatus("Unauthorized. Log in to access all functionalities",
@@ -125,8 +139,9 @@ public class RequestHandler {
         }
     }
 
-    public void loggedUserAction(String action) throws JsonProcessingException {
-        switch (action) {
+    public void loggedUserAction(String first) throws JsonProcessingException, SQLException {
+
+        switch (first) {
             case "score"    -> getScoreBoard();
             case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
             case "battles"  -> initBattle();
@@ -138,11 +153,36 @@ public class RequestHandler {
         }
     }
 
-    public void handleTradings(String token) {
+    public void handleTradings(String token) throws JsonProcessingException, SQLException {
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
-
+            switch(this.requestContext.getMethod()) {
+                case GET -> showCardsInCart();
+                case POST -> addCardToTrade(this.requestContext.getBody(), this.userController.getUser().getUsername());
+                default -> setResponseStatus("Tranding - Wrong method", StatusCode.BADREQUEST);
+            }
         } else {
             setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void addCardToTrade(String requestBody, String username) throws JsonProcessingException, SQLException {
+        String errorMsg = tradeController.addNewTrade(requestBody, username);
+        if(errorMsg == null) {
+            this.responseBody = "New trade added";
+        } else {
+            setResponseStatus(errorMsg, StatusCode.BADREQUEST);
+        }
+    }
+
+    public void showCardsInCart() {
+        String allStr = "--------------------\n" +
+                        "-- Cards to Trade --\n" +
+                        "--------------------\n\n";
+        String allTradesInfo = String.valueOf(tradeController.getTradesSummary());
+        if(allTradesInfo == null) {
+            setResponseStatus("The are no trades available", StatusCode.NOCONTENT);
+        } else {
+            this.responseBody = allStr + allTradesInfo;
         }
     }
 
@@ -156,7 +196,7 @@ public class RequestHandler {
                 this.responseBody = String.valueOf(cardController
                     .getCardListStats(this.userController.getUser().getStack().getStack(),"Stack"));
             } else {
-                this.responseBody = "Stack is empty";
+                setResponseStatus("Stack is empty", StatusCode.NOCONTENT);
             }
         } else {
             setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
@@ -179,7 +219,7 @@ public class RequestHandler {
                     default  -> setResponseStatus("Deck - This method is not allowed", StatusCode.BADREQUEST);
                 }
             } else {
-                this.responseBody = "Stack is empty";
+                setResponseStatus("Stack is empty", StatusCode.NOCONTENT);
             }
         } else {
             setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
@@ -196,7 +236,7 @@ public class RequestHandler {
                                 .getCardListStats(deck, "Deck"));
                     }
                 } else {
-                    this.responseBody = "Deck is empty";
+                    setResponseStatus("Deck is empty", StatusCode.NOCONTENT);
                 }
             }
         } else {
@@ -207,12 +247,11 @@ public class RequestHandler {
     public void initializeDeck(String requestBody) {
         List<String> ids = parseJsonArray(requestBody);
         if(ids.size() == 4) {
-            if(this.userController.addCardsToDeck(ids)) {
+            String errorMsg = this.userController.addCardsToDeck(ids);
+            if(errorMsg == null) {
                 this.responseBody = "New deck prepared";
             } else {
-                setResponseStatus(  "4 cards couldn't be addded. " +
-                                "Only user cards can be added to the deck",
-                        StatusCode.BADREQUEST);
+                setResponseStatus(  errorMsg, StatusCode.BADREQUEST);
             }
         } else {
             setResponseStatus("4 cards needs to be added to stack", StatusCode.BADREQUEST);
@@ -224,7 +263,7 @@ public class RequestHandler {
             if( ! this.cardController.insertJSONCards( this.requestContext.getBody(), this.userController.getUser() ) ) {
                 setResponseStatus( "This card already exists in DB", StatusCode.BADREQUEST);
             } else {
-                setResponseStatus( "Cards added to DB", StatusCode.BADREQUEST);
+                this.responseBody = "Cards added to DB";
             }
         } else {
             setResponseStatus("Only admin can add new packages", StatusCode.UNAUTHORIZED);

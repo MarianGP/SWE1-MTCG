@@ -16,5 +16,6 @@ public abstract class Card extends CardStack implements CardInterface, Attackabl
     private Element cardElement;
     private float damage;
     private boolean locked;
-
+    private String owner;
+    //TODO: delete what is not necessary
 }

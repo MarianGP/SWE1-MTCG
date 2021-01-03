@@ -79,6 +79,7 @@ public class GameServer implements Runnable {
                                 .userController(new UserController(
                                         new DbConnection(), null))
                                 .cardController( new CardController( new DbConnection() ) )
+                                .tradeController( new TradeController( new DbConnection() ) )
                                 .build();
 
                         HttpResponse response = requestHandler.handleRequest();

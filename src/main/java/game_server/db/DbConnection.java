@@ -8,6 +8,7 @@ import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.user.User;
+import game_server.trade.Trade;
 import lombok.Data;
 
 import java.io.FileInputStream;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 @Data
@@ -299,7 +299,9 @@ public class DbConnection {
                 .isAdmin( rs.getBoolean("admin") )
                 .build();
         List<Card> list = getCardListByOwner(user.getUsername());
-        user.getStack().addListToStack(list);
+        if(!list.isEmpty()) {
+            user.getStack().addListToStack(list);
+        }
         return user;
     }
 
@@ -525,7 +527,7 @@ public class DbConnection {
         }
     }
 
-    public boolean addToDeck(String cardId, String username) {
+    public boolean setIsDeck(String cardId, String username) {
         try {
             this.c = connect();
             String query = (
@@ -539,7 +541,7 @@ public class DbConnection {
 
             this.c.commit();
             closeConnection(stmt);
-            return true;
+            return (rows > 0);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return false;
@@ -579,14 +581,18 @@ public class DbConnection {
                     rs.getString("cardId"),
                     Element.find(rs.getString("element")),
                     rs.getString("name"),
-                    rs.getFloat("damage"));
+                    rs.getFloat("damage"),
+                    rs.getBoolean("deck"),
+                    rs.getString("owner"));
         } else {
             card = new MonsterCard(
                     rs.getString("cardId"),
-                    Objects.requireNonNull(MonsterType.find(rs.getString("monsterType"))),
-                    Objects.requireNonNull(Element.find(rs.getString("element"))),
+                    MonsterType.find(rs.getString("monsterType")),
+                    Element.find(rs.getString("element")),
                     rs.getString("name"),
-                    rs.getFloat("damage"));
+                    rs.getFloat("damage"),
+                    rs.getBoolean("deck"),
+                    rs.getString("owner"));
         }
         return card;
     }
@@ -600,6 +606,121 @@ public class DbConnection {
     public void closeConnection(PreparedStatement stmt) throws SQLException {
         stmt.close();
         this.c.close();
+    }
+
+    public boolean setCardOwner(String cardId, String newOwner) {
+        c = connect();
+        int rows = 0;
+        try {
+            String query = (
+                    "UPDATE public.card SET owner = ? WHERE \"cardId\" LIKE ?;");
+
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.setString(1, newOwner);
+            stmt.setString(2, cardId);
+
+            rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return rows > 0;
+    }
+
+    // ! TRADES
+
+    public Trade getTradeByCardId(String cid) {
+        Trade trade = null;
+        try {
+            this.c = connect();
+            String query = ( "SELECT * FROM PUBLIC.TRADE WHERE \"cardId\" = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, cid);
+            ResultSet rs = stmt.executeQuery();
+            if(rs == null || !rs.next()) {
+                System.out.println("Card not found");
+                return null;
+            }
+
+            trade = Trade.builder()
+                    .cardId(rs.getString("cardId"))
+                    .minDamage(rs.getFloat("minDamage"))
+                    .isSpell(rs.getBoolean("isSpell"))
+                    .owner(rs.getString("owner"))
+                    .build();
+
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return trade;
+    }
+
+    public List<String> getAllTradesId() {
+        List<String> allTradesId = new ArrayList<>();
+        try {
+            this.c = connect();
+            String query = ( "SELECT \"cardId\" FROM PUBLIC.TRADE;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                do {
+                    allTradesId.add(rs.getString("cardId"));
+                } while (rs.next());
+            }
+
+            closeConnection(rs, stmt);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return allTradesId;
+        }
+
+        return allTradesId;
+    }
+
+    public boolean deleteTrade(String cardId) {
+        try {
+            this.c = connect();
+            String query = ( "DELETE FROM PUBLIC.TRADE WHERE \"cardId\" = ?;" );
+            PreparedStatement stmt = this.c.prepareStatement(query);
+            stmt.setString(1, cardId);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) this.c.commit();
+            closeConnection(stmt);
+            this.c = null;
+
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean insertTrade(Trade trade) throws SQLException {
+        int rows = 0;
+
+        this.c = connect();
+        String query = ("INSERT INTO public.trade (\"cardId\", \"minDamage\", \"isSpell\", owner)\n" +
+                "VALUES (?,?,?,?);");
+        PreparedStatement stmt = this.c.prepareStatement(query);
+        stmt.setString(1, trade.getCardId());
+        stmt.setFloat(2, trade.getMinDamage());
+        stmt.setBoolean(3, trade.isSpell());
+        stmt.setString(4, trade.getOwner());
+
+        rows = stmt.executeUpdate();
+
+        if (rows > 0) this.c.commit();
+        closeConnection(stmt);
+        this.c = null;
+
+        return rows > 0;
     }
 
 }

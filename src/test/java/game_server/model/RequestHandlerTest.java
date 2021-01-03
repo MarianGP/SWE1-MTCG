@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ class RequestHandlerTest {
 
     @Test
     @DisplayName("Show Scoreboard")
-    void testScoreBoard() throws JsonProcessingException {
+    void testScoreBoard() throws JsonProcessingException, SQLException {
         RequestHandler requestHandler =
                 getHandler(HttpMethod.GET, "", "", "http://localhost:10001/score");
         requestHandler.loggedUserAction("score");

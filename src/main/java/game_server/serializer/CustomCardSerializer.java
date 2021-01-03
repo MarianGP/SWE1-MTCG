@@ -9,7 +9,6 @@ public class CustomCardSerializer {
     private String element;
     private String name;
     private float damage;
-
 }
 
 

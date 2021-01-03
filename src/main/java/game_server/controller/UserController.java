@@ -51,7 +51,7 @@ public class UserController {
 
     public boolean initializeStack() {
         List<Card> list = db.getCardListByOwner(this.user.getUsername());
-        if(list.isEmpty()) {
+        if(list.isEmpty() || list == null) {
             return false;
         } else {
             this.user.getStack().setStack(list);
@@ -60,29 +60,36 @@ public class UserController {
         }
     }
 
-    public boolean addCardsToDeck(List<String> ids) {
-        int i = 0;
-        db.cleanupDeck(this.user.getUsername());
-        for(String id: ids) {
-            if(!db.addToDeck(id, this.user.getUsername())){
+    public String addCardsToDeck(List<String> ids) {
+
+        db.cleanupDeck(this.user.getUsername()); // ! cleanup deck
+
+        for(String id: ids) {  // ! mark card isDeck if user-id marches
+            if(!db.setIsDeck(id, this.user.getUsername())){
                 db.cleanupDeck(this.user.getUsername());
-                return false;
+                return "Card doesn't belong to this user. Not added.";
             }
-            i++;
-        }
-        if(i != 4) {
-            db.cleanupDeck(this.user.getUsername());
-            return false;
         }
 
+        // ! initialize/set new user's deck
         this.user.getDeck().setDeckList(db.getDeckCards(this.user.getUsername()));
-        return true;
+
+        for(String id: ids) { // ! delete from trading market
+            if(db.getTradeByCardId(id) != null)
+                db.deleteTrade(id);
+        }
+
+        return null;
     }
 
     public boolean setUser(String token) {
         this.user = db.getLoggedUser(token);
-        initializeStack(); //changed check for errors
-        return this.user != null;
+        if(this.user != null) {
+            initializeStack(); //changed check for errors
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public String login(Credentials credentials) {

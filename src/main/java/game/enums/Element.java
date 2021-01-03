@@ -47,6 +47,6 @@ public enum Element {
                 return type;
             }
         }
-        return null;
+        return NORMAL;
     }
 }

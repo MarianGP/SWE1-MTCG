@@ -16,6 +16,7 @@ public class SpellCard extends Card {
     private MonsterType type = null;
     private float damage;
     private boolean locked;
+    private String owner;
 
     public SpellCard(Element cardElement) {
         String prefix = Name.ONE.getName();
@@ -42,20 +43,20 @@ public class SpellCard extends Card {
         this.locked = false;
     }
 
-    public SpellCard(String cid, Element cardElement, String name, float damage) {
+    public SpellCard(String cid, Element cardElement, String name, float damage, boolean inDeck, String owner) {
         this.cid = cid;
         this.cardElement = cardElement;
         this.name = name;
         this.damage = damage;
-        this.locked = false;
+        this.locked = inDeck;
+        this.owner = owner;
     }
 
     public String getCardStats() {
-        String stat =   "CardId: " + this.cid +
+        String stat =   "\tCardId: " + this.cid +
                         " - Name: " + this.name +
                         " - AP: " + this.damage +
                         " - Element: " + this.cardElement.getElementName() + "\n";
-        System.out.print(stat);
         return stat;
     }
 

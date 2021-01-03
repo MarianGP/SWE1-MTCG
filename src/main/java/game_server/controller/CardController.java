@@ -34,7 +34,7 @@ public class CardController {
         CustomCardSerializer[] listCustomCard = serializeCard(jsonCardsArray);
         int packageID = db.getMaxPackageId() + 1;
         for(CustomCardSerializer temp: listCustomCard) {
-            Card card = buildCustomCard(temp);
+            Card card = buildCustomCard(temp, user.getUsername(), false);
             if (!db.insertCard(card, false, user, temp.getId(), packageID)) {
                 return false;
             }
@@ -42,21 +42,25 @@ public class CardController {
         return true;
     }
 
-    private Card buildCustomCard(CustomCardSerializer customCard) {
+    private Card buildCustomCard(CustomCardSerializer customCard, String username, boolean inDeck) {
         Card card;
         if ( customCard.getMonsterType() == null || customCard.getMonsterType().isEmpty()) {
             card = new SpellCard(
                     customCard.getId(),
                     Element.find(customCard.getElement()),
                     customCard.getName(),
-                    customCard.getDamage());
+                    customCard.getDamage(),
+                    inDeck,
+                    username);
         } else {
             card = new MonsterCard(
                     customCard.getId(),
                     MonsterType.find(customCard.getMonsterType()),
                     Element.find(customCard.getElement()),
                     customCard.getName(),
-                    customCard.getDamage());
+                    customCard.getDamage(),
+                    inDeck,
+                    username);
         }
         return card;
     }
@@ -68,7 +72,7 @@ public class CardController {
         for (Card temp: cardList) {
             all.append(temp.getCardStats());
         }
-
+        System.out.println(all);
         return all;
     }
 
