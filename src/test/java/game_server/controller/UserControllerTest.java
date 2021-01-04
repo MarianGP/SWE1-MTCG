@@ -64,11 +64,11 @@ class UserControllerTest {
     @DisplayName("Log In: Wrong/Correct Pass, Logged")
     void testLogin() throws JsonProcessingException, SQLException {
         Assertions.assertEquals("Wrong user or password",
-                this.userController.login(RequestHandler.getCredentials(wrongJson)));
+                this.userController.signIn(RequestHandler.getCredentials(wrongJson)));
         Assertions.assertEquals("Login was successful",
-                this.userController.login(RequestHandler.getCredentials(correctJson)));
+                this.userController.signIn(RequestHandler.getCredentials(correctJson)));
         Assertions.assertEquals("User is already logged in",
-                this.userController.login(RequestHandler.getCredentials(correctJson)));
+                this.userController.signIn(RequestHandler.getCredentials(correctJson)));
     }
 
     @Test
@@ -80,7 +80,7 @@ class UserControllerTest {
     @DisplayName("Buy new package")
     void testBuyPackage() {
         createList();
-        this.userController.buyNewPackage(cardsList);
+        this.userController.buyPackage(cardsList);
     }
 
 

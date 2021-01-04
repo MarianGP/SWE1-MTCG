@@ -13,6 +13,7 @@ import game_server.controller.UserController;
 import game_server.db.DbConnection;
 import game_server.enums.HttpMethod;
 import game_server.enums.StatusCode;
+import game_server.interfaces.RequestHandling;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Builder
 @Data
-public class RequestHandler {
+public class RequestHandler implements RequestHandling {
 
     private StatusCode status; // * response
     private HttpRequest requestContext;
@@ -86,10 +87,10 @@ public class RequestHandler {
         if(this.requestContext.getPath().contains("\\?"))
             handleUrlParameters(fullPath.split("\\?")[1]);
 
-        validateURLActions(this.path[1], this.path[2]);
+        validateURLActions(this.path[1]);
     }
 
-    public void validateURLActions(String first, String second) {
+    public void validateURLActions(String first) {
         String[] allowedTables = {"users", "sessions", "transactions", "tradings", "score", "stats", "battles", "deck", "cards", "", "packages", null};
         if( !Arrays.asList( allowedTables ).contains( first ) ) {
             this.path = null;
@@ -147,7 +148,7 @@ public class RequestHandler {
         switch (first) {
             case "score"    -> getScoreBoard();
             case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
-            case "battles"  -> initBattle(getClientToken());
+            case "battles"  -> startBattle(getClientToken());
             case "packages" -> insertNewPackage();
             case "cards"    -> showUserCards(getClientToken());
             case "deck"     -> manipulateDeck(getClientToken(), requestContext.getBody());
@@ -159,8 +160,8 @@ public class RequestHandler {
     public void handleTradings(String token) throws JsonProcessingException, SQLException {
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
             switch(this.requestContext.getMethod()) {
-                case GET -> showCardsInCart();
-                case POST -> addCardToTrade(this.requestContext.getBody(), this.userController.getUser().getUsername());
+                case GET -> showTrades();
+                case POST -> addTrade(this.requestContext.getBody(), this.userController.getUser().getUsername());
                 default -> setResponseStatus("Tranding - Wrong method", StatusCode.BADREQUEST);
             }
         } else {
@@ -168,7 +169,7 @@ public class RequestHandler {
         }
     }
 
-    public void addCardToTrade(String requestBody, String username) throws JsonProcessingException, SQLException {
+    public void addTrade(String requestBody, String username) throws JsonProcessingException, SQLException {
         String errorMsg = tradeController.addNewTrade(requestBody, username);
         if(errorMsg == null) {
             this.responseBody = "New trade added";
@@ -177,7 +178,7 @@ public class RequestHandler {
         }
     }
 
-    public void showCardsInCart() {
+    public void showTrades() {
         String allStr = "--------------------\n" +
                         "-- Cards to Trade --\n" +
                         "--------------------\n\n";
@@ -189,7 +190,7 @@ public class RequestHandler {
         }
     }
 
-    public void initBattle(String token) {
+    public void startBattle(String token) {
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin() && this.requestContext.getMethod() == HttpMethod.POST) {
             if (this.userController.initializeStack()) {
                 if(this.userController.getUser().getStack().getStackList().size() >= 4) {
@@ -218,19 +219,13 @@ public class RequestHandler {
         }
     }
 
-    public List<String> parseJsonArray(String json) {
-        String replaceStr = json.replaceAll("[\\[\\] \\n\\r\"]", "");
-        List<String> array = Arrays.asList(replaceStr.split(","));
-        return array;
-    }
-
-    public void  manipulateDeck(String token, String requestBody) {
+    public void manipulateDeck(String token, String requestBody) {
 
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
             if(this.userController.initializeStack()) {
                 switch (this.requestContext.getMethod()) {
                     case PUT -> initializeDeck(requestBody);
-                    case GET -> displayDeck(false); //TODO: show in json
+                    case GET -> showDeckCards(false); //TODO: show in json
                     default  -> setResponseStatus("Deck - This method is not allowed", StatusCode.BADREQUEST);
                 }
             } else {
@@ -241,7 +236,7 @@ public class RequestHandler {
         }
     }
 
-    public void displayDeck(boolean formatJson) {
+    public void showDeckCards(boolean formatJson) {
         if(!this.userController.getUser().isAdmin()) {
             if(this.userController.getUser().getDeck().getDeckList() != null) {
                 List<Card> deck = this.userController.getUser().getDeck().getDeckList();
@@ -289,7 +284,7 @@ public class RequestHandler {
 
         if(this.requestContext.getMethod() == HttpMethod.POST && this.userController.setUser(token) ){
             if(urlAction.equals("packages") && requestBody.isEmpty()) {
-                this.responseBody = this.userController.buyNewPackage(null);
+                this.responseBody = this.userController.buyPackage(null);
             } else {
                 setResponseStatus("Wrong URL. Usage: URL/transactions/packages", StatusCode.BADREQUEST);
             }
@@ -317,7 +312,7 @@ public class RequestHandler {
                 this.responseBody = this.userController.getUser().printUserDetails();
 
             } else if ( requestContext.getMethod() == HttpMethod.PUT ) { // ! modify user info
-                this.responseBody = this.userController.editUser(this.requestContext.getBody());
+                this.responseBody = this.userController.editUserData(this.requestContext.getBody());
             } else {
                 setResponseStatus("Method not allowed", StatusCode.BADREQUEST);
             }
@@ -352,12 +347,12 @@ public class RequestHandler {
         }
     }
 
-    private void signUp(String requestBody, String token) throws JsonProcessingException, SQLException { //POST
+    public void signUp(String requestBody, String token) throws JsonProcessingException, SQLException { //POST
         Credentials credentials = getCredentials(requestBody);
 
         if(token == null) { // ! not logged
             if(db.getUser(credentials.getUsername()) == null) { // ! not exist in DB
-               this.responseBody = userController.addUserDB(credentials);
+               this.responseBody = userController.signUp(credentials);
             } else {
                 this.responseBody = "This user already exist in DB";
             }
@@ -370,7 +365,7 @@ public class RequestHandler {
 
     public void singIn(String requestBody) throws JsonProcessingException {
         Credentials credentials = getCredentials(requestBody);
-        this.responseBody = this.userController.login(credentials);
+        this.responseBody = this.userController.signIn(credentials);
         if(this.userController.getUser() == null) {
             this.status = StatusCode.UNAUTHORIZED;
         }
@@ -379,15 +374,6 @@ public class RequestHandler {
     public void setResponseStatus(String responseMsg, StatusCode code) {
         this.status = code;
         this.responseBody = responseMsg;
-    }
-
-    public boolean isContentJson() { // for editUser
-        if(!requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
-            setResponseStatus("Only Json request are allowed", StatusCode.BADREQUEST);
-            return false;
-        } else {
-            return true;
-        }
     }
 
     public void handleUrlParameters(String parameters) {
@@ -405,6 +391,21 @@ public class RequestHandler {
             map.put(key, value);
         }
         return map;
+    }
+
+    public List<String> parseJsonArray(String json) {
+        String replaceStr = json.replaceAll("[\\[\\] \\n\\r\"]", "");
+        List<String> arr = Arrays.asList(replaceStr.split(","));
+        return arr;
+    }
+
+    public boolean isContentJson() { // for editUser
+        if(!requestContext.getHeaderPairs().get("Content-Type").equals("application/json")) {
+            setResponseStatus("Only Json request are allowed", StatusCode.BADREQUEST);
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

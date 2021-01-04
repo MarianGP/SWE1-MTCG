@@ -8,7 +8,7 @@ import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.user.User;
-import game_server.trade.Trade;
+import game.trade.Trade;
 import lombok.Data;
 
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package game_server.trade;
+package game.trade;
 
 import lombok.Builder;
 import lombok.Data;

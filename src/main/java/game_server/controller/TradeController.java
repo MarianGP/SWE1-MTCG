@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import game.cards.Card;
 import game.cards.SpellCard;
 import game_server.db.DbConnection;
-import game_server.serializer.CustomeTradeSerializer;
-import game_server.trade.Trade;
+import game_server.serializer.TradeData;
+import game.trade.Trade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -74,11 +74,10 @@ public class TradeController {
         db.deleteTrade(offeredCard.getCid()); //if already in trade delete it
 
         return null;
-
     }
 
     public String addNewTrade(String json, String username) throws JsonProcessingException, SQLException {
-        CustomeTradeSerializer tradeSerialized = getParsedTrade(json);
+        TradeData tradeSerialized = getParsedTrade(json);
         boolean isSpell = (!tradeSerialized.getType().equals("monster"));
         Trade trade = Trade.builder()
                 .cardId(tradeSerialized.getCardToTrade())
@@ -100,10 +99,9 @@ public class TradeController {
         }
     }
 
-    public CustomeTradeSerializer getParsedTrade(String json) throws JsonProcessingException {
+    public TradeData getParsedTrade(String json) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(json, CustomeTradeSerializer.class);
+        return objectMapper.readValue(json, TradeData.class);
     }
-
 
 }

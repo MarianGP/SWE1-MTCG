@@ -67,6 +67,4 @@ public class GameController {
         this.setFinished(true);
     }
 
-
-
 }

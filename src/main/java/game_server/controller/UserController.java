@@ -8,7 +8,7 @@ import game.decks.CardStack;
 import game.user.Credentials;
 import game.user.User;
 import game_server.db.DbConnection;
-import game_server.serializer.CustomUserSerializer;
+import game_server.serializer.UserData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +24,7 @@ public class UserController {
     private DbConnection db;
     private User user;
 
-    public String addUserDB(Credentials credentials) throws SQLException {
+    public String signUp(Credentials credentials) throws SQLException {
         try {
             this.user = User.builder()
                     .username(credentials.getUsername())
@@ -94,7 +94,7 @@ public class UserController {
         }
     }
 
-    public String login(Credentials credentials) {
+    public String signIn(Credentials credentials) {
         try {
             this.user = db.getUser(credentials.getUsername(), credentials.getPassword());
             if(this.user != null) {
@@ -114,7 +114,7 @@ public class UserController {
         }
     }
 
-    public String buyNewPackage(List<Card> packageDB) {
+    public String buyPackage(List<Card> packageDB) {
         if(packageDB == null) {
             packageDB = new ArrayList<>(db.getPackageCards(db.getMaxPackageId()));
             if(packageDB.size() == 0) {
@@ -127,8 +127,8 @@ public class UserController {
         return "Package bought";
     }
 
-    public String editUser(String jsonEditedUser) throws JsonProcessingException {
-        CustomUserSerializer parsedUser = getParsedUser(jsonEditedUser);
+    public String editUserData(String jsonEditedUser) throws JsonProcessingException {
+        UserData parsedUser = getParsedUser(jsonEditedUser);
 
         String pass = (parsedUser.getPassword() != null) ? parsedUser.getPassword() : this.user.getPassword();
         String newBio = (parsedUser.getBio() != null) ? parsedUser.getBio() : this.user.getBio();
@@ -154,9 +154,9 @@ public class UserController {
         }
     }
 
-    public CustomUserSerializer getParsedUser(String jsonEditUser) throws JsonProcessingException {
+    public UserData getParsedUser(String jsonEditUser) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(jsonEditUser, CustomUserSerializer.class);
+        return objectMapper.readValue(jsonEditUser, UserData.class);
     }
 
 

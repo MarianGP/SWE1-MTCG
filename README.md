@@ -40,12 +40,18 @@ Division of project into 2 main section:
 
 
 ### Failures
-1) 
-Problem: Try to define modify simultaneously gameController in GameServer
+1) Problem 1:
+   
+Try to modify simultaneously gameController in GameServer
 If a request hasn't been finished another request from a different client won't be run until the first one is finished.
-Solution: 
 
-2) Couldn't parse with Mapper 
+Solution: Threading
+
+2) Problem 2:
+   
+Couldn't parse with jackson directly to the wanted class.
+
+Solution: Create ClassData classes (package serializer), which won't have constructors (Compiler error) 
 
 ### Selected solutions
 
@@ -60,9 +66,14 @@ chosen and why the tested code is critical
 
 ### Time tracking
 
-too much
+~ 130-150 hrs
 
 
-#### Git-history
+### Git-history
+
+
+
+https://github.com/MarianGP/SWE1-MTCG
+
 
 

@@ -99,8 +99,4 @@ public class SpellCard extends Card {
         }
     }
 
-    public MonsterType geType(){
-        return null;
-    }
-
 }

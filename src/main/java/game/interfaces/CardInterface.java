@@ -1,5 +1,6 @@
 package game.interfaces;
 
 public interface CardInterface {
-    public String getCardStats();
+    String getCardStats();
+    boolean compareDamage(float attackerDP);
 }

@@ -3,7 +3,7 @@ package game_server.serializer;
 import lombok.Getter;
 
 @Getter
-public class CustomCardSerializer {
+public class CardData {
     private String id;
     private String monsterType;
     private String element;

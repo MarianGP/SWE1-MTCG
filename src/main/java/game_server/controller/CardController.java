@@ -10,7 +10,7 @@ import game.enums.Element;
 import game.enums.MonsterType;
 import game.user.User;
 import game_server.db.DbConnection;
-import game_server.serializer.CustomCardSerializer;
+import game_server.serializer.CardData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,18 +23,18 @@ import java.util.List;
 public class CardController {
     private DbConnection db;
 
-    public CustomCardSerializer[] serializeCard(String jsonCardsArray) throws JsonProcessingException {
+    public CardData[] serializeCard(String jsonCardsArray) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(
                 DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-        return objectMapper.readValue(jsonCardsArray, CustomCardSerializer[].class);
+        return objectMapper.readValue(jsonCardsArray, CardData[].class);
     }
 
     public boolean insertJSONCards(String jsonCardsArray, User user) throws JsonProcessingException {
-        CustomCardSerializer[] listCustomCard = serializeCard(jsonCardsArray);
+        CardData[] listCustomCard = serializeCard(jsonCardsArray);
         int packageID = db.getMaxPackageId() + 1;
-        for(CustomCardSerializer temp: listCustomCard) {
-            Card card = buildCustomCard(temp, user.getUsername(), false);
+        for(CardData temp: listCustomCard) {
+            Card card = buildCard(temp, user.getUsername(), false);
             if (!db.insertCard(card, false, user, temp.getId(), packageID)) {
                 return false;
             }
@@ -42,23 +42,23 @@ public class CardController {
         return true;
     }
 
-    private Card buildCustomCard(CustomCardSerializer customCard, String username, boolean inDeck) {
+    private Card buildCard(CardData cardData, String username, boolean inDeck) {
         Card card;
-        if ( customCard.getMonsterType() == null || customCard.getMonsterType().isEmpty()) {
+        if ( cardData.getMonsterType() == null || cardData.getMonsterType().isEmpty()) {
             card = new SpellCard(
-                    customCard.getId(),
-                    Element.find(customCard.getElement()),
-                    customCard.getName(),
-                    customCard.getDamage(),
+                    cardData.getId(),
+                    Element.find(cardData.getElement()),
+                    cardData.getName(),
+                    cardData.getDamage(),
                     inDeck,
                     username);
         } else {
             card = new MonsterCard(
-                    customCard.getId(),
-                    MonsterType.find(customCard.getMonsterType()),
-                    Element.find(customCard.getElement()),
-                    customCard.getName(),
-                    customCard.getDamage(),
+                    cardData.getId(),
+                    MonsterType.find(cardData.getMonsterType()),
+                    Element.find(cardData.getElement()),
+                    cardData.getName(),
+                    cardData.getDamage(),
                     inDeck,
                     username);
         }
