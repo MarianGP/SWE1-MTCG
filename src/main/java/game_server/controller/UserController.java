@@ -9,6 +9,7 @@ import game.user.Credentials;
 import game.user.User;
 import game_server.db.DbConnection;
 import game_server.serializer.CustomUserSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class UserController {
     private DbConnection db;
     private User user;

@@ -14,7 +14,7 @@ import java.util.Random;
 @Setter
 
 public class CardDeck implements Randomizable {
-    private final static int DECKSIZE = 5;
+    private final static int DECKSIZE = 4;
     private List<Card> deckList;
     Random RANDOM = new Random();
 

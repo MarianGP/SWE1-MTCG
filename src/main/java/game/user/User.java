@@ -86,11 +86,18 @@ public class User implements Comparable<User> {
 
     public String printUserDetails() {
         return  "-- User Account Summary -- \n" +
-                "User: " + this.username +
+                "\tUser: " + this.username +
                 " - ELO: " + this.elo + " - coins: " + this.coins +
                 "\nBio: "+ this.bio +
                 "\nImage: "+ this.image +
                 "\nToken: "+ this.token + " \n";
+    }
+
+    public String getUserStats() {
+        return  "-- User Account Summary -- \n" +
+                "User: " + this.username +
+                " - ELO: " + this.elo +
+                " - Total Cards: " + this.stack.getStackList().size() + " \n";
     }
 
     @Override

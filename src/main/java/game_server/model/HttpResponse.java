@@ -1,9 +1,10 @@
 package game_server.model;
 
 
+import game.user.User;
+import game_server.enums.StatusCode;
 import lombok.Builder;
 import lombok.Getter;
-import game_server.enums.StatusCode;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -16,11 +17,13 @@ import java.util.Set;
 public class HttpResponse {
 
     private final String version;
-    private final String response;
+    private String response;
     private final StatusCode status;
     private String contentType;
     private final Map<String, String> requestHeaderPairs;
     private Map<String, String> responseHeaderPairs;
+    private User player;
+    private boolean startBattle;
 
     public String getResponse() {
         this.responseHeaderPairs = new HashMap<>();

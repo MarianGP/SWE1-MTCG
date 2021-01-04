@@ -134,29 +134,6 @@ public class DbConnection {
         return rows > 0;
     }
 
-    public boolean editUserStats(User user, int coinsDelta, int eloDelta) {
-        c = connect();
-        int rows = 0;
-        try {
-            String query = (
-                    "UPDATE public.user SET coins = ?, elo = ? WHERE username LIKE ?;");
-
-            PreparedStatement stmt = c.prepareStatement(query);
-            stmt.setInt(1, user.getCoins() + coinsDelta );
-            stmt.setInt(2, user.getElo() + eloDelta );
-            stmt.setString(3, user.getUsername());
-
-            rows = stmt.executeUpdate();
-
-            if (rows > 0) this.c.commit();
-            closeConnection(stmt);
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return rows > 0;
-    }
-
     public boolean editUserStats(User user) {
         c = connect();
         int rows = 0;
@@ -181,11 +158,11 @@ public class DbConnection {
     }
 
     public boolean addSession(String token){
-        int rows = 0;
+        int rows;
         try {
             if(!isLogged(token)) {
                 this.c = connect();
-                String query = ("INSERT INTO PUBLIC.SESSION (token) VALUES (?);");
+                String query = ("INSERT INTO PUBLIC.SESSION (token, \"lastLoggedIn\") VALUES (?, current_timestamp);");
                 PreparedStatement stmt = this.c.prepareStatement(query);
                 stmt.setString(1, token);
                 rows = stmt.executeUpdate();
@@ -198,21 +175,6 @@ public class DbConnection {
             throwables.printStackTrace();
         }
         return false;
-    }
-
-    public boolean isLogged(String token) throws SQLException { //getSession
-        this.c = connect();
-        String query = ("SELECT * FROM PUBLIC.SESSION WHERE token = ?;");
-        PreparedStatement stmt = this.c.prepareStatement(query);
-        stmt.setString(1, token);
-        ResultSet rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            closeConnection(rs,stmt);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public boolean deleteSession(String token) {
@@ -232,6 +194,21 @@ public class DbConnection {
             throwables.printStackTrace();
         }
         return rows > 0;
+    }
+
+    public boolean isLogged(String token) throws SQLException { //getSession
+        this.c = connect();
+        String query = ("SELECT * FROM PUBLIC.SESSION WHERE token = ?;");
+        PreparedStatement stmt = this.c.prepareStatement(query);
+        stmt.setString(1, token);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            closeConnection(rs,stmt);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public User getUser(String username, String pass) {

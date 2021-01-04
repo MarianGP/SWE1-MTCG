@@ -28,6 +28,7 @@ public class RequestHandler {
     private HttpRequest requestContext;
     private String responseBody;
     private String[] path;
+    private boolean startBattle;
 
     private DbConnection db;
     private UserController userController;
@@ -51,6 +52,8 @@ public class RequestHandler {
                 .response(this.responseBody)
                 .status(this.status)
                 .requestHeaderPairs(this.requestContext.getHeaderPairs())
+                .player(this.userController.getUser())
+                .startBattle(startBattle)
                 .build();
     }
 
@@ -144,7 +147,7 @@ public class RequestHandler {
         switch (first) {
             case "score"    -> getScoreBoard();
             case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
-            case "battles"  -> initBattle();
+            case "battles"  -> initBattle(getClientToken());
             case "packages" -> insertNewPackage();
             case "cards"    -> showUserCards(getClientToken());
             case "deck"     -> manipulateDeck(getClientToken(), requestContext.getBody());
@@ -186,8 +189,20 @@ public class RequestHandler {
         }
     }
 
-    public void initBattle() {
-        System.out.println("TODO");
+    public void initBattle(String token) {
+        if(this.userController.setUser(token) && !this.userController.getUser().isAdmin() && this.requestContext.getMethod() == HttpMethod.POST) {
+            if (this.userController.initializeStack()) {
+                if(this.userController.getUser().getStack().getStackList().size() >= 4) {
+                    this.startBattle = true;
+                } else {
+                    setResponseStatus("You don't have enough cards to play (min: 4)", StatusCode.BADREQUEST);
+                }
+            }  else {
+                setResponseStatus("You can't start a battle. Your Stack is Empty", StatusCode.BADREQUEST);
+            }
+        } else {
+            setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
+        }
     }
 
     public void showUserCards(String token) { // ! none-admin users
@@ -288,7 +303,7 @@ public class RequestHandler {
         List<User> allUsers = new ArrayList<>(db.getAllUsers());
         allUsers.sort(Collections.reverseOrder());
 
-        this.responseBody = "-- Scoreboard --";
+        this.responseBody = "-- Scoreboard --\n";
         allUsers.forEach((temp)-> {
             if(!temp.isAdmin()) i.incrementAndGet();
             this.responseBody = this.responseBody + temp.userStats(i.toString());

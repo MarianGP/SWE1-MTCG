@@ -65,7 +65,7 @@ class DbConnectionTest {
 
     @Test
     @DisplayName("Insert and Delete MonsterCard")
-    void testInsertandDeleteMonsterCard() throws SQLException {
+    void testInsertAndDeleteMonsterCard() throws SQLException {
         Assertions.assertTrue(db.insertCard((MonsterCard) dragon, false, db.getUser("marian", "1234"), "bla-bla-1234", 9999));
         Assertions.assertEquals(120.0f, db.getCardById("bla-bla-1234").getDamage());
         Assertions.assertTrue(db.deleteCard("bla-bla-1234"));
@@ -83,8 +83,8 @@ class DbConnectionTest {
     @Test
     @DisplayName("Add and delete Session")
     void testAddAndDeleteSession() {
-        Assertions.assertTrue(db.addSession("test-token"));
-        Assertions.assertTrue(db.deleteSession("test-token"));
+        Assertions.assertTrue(db.addSession("testX-token"));
+        Assertions.assertTrue(db.deleteSession("testX-token"));
     }
 
     @Test

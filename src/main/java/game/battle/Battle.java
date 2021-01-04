@@ -14,8 +14,8 @@ public class Battle {
 
     private static DbConnection db = new DbConnection();
 
-    static private User winner = null;
-    static private User loser = null;
+    private User winner = null;
+    private User loser = null;
     private int rounds = 0;
     private final int MAXROUNDS;
     private User currentPlayer;
@@ -30,19 +30,17 @@ public class Battle {
     }
 
     public void startBattle() {
-        while (winner == null && rounds < MAXROUNDS) {
+        while (this.winner == null && rounds < MAXROUNDS) {
             rounds++;
-            winner = playRound(this.currentPlayer, this.nextPlayer);
+            this.winner = playRound(this.currentPlayer, this.nextPlayer);
         }
         System.out.println("Game Over");
 
-        if(winner != null) {
-            loser = getLoser(this.currentPlayer, this.nextPlayer);
-            winner.eloUp();     //+3 pts
-            loser.eloDown();    //-5 pts
+        if(this.winner != null) {
+            this.loser = getLoser(this.currentPlayer, this.nextPlayer);
+            this.winner.eloUp();     //+3 pts
+            this.loser.eloDown();    //-5 pts
         }
-//        this.currentPlayer.reorganizeCards();
-//        this.nextPlayer.reorganizeCards();
     }
 
     private User playRound(User currentPlayer, User nextPlayer) {
@@ -86,34 +84,23 @@ public class Battle {
         int j = nextPlayer.getDeck().getDeckList().size();
 
         if (i == 0) {
-            winner = nextPlayer;
+            this.winner = nextPlayer;
         } else if (j == 0) {
-            winner = currentPlayer;
+            this.winner = currentPlayer;
         } else {
-            winner =  null;
+            this.winner =  null;
         }
 
-        return winner;
+        return this.winner;
     }
 
-    public User getLoser(User currentPlayer,User nextPlayer) {
+    public User getLoser(User currentPlayer, User nextPlayer) {
         if(currentPlayer.getDeck().getDeckList().size() == 0) {
             return currentPlayer;
         } else if (nextPlayer.getDeck().getDeckList().size() == 0) {
             return nextPlayer;
         }
         throw new UnsupportedOperationException("ERR: there is a winner, but not a loser");
-    }
-
-    public void gameStats() {
-        if(winner != null) {
-            System.out.println("Winner: " + winner.getUsername());
-        } else {
-            System.out.println("Nobody won the game");
-        }
-        System.out.println("Rounds: " + rounds);
-        currentPlayer.userStats("");
-        nextPlayer.userStats("");
     }
 
 //    public static void main(String[] args) {
