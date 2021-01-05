@@ -11,13 +11,20 @@ import java.util.Random;
 @AllArgsConstructor
 @Getter
 
+<<<<<<< HEAD
 public enum Element extends SpellCard {
     FIRE("Fire", 110, "NORMAL"),
     WATER("Water", 103, "FIRE"),
     NORMAL("Normal", 95, "WATER");
+=======
+public enum Element {
+    FIRE("Fire", 110f, "NORMAL"),
+    WATER("Water", 103f, "FIRE"),
+    NORMAL("Normal", 95f, "WATER");
+>>>>>>> integration-game-server
 
     private String elementName;
-    private int maxDamage;
+    private float maxDamage;
     private String defeats;
 
     //checks if the element of the card receiving the attack is defeated by the attacker's element
@@ -41,5 +48,14 @@ public enum Element extends SpellCard {
 
     public static Element randomElement()  {
         return listOfNames.get(RANDOM.nextInt(SIZE));
+    }
+
+    public static Element find(String name) {
+        for (Element type : listOfNames) {
+            if (type.getElementName().contains(name)) {
+                return type;
+            }
+        }
+        return NORMAL;
     }
 }

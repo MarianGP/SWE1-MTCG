@@ -3,6 +3,8 @@ package game.battle;
 import game.cards.Card;
 import game.cards.MonsterCard;
 import game.cards.SpellCard;
+import game.decks.CardDeck;
+import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
 import game.enums.Name;
@@ -11,26 +13,36 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 
 class BattleTest {
     @Mock
-    User player1 = new User("Player 1", "0");
-    User player2 = new User("Player 2", "0");
-    User player3 = new User("Player 3", "0");
-    User player4 = new User("Player 4", "0");
 
-    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100);
-    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120);
-    Card water = new SpellCard(Element.WATER, Name.FIVE, 50);
-    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200);
-    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200);
+    User player1 = User.builder().username("Player1").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player2 = User.builder().username("Player2").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player3 = User.builder().username("Player3").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+    User player4 = User.builder().username("Player4").password("").token("")
+            .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+            .deck(new CardDeck()).isAdmin(false).build();
+
+
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100.0f);
+    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120.0f);
+    Card water = new SpellCard(Element.WATER, Name.FIVE, 50.0f);
+    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
+    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
 
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);
@@ -61,8 +73,8 @@ class BattleTest {
     void returnWinnerPlayer2() {
         Assertions.assertEquals(null,anotherBattle.checkWinner(player3, player4));
         player4.getDeck().clearDeck();
-        Assertions.assertEquals(0, player4.getDeck().getDeck().size());
-        Assertions.assertEquals(5, player3.getDeck().getDeck().size());
+        Assertions.assertEquals(0, player4.getDeck().getDeckList().size());
+        Assertions.assertEquals(5, player3.getDeck().getDeckList().size());
         Assertions.assertEquals(player3,anotherBattle.checkWinner(player3, player4));
         Assertions.assertEquals(player4,anotherBattle.getLoser(player3, player4));
 
@@ -86,23 +98,22 @@ class BattleTest {
     }
 
     @Test
-    @DisplayName("Compare cards and move to round-winner: Player Next playes a stronger Card")
+    @DisplayName("Compare cards and move to round-winner: Player Next plays a stronger Card")
     void moveDefeatedCard() {
-        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
-        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(wizzard,elf);
-        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(elf,wizzard);
-        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeck().size());
+        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
     }
 
     @Test
-    @DisplayName ("One Round ")
+    @DisplayName ("A few rounds Round")
     void playOneRound() {
-        Battle newBattle = new Battle(player2, player3, 2);
-        newBattle.startBattle();
+        nextBattle.startBattle();
         Assertions.assertEquals(2, newBattle.getRounds());
     }
 

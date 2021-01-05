@@ -6,12 +6,14 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 
 @AllArgsConstructor
 @Getter
 
+<<<<<<< HEAD
 public enum MonsterType extends MonsterCard {
     GOBLIN  ("Goblin", 100),
     DRAGON  ("Dragon", 120),
@@ -20,13 +22,23 @@ public enum MonsterType extends MonsterCard {
     KNIGHT  ("Knight", 105),
     KRAKEN  ("Kraken", 125),
     ELF     ("Elf", 98);
+=======
+public enum MonsterType {
+    GOBLIN  ("Goblin", 100.0f),
+    DRAGON  ("Dragon", 120.0f),
+    WIZZARD ("Wizzard", 110.0f),
+    ORK     ("Org", 95.0f),
+    KNIGHT  ("Knight", 105.0f),
+    KRAKEN  ("Kraken", 125.0f),
+    ELF     ("Elf", 98.0f);
+>>>>>>> integration-game-server
 
     private static final List<MonsterType> listOfNames = List.of(values());
     private static final int SIZE = listOfNames.size();
     private static final Random RANDOM = new Random();
 
     private String name;
-    private int maxDamage;
+    private float maxDamage;
 
     public static MonsterType randomMonsterType() {
         return listOfNames.get(RANDOM.nextInt(SIZE));
@@ -35,5 +47,15 @@ public enum MonsterType extends MonsterCard {
     public void randomMonster() {
         Arrays.asList(MonsterType.values())
                 .forEach(m -> System.out.println(m.name));
+    }
+
+    public static MonsterType find(String name) {
+        for (MonsterType type : listOfNames) {
+            String typeName = type.getName();
+            if (Objects.equals(typeName, name)) {
+                return type;
+            }
+        }
+        return null;
     }
 }

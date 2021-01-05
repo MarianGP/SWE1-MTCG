@@ -5,40 +5,48 @@ import game.cards.Card;
 import game.decks.CardDeck;
 import game.decks.CardStack;
 import game.decks.Package;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 import java.util.Random;
 
-@Getter
 @Setter
+<<<<<<< HEAD
 
 public class User extends Battle {
+=======
+@Getter
+@Builder
+public class User implements Comparable<User> {
+>>>>>>> integration-game-server
     private String username;
     private String password;
     private String token;
+    private String bio;
+    private String image;
     private int coins;
-    private int ELO;
+    private int elo;
     private CardStack stack;
     private CardDeck deck;
+    private boolean isAdmin;
+
     private final static Random RANDOM = new Random();
     private final static int DECKSIZE = 5;
 
-    public User(String username, String password){
-        this.username = username;
-        this.password = password;
-        this.token = username + "-mtcgToken";
-        this.coins = 20;
-        this.ELO = 100;
-        this.stack = new CardStack();
+    public void buyPackage(){ // ! random package for testing
+        Package newPackage = new Package();
+        if(this.coins - newPackage.getPRICE() > 0) {
+            this.coins = this.coins - newPackage.getPRICE();
+            this.stack.addListToStack(newPackage.getCardsInPackage());
+        }
     }
 
-    public void buyPackage(){
-        Package newPackage = new Package();
-        Card temp;
-        if(this.coins - newPackage.getPrice() > 0) {
-            this.coins = this.coins - newPackage.getPrice();
+    public void buyPackage(List<Card> list){ // ! DB cards
+        Package newPackage = new Package(list);
+        if(this.coins - newPackage.getPRICE() > 0) {
+            this.coins = this.coins - newPackage.getPRICE();
             this.stack.addListToStack(newPackage.getCardsInPackage());
         }
     }
@@ -47,43 +55,60 @@ public class User extends Battle {
         this.deck = new CardDeck(this);
     }
 
-    public void listCards(List<Card> aStack) {
-        int i = 0;
-        System.out.println("Your Card's Stack");
-        while (i < aStack.size()) {
-            aStack.get(i).printCardStats();
-            i++;
-        }
-    }
-
     public void eloDown() {
         int temp;
-        temp = this.ELO - 5;
+        temp = this.elo - 5;
         if(temp >= 0) {
-            this.ELO = temp;
+            this.elo = temp;
         } else {
-            this.ELO = 0;
+            this.elo = 0;
         }
     }
 
     public void reorganizeCards() {
-        this.stack.addListToStack(this.deck.getDeck());
+        this.stack.addListToStack(this.deck.getDeckList());
         this.deck.clearDeck();
     }
 
     public void eloUp(){
-        this.ELO = this.ELO + 3;
+        this.elo = this.elo + 3;
     }
 
-    public void printUserStats() {
-        System.out.println(
-            "\nUser: " + this.username +
-            " - ELO: " + this.ELO +
-            " - cois: " + this.coins
-        );
-        this.getStack().listCardsInStack();
+    public String userStats(String rank) {
+        if(!this.isAdmin) {
+            if(rank.isEmpty()) {
+                return  rank +
+                        " User: " + this.username +
+                        " Coins: " + this.coins +
+                        " - ELO: " + this.elo + "\n";
+            }
+            return  rank +
+                    " User: " + this.username +
+                    " - ELO: " + this.elo + "\n";
+        } else {
+            return "";
+        }
     }
 
+    public String printUserDetails() {
+        return  "-- User Account Summary -- \n" +
+                "\tUser: " + this.username +
+                " - ELO: " + this.elo + " - coins: " + this.coins +
+                "\nBio: "+ this.bio +
+                "\nImage: "+ this.image +
+                "\nToken: "+ this.token + " \n";
+    }
 
+    public String getUserStats() {
+        return  "-- User Account Summary -- \n" +
+                "User: " + this.username +
+                " - ELO: " + this.elo +
+                " - Total Cards: " + this.stack.getStackList().size() + " \n";
+    }
+
+    @Override
+    public int compareTo(User user) {
+        return this.elo - user.getElo();
+    }
 
 }

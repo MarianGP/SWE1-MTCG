@@ -1,20 +1,23 @@
 package game.enums;
 
-import game.user.User;
-import org.junit.jupiter.api.extension.ExtendWith;
+import game.cards.Card;
+import game.cards.MonsterCard;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-@ExtendWith(MockitoExtension.class)
 
 class MonsterTypeTest {
     @Mock
-    User user1 = new User("Hello", "10");
+    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, Name.ONE, 400.0f);
 
-//    @DisplayName("Try to get MonsterElement out of String InmuneTo")
-//
-//    @Test
-//    public void getImmuneMonsterType() {
-//        Assertions.assertEquals(MonsterType.DRAGON, MonsterType.ELF.getImmuneMonsterType());
-//    }
+
+    @Test
+    void testFind() {
+        Assertions.assertEquals(MonsterType.DRAGON, MonsterType.find("Dragon"));
+    }
+
+    @Test
+    void returnStringType() {
+        System.out.println(goblin.getType().getName());
+    }
 }

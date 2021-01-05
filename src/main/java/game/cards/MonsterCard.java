@@ -11,11 +11,17 @@ import lombok.ToString;
 @ToString
 
 public class MonsterCard extends Card {
+    private String cid;
     private String name;
     private MonsterType type;
     private Element cardElement;
-    private int damage;
+    private float damage;
     private boolean locked;
+    private String owner;
+
+    public String getName() {
+        return name;
+    }
 
     MonsterCard(MonsterType type, Element cardElement) {
         String prefix = Name.SIX.getName();
@@ -25,16 +31,8 @@ public class MonsterCard extends Card {
         this.damage = type.getMaxDamage();
     }
 
-    public MonsterCard(MonsterType type, Element cardElement, Name randomName) {
-        String prefix = randomName.getName();
-        this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
-        this.type = type;
-        this.cardElement = cardElement;
-        this.damage = type.getMaxDamage();
-    }
-
     //for testing purpose
-    public MonsterCard(MonsterType type, Element cardElement, Name randomName, int damage) {
+    public MonsterCard(MonsterType type, Element cardElement, Name randomName, float damage) {
         String prefix = randomName.getName();
         this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
         this.type = type;
@@ -42,9 +40,23 @@ public class MonsterCard extends Card {
         this.damage = damage;
     }
 
-    public String printCardStats() {
-        String stat = "Card: " + this.name + " - AP: " + this.damage;
-        System.out.println(stat);
+    public MonsterCard(String cid, MonsterType type, Element cardElement,
+                       String name, float damage, boolean inDeck, String owner) {
+        this.cid = cid;
+        this.name = name;
+        this.type = type;
+        this.cardElement = cardElement;
+        this.damage = damage;
+        this.locked = inDeck;
+        this.owner = owner;
+    }
+
+    public String getCardStats() {
+        String stat =   "\tCardId: " + this.cid +
+                        " - Name: " + this.name +
+                        " - AP: " + this.damage +
+                        " - Element: " + this.cardElement.getElementName() +
+                        " - Type : " + this.type.getName() + "\n";
         return stat;
     }
 
@@ -66,15 +78,11 @@ public class MonsterCard extends Card {
         return GeneralEffectiveness.ATTACKS;
     }
 
-    public boolean compareDamage(int attackerDP){
-        if (attackerDP > this.damage) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean compareDamage(float attackerDP){
+        return attackerDP > this.damage;
     }
 
-    public boolean result(GeneralEffectiveness effect, int attackerDP) {
+    public boolean result(GeneralEffectiveness effect, float attackerDP) {
         if (effect == GeneralEffectiveness.ATTACKS) {
             return compareDamage(attackerDP);
         } else if (effect == GeneralEffectiveness.MISSES) {

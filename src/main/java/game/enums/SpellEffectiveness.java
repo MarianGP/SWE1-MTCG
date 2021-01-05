@@ -10,7 +10,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 
+<<<<<<< HEAD
 public enum SpellEffectiveness extends SpellCard {
+=======
+public enum SpellEffectiveness  {
+>>>>>>> integration-game-server
     ONE(    null, GeneralEffectiveness.MISSES,    MonsterType.KRAKEN), //immune to any spell
     TWO(   Element.WATER,  GeneralEffectiveness.DEFEATES,  MonsterType.KNIGHT);
 

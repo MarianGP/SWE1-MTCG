@@ -2,6 +2,7 @@ package game.battle;
 
 import game.cards.Card;
 import game.user.User;
+import game_server.db.DbConnection;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -11,35 +12,35 @@ import java.util.List;
 
 public class Battle {
 
-    static private User winner = null;
-    static private User loser = null;
+    private static DbConnection db = new DbConnection();
+
+    private User winner = null;
+    private User loser = null;
     private int rounds = 0;
     private final int MAXROUNDS;
     private User currentPlayer;
     private User nextPlayer;
     private List<Card> table;
 
-    Battle(User player1, User player2, int setMaxRounds) {
+    public Battle(User player1, User player2, int setMaxRounds) {
         this.currentPlayer = player1;
         this.nextPlayer = player2;
-        this.table = new ArrayList<Card>();
+        this.table = new ArrayList<>();
         MAXROUNDS = setMaxRounds;
     }
 
     public void startBattle() {
-        while (winner == null && rounds < MAXROUNDS) {
+        while (this.winner == null && rounds < MAXROUNDS) {
             rounds++;
-            winner = playRound(this.currentPlayer, this.nextPlayer);
+            this.winner = playRound(this.currentPlayer, this.nextPlayer);
         }
         System.out.println("Game Over");
 
-        if(winner != null) {
-            loser = getLoser(this.currentPlayer, this.nextPlayer);
-            winner.eloUp();     //+3 pts
-            loser.eloDown();    //-5 pts
+        if(this.winner != null) {
+            this.loser = getLoser(this.currentPlayer, this.nextPlayer);
+            this.winner.eloUp();     //+3 pts
+            this.loser.eloDown();    //-5 pts
         }
-        this.currentPlayer.reorganizeCards();
-        this.nextPlayer.reorganizeCards();
     }
 
     private User playRound(User currentPlayer, User nextPlayer) {
@@ -66,8 +67,8 @@ public class Battle {
             temp = nextPlayer;
         }
 
-        temp.getDeck().getDeck().add(this.table.get(0));
-        temp2.getDeck().getDeck().add(this.table.get(1));
+        temp.getDeck().getDeckList().add(this.table.get(0));
+        temp2.getDeck().getDeckList().add(this.table.get(1));
 
         this.table.clear(); //empty tableList for next round
     }
@@ -79,52 +80,48 @@ public class Battle {
     }
 
     public User checkWinner(User currentPlayer, User nextPlayer)  {
-        int i = currentPlayer.getDeck().getDeck().size();
-        int j = nextPlayer.getDeck().getDeck().size();
+        int i = currentPlayer.getDeck().getDeckList().size();
+        int j = nextPlayer.getDeck().getDeckList().size();
 
         if (i == 0) {
-            winner = nextPlayer;
+            this.winner = nextPlayer;
         } else if (j == 0) {
-            winner = currentPlayer;
+            this.winner = currentPlayer;
         } else {
-            winner =  null;
+            this.winner =  null;
         }
 
-        return winner;
+        return this.winner;
     }
 
-    public User getLoser(User currentPlayer,User nextPlayer) {
-        if(currentPlayer.getDeck().getDeck().size() == 0) {
+    public User getLoser(User currentPlayer, User nextPlayer) {
+        if(currentPlayer.getDeck().getDeckList().size() == 0) {
             return currentPlayer;
-        } else if (nextPlayer.getDeck().getDeck().size() == 0) {
+        } else if (nextPlayer.getDeck().getDeckList().size() == 0) {
             return nextPlayer;
         }
         throw new UnsupportedOperationException("ERR: there is a winner, but not a loser");
     }
 
-    public void gameStats() {
-        if(winner != null) {
-            System.out.println("Winner: " + winner.getUsername());
-        } else {
-            System.out.println("Nobody won the game");
-        }
-        System.out.println("Rounds: " + rounds);
-        currentPlayer.printUserStats();
-        nextPlayer.printUserStats();
-
-    }
-
-    public static void main(String[] args) {
-        User p1 = new User("Player1" , "0");
-        User p2 = new User("Player2" , "0");
-        p1.buyPackage();
-        p1.prepareDeck();
-        p2.buyPackage();
-        p2.prepareDeck();
-
-        Battle newBattle = new Battle(p1,p2,100);
-        newBattle.startBattle();
-        newBattle.gameStats();
-    }
+//    public static void main(String[] args) {
+//        User p1 = User.builder().username("Player1").password("").token("")
+//                .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+//                .deck(new CardDeck()).isAdmin(false).build();
+//
+//        User p2 = User.builder().username("Player2").password("").token("")
+//                .bio(":/").image(":/").coins(20).elo(100).stack(new CardStack())
+//                .deck(new CardDeck()).isAdmin(false).build();
+//
+//        p1.buyPackage();
+//        p1.prepareDeck();
+//        p2.buyPackage();
+//        p2.prepareDeck();
+//
+//        Battle newBattle = new Battle(p1,p2,1000);
+//
+//        newBattle.startBattle();
+//        newBattle.gameStats();
+//
+//    }
 
 }

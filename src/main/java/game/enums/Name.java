@@ -28,4 +28,13 @@ public enum Name {
     public static Name randomName()  {
         return listOfNames.get(RANDOM.nextInt(SIZE));
     }
+
+    public static Name find(String name) {
+        for (Name type : listOfNames) {
+            if (type.getName().contains(name)) {
+                return type;
+            }
+        }
+        return null;
+    }
 }

@@ -13,27 +13,38 @@ import java.util.Random;
 @Getter
 @Setter
 
+<<<<<<< HEAD
 public class CardDeck extends User implements Randomizable {
     private final static int DECKSIZE = 5;
     private List<Card> deck;
+=======
+public class CardDeck implements Randomizable {
+    private final static int DECKSIZE = 4;
+    private List<Card> deckList;
+>>>>>>> integration-game-server
     Random RANDOM = new Random();
 
+    public CardDeck() {
+        this.deckList = new ArrayList<>();
+    }
+
+    //  ! random Deck from stack
     public CardDeck(User player) {
-        this.deck = new ArrayList<Card>();
+        this.deckList = new ArrayList<>();
         for (int i = 0; i < DECKSIZE; i++) {
-            this.deck.add( player.getStack().randomCard() ); //deletes from stack and adds to deck
+            this.deckList.add( player.getStack().randomCard() );
         }
     }
 
     public Card randomCard() {
-        int randomPosition = RANDOM.nextInt(this.deck.size());
-        Card dropped = this.deck.get(randomPosition);
-        this.deck.remove(randomPosition);
+        int randomPosition = RANDOM.nextInt(this.deckList.size());
+        Card dropped = this.deckList.get(randomPosition);
+        this.deckList.remove(randomPosition);
         return dropped;
     }
 
     public void clearDeck() {
-        this.deck.clear();
+        this.deckList.clear();
     }
 
     //adding cards defeated during battle
@@ -42,7 +53,5 @@ public class CardDeck extends User implements Randomizable {
             oneList.add(oneList.get(i));
         }
     }
-
-
 
 }
