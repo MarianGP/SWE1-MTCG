@@ -6,7 +6,7 @@ import game.decks.CardDeck;
 import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import game.user.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ class DbConnectionTest {
             .image(":D")
             .build();
 
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE, 120.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, CardName.FIVE, 120.0f);
 
     @Test
     @DisplayName("Insert User into DB")
@@ -78,13 +78,6 @@ class DbConnectionTest {
     @DisplayName("Return one logged user")
     void testGetLoggedUser() {
         Assertions.assertEquals("stefan", db.getLoggedUser("stefan-mtcgToken").getUsername());
-    }
-
-    @Test
-    @DisplayName("Add and delete Session")
-    void testAddAndDeleteSession() {
-        Assertions.assertTrue(db.addSession("testX-token"));
-        Assertions.assertTrue(db.deleteSession("testX-token"));
     }
 
     @Test

@@ -3,7 +3,7 @@ package game.cards;
 import game.enums.Element;
 import game.enums.GeneralEffectiveness;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,12 @@ class SpellCardTest {
     Card knight = new MonsterCard(MonsterType.KNIGHT, Element.FIRE);
     Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.WATER);
     Card dragon = new MonsterCard(MonsterType.DRAGON, Element.WATER);
-    Card water = new SpellCard(Element.WATER, Name.FIVE);
+    Card water = new SpellCard(Element.WATER, CardName.FIVE);
     Card fire = new SpellCard(Element.FIRE);
     Card normal = new SpellCard(Element.NORMAL);
-    Card water2 = new SpellCard(Element.WATER, Name.FIVE, 50);
-    Card fire2 = new SpellCard(Element.FIRE, Name.FIVE, 200);
-    Card normal2 = new SpellCard(Element.NORMAL, Name.FIVE, 200);
+    Card water2 = new SpellCard(Element.WATER, CardName.FIVE, 50);
+    Card fire2 = new SpellCard(Element.FIRE, CardName.FIVE, 200);
+    Card normal2 = new SpellCard(Element.NORMAL, CardName.FIVE, 200);
 
     @Test
     @DisplayName("check Spell Effectiveness")
@@ -30,7 +30,7 @@ class SpellCardTest {
         Assertions.assertEquals(((SpellCard) water2).checkEffectiveness((MonsterCard) kraken), GeneralEffectiveness.MISSES);
         Assertions.assertEquals(((SpellCard) fire2).checkEffectiveness((MonsterCard) kraken), GeneralEffectiveness.MISSES);
         Assertions.assertEquals(((SpellCard) normal2).checkEffectiveness((MonsterCard) kraken), GeneralEffectiveness.MISSES);
-        Assertions.assertEquals(((SpellCard) water).checkEffectiveness((MonsterCard) knight), GeneralEffectiveness.DEFEATES);
+        Assertions.assertEquals(((SpellCard) water).checkEffectiveness((MonsterCard) knight), GeneralEffectiveness.DEFEATS);
         Assertions.assertEquals(((SpellCard) fire).checkEffectiveness((MonsterCard) knight), GeneralEffectiveness.ATTACKS);
     }
 

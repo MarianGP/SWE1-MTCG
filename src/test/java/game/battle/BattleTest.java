@@ -7,7 +7,7 @@ import game.decks.CardDeck;
 import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import game.user.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,13 +36,13 @@ class BattleTest {
             .deck(new CardDeck()).isAdmin(false).build();
 
 
-    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100.0f);
-    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, Name.ONE, 120.0f);
-    Card water = new SpellCard(Element.WATER, Name.FIVE, 50.0f);
-    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
-    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, CardName.ONE, 100.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, CardName.ONE, 100.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, CardName.ONE, 100.0f);
+    Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, CardName.ONE, 120.0f);
+    Card water = new SpellCard(Element.WATER, CardName.FIVE, 50.0f);
+    Card fire = new SpellCard(Element.FIRE, CardName.FIVE, 200.0f);
+    Card normal = new SpellCard(Element.NORMAL, CardName.FIVE, 200.0f);
 
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);
@@ -74,7 +74,7 @@ class BattleTest {
         Assertions.assertEquals(null,anotherBattle.checkWinner(player3, player4));
         player4.getDeck().clearDeck();
         Assertions.assertEquals(0, player4.getDeck().getDeckList().size());
-        Assertions.assertEquals(5, player3.getDeck().getDeckList().size());
+        Assertions.assertEquals(4, player3.getDeck().getDeckList().size());
         Assertions.assertEquals(player3,anotherBattle.checkWinner(player3, player4));
         Assertions.assertEquals(player4,anotherBattle.getLoser(player3, player4));
 
@@ -100,21 +100,21 @@ class BattleTest {
     @Test
     @DisplayName("Compare cards and move to round-winner: Player Next plays a stronger Card")
     void moveDefeatedCard() {
-        Assertions.assertEquals(5, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
-        Assertions.assertEquals(5, nextBattle.getNextPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(4, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(4, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(wizzard,elf);
-        Assertions.assertEquals(7, nextBattle.getNextPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(6, nextBattle.getNextPlayer().getDeck().getDeckList().size());
 
         nextBattle.compareCards(elf,wizzard);
-        Assertions.assertEquals(7, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
+        Assertions.assertEquals(6, nextBattle.getCurrentPlayer().getDeck().getDeckList().size());
     }
 
     @Test
     @DisplayName ("A few rounds Round")
     void playOneRound() {
         nextBattle.startBattle();
-        Assertions.assertEquals(2, newBattle.getRounds());
+        Assertions.assertEquals(0, newBattle.getRounds());
     }
 
 }

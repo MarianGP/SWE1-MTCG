@@ -6,13 +6,14 @@ import lombok.Builder;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Builder
 public class GameServer implements Runnable {
 
     private static ServerSocket listener = null;
-    private static GameController gameController = new GameController(new ArrayList<>(), false, null);
+    private final static GameController gameController = new GameController(new ArrayBlockingQueue<>(2, true), new AtomicBoolean(false), null);
 
 
     public static void main(String[] args) {

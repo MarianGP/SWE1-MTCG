@@ -91,16 +91,12 @@ public class RequestThread implements Runnable {
                     if(gameController.getPlayers().size() == 2)
                         gameController.startGame();
 
-                    while(!gameController.isFinished()) {
-                        Thread.sleep(100);
+                    while(!gameController.getIsFinished().get()) {
+                        Thread.sleep(50);
                     }
 
                     response.setResponse(gameController.getBattleLog().getResultSummary());
 
-                    // Reset gameController
-                    Thread.sleep(100);
-                    gameController.setPlayers(new ArrayList<>());
-                    gameController.setFinished(false);
                 }
 
                 // Write Response to Client

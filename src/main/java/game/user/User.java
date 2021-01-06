@@ -13,14 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 @Setter
-<<<<<<< HEAD
-
-public class User extends Battle {
-=======
 @Getter
 @Builder
 public class User implements Comparable<User> {
->>>>>>> integration-game-server
     private String username;
     private String password;
     private String token;

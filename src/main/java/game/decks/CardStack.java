@@ -2,7 +2,6 @@ package game.decks;
 
 import game.cards.Card;
 import game.interfaces.Randomizable;
-import game.user.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,15 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 @Getter
-<<<<<<< HEAD
-
-public class CardStack extends User implements Randomizable {
-    List<Card> stack;
-=======
 @Setter
 public class CardStack implements Randomizable {
     List<Card> stackList;
->>>>>>> integration-game-server
     private static final Random RANDOM = new Random();
 
     public CardStack() {

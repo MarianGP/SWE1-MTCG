@@ -13,15 +13,9 @@ import java.util.Random;
 @Getter
 @Setter
 
-<<<<<<< HEAD
-public class CardDeck extends User implements Randomizable {
-    private final static int DECKSIZE = 5;
-    private List<Card> deck;
-=======
 public class CardDeck implements Randomizable {
     private final static int DECKSIZE = 4;
     private List<Card> deckList;
->>>>>>> integration-game-server
     Random RANDOM = new Random();
 
     public CardDeck() {

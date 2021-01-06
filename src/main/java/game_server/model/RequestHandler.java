@@ -186,6 +186,7 @@ public class RequestHandler implements RequestHandling {
         if(allTradesInfo == null) {
             setResponseStatus("The are no trades available", StatusCode.NOCONTENT);
         } else {
+            System.out.println(allStr + allTradesInfo);
             this.responseBody = allStr + allTradesInfo;
         }
     }

@@ -11,16 +11,49 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Builder
 @Data
 @AllArgsConstructor
 
 public class GameController {
-    private List<User> players;
+    private ArrayBlockingQueue<User> players;
     private static DbConnection db = new DbConnection();
-    private boolean isFinished;
+    private AtomicBoolean isFinished;
     private BattleLog battleLog;
+
+    public void addPlayer(User player) {
+        if(player.getDeck().getDeckList().isEmpty())
+            player.setDeck(new CardDeck(player)); //random deck
+
+        players.add(player);
+        this.isFinished.set(false);
+    }
+
+    public void startGame() throws InterruptedException {
+
+        User player1 = players.take();
+        User player2 = players.take();
+
+        Battle newBattle = new Battle(player1,player2,1000);
+
+        newBattle.startBattle();
+
+        updatePlayerResults(newBattle.getCurrentPlayer());
+        updatePlayerResults(newBattle.getNextPlayer());
+
+        battleLog = new BattleLog(
+                db.getUser(player1.getUsername()),
+                db.getUser(player2.getUsername()),
+                newBattle.getWinner(),
+                newBattle.getRounds());
+
+        System.out.println(battleLog.getResultSummary());
+
+        this.isFinished.set(true);
+    }
 
     public void updatePlayerResults(User player) {
         for(Card card: player.getDeck().getDeckList()){
@@ -37,34 +70,6 @@ public class GameController {
         if(!list.isEmpty()) {
             player.getStack().setStackList(list);
         }
-    }
-
-    public void addPlayer(User player) {
-        if(player.getDeck().getDeckList().isEmpty())
-            player.setDeck(new CardDeck(player)); //random deck
-
-        players.add(player);
-        this.isFinished = false;
-    }
-
-    public void startGame() {
-
-        Battle newBattle = new Battle(players.get(0),players.get(1),100);
-
-        newBattle.startBattle();
-
-        updatePlayerResults(newBattle.getCurrentPlayer());
-        updatePlayerResults(newBattle.getNextPlayer());
-
-        battleLog = new BattleLog(
-                db.getUser(players.get(0).getUsername()),
-                db.getUser(players.get(1).getUsername()),
-                newBattle.getWinner(),
-                newBattle.getRounds());
-
-        System.out.println(battleLog.getResultSummary());
-
-        this.setFinished(true);
     }
 
 }

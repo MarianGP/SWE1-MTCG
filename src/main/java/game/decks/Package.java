@@ -5,7 +5,7 @@ import game.cards.MonsterCard;
 import game.cards.SpellCard;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ public class Package {
         for (int i = 0; i < 5; i++) {
             if(random.nextInt(10)%2 == 0) {
                 Element tempElement = Element.randomElement();
-                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement,Name.randomName(), tempElement.getMaxDamage());
+                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement, CardName.randomName(), tempElement.getMaxDamage());
             } else {
-                temp = new SpellCard(Element.randomElement(),Name.randomName());
+                temp = new SpellCard(Element.randomElement(), CardName.randomName());
             }
             this.cardsInPackage.add(temp);
         }
@@ -42,9 +42,9 @@ public class Package {
         packageDB.forEach((temp) -> {
             if(temp.getType() != null) {
                 Element tempElement = Element.randomElement();
-                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement,Name.randomName(), tempElement.getMaxDamage());
+                temp = new MonsterCard(MonsterType.randomMonsterType(),tempElement, CardName.randomName(), tempElement.getMaxDamage());
             } else {
-                temp = new SpellCard(Element.randomElement(),Name.randomName());
+                temp = new SpellCard(Element.randomElement(), CardName.randomName());
             }
             this.cardsInPackage.add(temp);
         });

@@ -3,7 +3,7 @@ package game.cards;
 import game.enums.Element;
 import game.enums.GeneralEffectiveness;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,17 +18,17 @@ class MonsterCardTest {
     Card water_elf = new MonsterCard(MonsterType.ELF,Element.WATER);
     Card knight = new MonsterCard(MonsterType.KNIGHT, Element.WATER);
     Card kraken = new MonsterCard(MonsterType.KRAKEN, Element.FIRE);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.FIVE,120.0f);
-    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, Name.ONE, 100.0f);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 120.0f);
-    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, Name.ONE, 400.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, CardName.FIVE,120.0f);
+    Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, CardName.ONE, 100.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, CardName.ONE, 120.0f);
+    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, CardName.ONE, 400.0f);
 
     Card water = new SpellCard(Element.WATER);
     Card fire = new SpellCard(Element.FIRE);
     Card normal = new SpellCard(Element.NORMAL);
-    Card water2 = new SpellCard(Element.WATER, Name.FIVE, 200.0f);
-    Card fire2 = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
-    Card normal2 = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
+    Card water2 = new SpellCard(Element.WATER, CardName.FIVE, 200.0f);
+    Card fire2 = new SpellCard(Element.FIRE, CardName.FIVE, 200.0f);
+    Card normal2 = new SpellCard(Element.NORMAL, CardName.FIVE, 200.0f);
 
     @Test
     @DisplayName("checkEffectiveness Monster vs Monster")
@@ -50,7 +50,7 @@ class MonsterCardTest {
     @DisplayName("result boolean")
     void result () {
         Assertions.assertFalse( ( (MonsterCard) wizzard).result(GeneralEffectiveness.MISSES, 120f) );
-        Assertions.assertTrue( ( (MonsterCard) wizzard).result(GeneralEffectiveness.DEFEATES, 110f) );
+        Assertions.assertTrue( ( (MonsterCard) wizzard).result(GeneralEffectiveness.DEFEATS, 110f) );
     }
 
 

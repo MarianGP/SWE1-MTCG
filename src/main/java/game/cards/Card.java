@@ -1,23 +1,15 @@
 package game.cards;
 
-<<<<<<< HEAD
-import game.decks.CardDeck;
-import game.decks.CardStack;
-=======
+
 import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
->>>>>>> integration-game-server
 import game.interfaces.Attackable;
 import game.interfaces.CardInterface;
-import lombok.Getter;
+import lombok.Data;
 
-<<<<<<< HEAD
-public abstract class Card extends CardStack implements CardInterface, Attackable {
 
-=======
-@Getter
->>>>>>> integration-game-server
+@Data
 
 public abstract class Card extends CardStack implements CardInterface, Attackable {
     private String cid;

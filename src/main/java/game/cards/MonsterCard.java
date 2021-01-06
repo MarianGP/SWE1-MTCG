@@ -1,6 +1,5 @@
 package game.cards;
 
-import game.decks.CardStack;
 import game.enums.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +23,7 @@ public class MonsterCard extends Card {
     }
 
     MonsterCard(MonsterType type, Element cardElement) {
-        String prefix = Name.SIX.getName();
+        String prefix = CardName.SIX.getName();
         this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
         this.type = type;
         this.cardElement = cardElement;
@@ -32,7 +31,7 @@ public class MonsterCard extends Card {
     }
 
     //for testing purpose
-    public MonsterCard(MonsterType type, Element cardElement, Name randomName, float damage) {
+    public MonsterCard(MonsterType type, Element cardElement, CardName randomName, float damage) {
         String prefix = randomName.getName();
         this.name = prefix + " " + cardElement.getElementName() + "-" + type.getName(); //checked with Ctrl+Shif+P (beide sind Strings)
         this.type = type;
@@ -87,7 +86,7 @@ public class MonsterCard extends Card {
             return compareDamage(attackerDP);
         } else if (effect == GeneralEffectiveness.MISSES) {
             return false;
-        } else if (effect == GeneralEffectiveness.DEFEATES) {
+        } else if (effect == GeneralEffectiveness.DEFEATS) {
             return true;
         }
         throw new UnsupportedOperationException("None allowed Effectiveness Value");

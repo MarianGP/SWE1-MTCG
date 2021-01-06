@@ -8,7 +8,7 @@ import game.decks.CardDeck;
 import game.decks.CardStack;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.Name;
+import game.enums.CardName;
 import game.user.User;
 import game_server.db.DbConnection;
 import game_server.model.RequestHandler;
@@ -52,11 +52,11 @@ class UserControllerTest {
             "}";
 
     List<Card> cardsList = new ArrayList<>();
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, Name.ONE, 100.0f);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, Name.ONE, 100.0f);
-    Card water = new SpellCard(Element.WATER, Name.FIVE, 50.0f);
-    Card fire = new SpellCard(Element.FIRE, Name.FIVE, 200.0f);
-    Card normal = new SpellCard(Element.NORMAL, Name.FIVE, 200.0f);
+    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, CardName.ONE, 100.0f);
+    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, CardName.ONE, 100.0f);
+    Card water = new SpellCard(Element.WATER, CardName.FIVE, 50.0f);
+    Card fire = new SpellCard(Element.FIRE, CardName.FIVE, 200.0f);
+    Card normal = new SpellCard(Element.NORMAL, CardName.FIVE, 200.0f);
 
     boolean isLogged = this.userController.getDb().deleteSession("marian-mtcgToken");
 
@@ -73,7 +73,7 @@ class UserControllerTest {
 
     @Test
     void testGetLoggedUser() {
-        Assertions.assertEquals("Session was opened",this.userController.setUser("stefan-mtcgToken"));
+        Assertions.assertTrue(this.userController.setUser("stefan-mtcgToken"));
     }
 
     @Test

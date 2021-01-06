@@ -1,6 +1,5 @@
 package game.enums;
 
-import game.cards.MonsterCard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,16 +12,6 @@ import java.util.Random;
 @AllArgsConstructor
 @Getter
 
-<<<<<<< HEAD
-public enum MonsterType extends MonsterCard {
-    GOBLIN  ("Goblin", 100),
-    DRAGON  ("Dragon", 120),
-    WIZZARD ("Wizzard", 110),
-    ORK     ("Org", 95),
-    KNIGHT  ("Knight", 105),
-    KRAKEN  ("Kraken", 125),
-    ELF     ("Elf", 98);
-=======
 public enum MonsterType {
     GOBLIN  ("Goblin", 100.0f),
     DRAGON  ("Dragon", 120.0f),
@@ -31,7 +20,6 @@ public enum MonsterType {
     KNIGHT  ("Knight", 105.0f),
     KRAKEN  ("Kraken", 125.0f),
     ELF     ("Elf", 98.0f);
->>>>>>> integration-game-server
 
     private static final List<MonsterType> listOfNames = List.of(values());
     private static final int SIZE = listOfNames.size();

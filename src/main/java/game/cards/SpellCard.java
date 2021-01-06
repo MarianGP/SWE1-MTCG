@@ -19,14 +19,14 @@ public class SpellCard extends Card {
     private String owner;
 
     public SpellCard(Element cardElement) {
-        String prefix = Name.ONE.getName();
+        String prefix = CardName.ONE.getName();
         this.cardElement = cardElement;
         this.name = prefix + " " + cardElement.getElementName() + "-Spell";
         this.damage = (float) cardElement.getMaxDamage();
         this.locked = false;
     }
 
-    public SpellCard(Element cardElement, Name randomName) {
+    public SpellCard(Element cardElement, CardName randomName) {
         String prefix = randomName.getName();
         this.cardElement = cardElement;
         this.name = prefix + " " + cardElement.getElementName() + "-Spell";
@@ -35,7 +35,7 @@ public class SpellCard extends Card {
     }
 
     //for testing purpose
-    public SpellCard(Element cardElement, Name aName, float damage) {
+    public SpellCard(Element cardElement, CardName aName, float damage) {
         String prefix = aName.getName();
         this.cardElement = cardElement;
         this.name = prefix + " " + cardElement.getElementName() + "-Spell";
@@ -62,11 +62,11 @@ public class SpellCard extends Card {
 
     public GeneralEffectiveness checkEffectiveness(MonsterCard defender) {
         for (int i = 0; i < SpellEffectiveness.spellEffectivenessList.size(); i++) {
-            if (defender.getType() == SpellEffectiveness.spellEffectivenessList.get(i).getMonsterDefending() &&
-                    (
-                            this.cardElement == SpellEffectiveness.spellEffectivenessList.get(i).getSpellElement()
-                            || SpellEffectiveness.spellEffectivenessList.get(i).getSpellElement() == null)
-                    )
+            if  (   defender.getType() == SpellEffectiveness.spellEffectivenessList.get(i).getMonsterDefending() &&
+                (
+                    this.cardElement == SpellEffectiveness.spellEffectivenessList.get(i).getSpellElement()
+                    || SpellEffectiveness.spellEffectivenessList.get(i).getSpellElement() == null)
+                )
             {
                 return SpellEffectiveness.spellEffectivenessList.get(i).getEffectiveness();
             }

@@ -8,7 +8,7 @@ import org.mockito.Mock;
 
 class MonsterTypeTest {
     @Mock
-    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, Name.ONE, 400.0f);
+    Card goblin = new MonsterCard(MonsterType.GOBLIN, Element.FIRE, CardName.ONE, 400.0f);
 
 
     @Test

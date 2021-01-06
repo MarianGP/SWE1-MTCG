@@ -3,28 +3,30 @@ package game_server.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import game.cards.Card;
-import game.cards.SpellCard;
-import game_server.db.DbConnection;
-import game_server.serializer.TradeData;
 import game.trade.Trade;
+import game_server.db.DbConnection;
+import game_server.interfaces.Tradable;
+import game_server.serializer.TradeData;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Builder
 @AllArgsConstructor
 @Data
-public class TradeController {
+public class TradeController implements Tradable {
     DbConnection db;
 
     public StringBuilder getTradesSummary() { //TODO: list not empty
-        List <String> allTradesId = db.getAllTradesId();
+        List<String> allTradesId = db.getAllTradesId();
         StringBuilder all = new StringBuilder();
         Card card;
         int i = 1;
-        if(allTradesId != null) {
-            for(String id: allTradesId) {
+        if (allTradesId != null) {
+            for (String id : allTradesId) {
                 card = db.getCardById(id);
                 all.append(i++ + ") ");
                 all.append(card.getCardStats());
@@ -46,26 +48,10 @@ public class TradeController {
         Trade wantedCardTrade =  db.getTradeByCardId(wantedCardId);
         Card offeredCard = db.getCardById(offeredCardId);
 
-        if(wantedCardTrade == null)
-            return "The card you want is not on the trading cart";
+        String response = wantedCardTrade.validateTrade(offeredCard, username);
 
-        if(offeredCard == null)
-            return "A card with this Id doesn't exist";
-
-        if(offeredCard.isLocked())
-            return "You can't trade cards from your deck";
-
-        if(wantedCardTrade.getOwner().equals(username))
-            return "You can't trade cards with yourself";
-
-        if(!offeredCard.getOwner().equals(username))
-            return "You can't offer cards you don't own";
-
-        if( wantedCardTrade.isSpell() != offeredCard instanceof SpellCard)
-            return "Trade not accepted. Type offered doesn't match with required";
-
-        if (wantedCardTrade.getMinDamage() > offeredCard.getDamage())
-            return "Trade not accepted. Damage offered < Damage min";
+        if(response != null)
+            return response;
 
         db.setCardOwner(wantedCardId, username);
         db.deleteTrade(wantedCardId);
@@ -79,6 +65,7 @@ public class TradeController {
     public String addNewTrade(String json, String username) throws JsonProcessingException, SQLException {
         TradeData tradeSerialized = getParsedTrade(json);
         boolean isSpell = (!tradeSerialized.getType().equals("monster"));
+
         Trade trade = Trade.builder()
                 .cardId(tradeSerialized.getCardToTrade())
                 .minDamage(tradeSerialized.getMinimumDamage())
