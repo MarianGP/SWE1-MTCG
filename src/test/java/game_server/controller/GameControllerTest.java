@@ -21,7 +21,7 @@ class GameControllerTest {
     UserController userController2 = new UserController(new DbConnection(), null);
 
     @Test
-    @DisplayName(   "Special TEST to debug the Battle" +
+    @DisplayName(   "Will Fail - Special TEST to debug the Battle" +
                     "This test will fail when the players don't have enough cards (DB). IllegalArgumentException." +
                     "Why necessary: Is not possible to change threads using the debugger. This is the only way of debugging the battle.")
 
@@ -32,7 +32,13 @@ class GameControllerTest {
         gameController.addPlayer(userController1.getUser());
         gameController.addPlayer(userController2.getUser());
 
-        gameController.startGame();
+        try {
+            gameController.startGame();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Stack is empty");;
+        }
+
+
 
     }
 

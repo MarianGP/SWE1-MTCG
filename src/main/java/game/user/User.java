@@ -1,6 +1,5 @@
 package game.user;
 
-import game.battle.Battle;
 import game.cards.Card;
 import game.decks.CardDeck;
 import game.decks.CardStack;
@@ -10,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Random;
 
 @Setter
 @Getter
@@ -23,14 +21,16 @@ public class User implements Comparable<User> {
     private String image;
     private int coins;
     private int elo;
+    private int gamesPlayed;
     private CardStack stack;
     private CardDeck deck;
+
     private boolean isAdmin;
 
-    private final static Random RANDOM = new Random();
-    private final static int DECKSIZE = 5;
+    private final static int ELOUP = 3;
+    private final static int ELODOWN = 5;
 
-    public void buyPackage(){ // ! random package for testing
+    public void buyPackage(){ // ! generate random package for testing
         Package newPackage = new Package();
         if(this.coins - newPackage.getPRICE() > 0) {
             this.coins = this.coins - newPackage.getPRICE();
@@ -52,7 +52,7 @@ public class User implements Comparable<User> {
 
     public void eloDown() {
         int temp;
-        temp = this.elo - 5;
+        temp = this.elo - ELODOWN;
         if(temp >= 0) {
             this.elo = temp;
         } else {
@@ -66,7 +66,7 @@ public class User implements Comparable<User> {
     }
 
     public void eloUp(){
-        this.elo = this.elo + 3;
+        this.elo = this.elo + ELOUP;
     }
 
     public String userStats(String rank) {
@@ -74,11 +74,13 @@ public class User implements Comparable<User> {
             if(rank.isEmpty()) {
                 return  rank +
                         " User: " + this.username +
-                        " Coins: " + this.coins +
+                        " - Coins: " + this.coins +
+                        " - Games Played: " + this.gamesPlayed +
                         " - ELO: " + this.elo + "\n";
             }
             return  rank +
                     " User: " + this.username +
+                    " - Games Played: " + this.gamesPlayed +
                     " - ELO: " + this.elo + "\n";
         } else {
             return "";
@@ -98,6 +100,7 @@ public class User implements Comparable<User> {
         return  "-- User Account Summary -- \n" +
                 "User: " + this.username +
                 " - ELO: " + this.elo +
+                " - Games Played: " + this.gamesPlayed +
                 " - Total Cards: " + this.stack.getStackList().size() + " \n";
     }
 

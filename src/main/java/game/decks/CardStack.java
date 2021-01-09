@@ -32,7 +32,4 @@ public class CardStack implements Randomizable {
         }
     }
 
-//    public Card cardToTrade() {
-//
-//    }
 }

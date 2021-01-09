@@ -72,8 +72,8 @@ public class DbConnection {
 
         this.c = connect();
         String query = ("INSERT INTO PUBLIC.USER " +
-                        "(username, password, bio, token, image, coins, elo, admin) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+                        "(username, password, bio, token, image, coins, elo, admin, games) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
         PreparedStatement stmt = this.c.prepareStatement(query);
         stmt.setString(1, player.getUsername());
         stmt.setString(2, player.getPassword());
@@ -83,6 +83,7 @@ public class DbConnection {
         stmt.setInt(6, player.getCoins());
         stmt.setInt(7, player.getElo());
         stmt.setBoolean(8, player.isAdmin());
+        stmt.setInt(9, player.getCoins());
 
         rows = stmt.executeUpdate();
 
@@ -139,12 +140,13 @@ public class DbConnection {
         int rows = 0;
         try {
             String query = (
-                    "UPDATE public.user SET coins = ?, elo = ? WHERE username LIKE ?;");
+                    "UPDATE public.user SET coins = ?, elo = ?, games = ? WHERE username LIKE ?;");
 
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setInt(1, user.getCoins() );
             stmt.setInt(2, user.getElo() );
-            stmt.setString(3, user.getUsername());
+            stmt.setInt(3, user.getGamesPlayed() + 1);
+            stmt.setString(4, user.getUsername());
 
             rows = stmt.executeUpdate();
 
@@ -297,6 +299,7 @@ public class DbConnection {
                 .stack(new CardStack())
                 .deck(new CardDeck())
                 .isAdmin( rs.getBoolean("admin") )
+                .gamesPlayed( rs.getInt("games") )
                 .build();
         List<Card> list = getCardListByOwner(user.getUsername());
         if(!list.isEmpty()) {

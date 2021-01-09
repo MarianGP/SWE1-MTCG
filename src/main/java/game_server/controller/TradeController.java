@@ -48,6 +48,13 @@ public class TradeController implements Tradable {
         Trade wantedCardTrade =  db.getTradeByCardId(wantedCardId);
         Card offeredCard = db.getCardById(offeredCardId);
 
+        if(wantedCardTrade == null)
+            return "Wanted card doesn't exist on the trading market";
+
+        if(offeredCard == null) {
+            return "There is no cards with this id";
+        }
+
         String response = wantedCardTrade.validateTrade(offeredCard, username);
 
         if(response != null)
@@ -91,4 +98,15 @@ public class TradeController implements Tradable {
         return objectMapper.readValue(json, TradeData.class);
     }
 
+    public String buyTradedCard(String wantedCardId, String username) {
+        Trade wantedCardTrade =  db.getTradeByCardId(wantedCardId);
+
+        if(wantedCardTrade == null)
+            return "Wanted card doesn't exist on the trading market";
+
+        db.setCardOwner(wantedCardId, username);
+        db.deleteTrade(wantedCardId);
+
+        return null;
+    }
 }

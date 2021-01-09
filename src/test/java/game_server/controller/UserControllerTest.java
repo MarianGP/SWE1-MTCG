@@ -6,9 +6,9 @@ import game.cards.MonsterCard;
 import game.cards.SpellCard;
 import game.decks.CardDeck;
 import game.decks.CardStack;
+import game.enums.CardName;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.CardName;
 import game.user.User;
 import game_server.db.DbConnection;
 import game_server.model.RequestHandler;
@@ -60,6 +60,7 @@ class UserControllerTest {
 
     boolean isLogged = this.userController.getDb().deleteSession("marian-mtcgToken");
 
+
     @Test
     @DisplayName("Log In: Wrong/Correct Pass, Logged")
     void testLogin() throws JsonProcessingException, SQLException {
@@ -81,6 +82,7 @@ class UserControllerTest {
     void testBuyPackage() {
         createList();
         this.userController.buyPackage(cardsList);
+        Assertions.assertEquals(15, this.userController.getUser().getCoins());
     }
 
 

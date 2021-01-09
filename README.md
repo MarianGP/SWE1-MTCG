@@ -2,13 +2,55 @@
 
 
 ## Technical steps
-1) Game structure definition: Classes, Parameter, Enum, Parameters, etc
-2) Unit test definition which will guide the definition of functions to fulfill its purpose.
-3) Server structure definition: Server, RequestContext, RequestHandler, Response, 
-4) Endpoints definition in RequestHandler
-5) Allow threads in the server to handle multiple client requests
-6) Creation of DB and tables for data persistence
-7) Definition of trading system based on requirements
+###1) Game structure definition: Interfaces, Classes, Parameter, Enum, Parameters.
+
+- Separation of the project in 2 main sections: game, server.
+- Interfaces which define with functionality the program and its classes need to achieve.
+
+###2) Unit test for TDD
+
+
+###3) Server structure definition: Server, RequestContext, RequestHandler, Response, Controllers
+
+- Connection using websockets and basic authentication.
+- 
+
+###4) Endpoints definition in RequestHandler
+
+- Accordingly to URL/Path and HttpMethod.
+- Error handling in case of unauthorized access.
+
+###5) Allow threads in the server to handle multiple client requests
+
+- Implement threads and make collections and variables thread safe. To prevent race condition.
+
+###6) Creation of DB and tables for data persistence
+
+- Creation of tables and db structure for persistence of data.
+- Tables: card, session, trade, user
+
+###7) Definition of trading system based on requirements
+
+- Simple comparison between offered card features and card being traded.
+
+###8) Election of collections
+
+a) `Map`s: for storing key-value pairs `Hashmap<Key,Value>`
+    
+- Http request header.
+- Map Card's class to Json.
+
+b) `List`s:
+
+- Stack, deck, and many other list of objects in general.
+- `ArrayBlockingQueue<User>` for add 2 player to the same battle.
+This collection gives access to extra methods like: pop(), 
+
+c) Arrays
+
+- `String[]` Strings of array for spliting URL
+
+
 
 ## Design
 

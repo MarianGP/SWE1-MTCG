@@ -10,8 +10,8 @@ public interface RequestHandling {
     void signUp(String requestBody, String token) throws JsonProcessingException, SQLException;
     void singIn(String requestBody) throws JsonProcessingException;
 
-    void showUserCards(String token);
-    void showDeckCards(boolean formatJson);
+    void showUserCards(String token) throws JsonProcessingException;
+    void showDeckCards(boolean formatJson) throws JsonProcessingException;
 
     void tradeCards(String wantedCardId, String requestBody);
     void addTrade(String requestBody, String username) throws JsonProcessingException, SQLException;

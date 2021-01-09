@@ -81,13 +81,6 @@ class BattleTest {
     }
 
     @Test
-    @DisplayName("")
-    void checkIfWinner() {
-//        when(newBattle.checkWinner(player1, player2).thenReturn(false));
-//        verify(newBattle.checkWinner(player1, player2);
-    }
-
-    @Test
     @DisplayName("Swap Players: CurrentPlayer becomes NextPlayer")
     void tryToSwapAttackers() {
         User current = newBattle.getCurrentPlayer();

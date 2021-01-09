@@ -90,8 +90,9 @@ class RequestHandlerTest {
 
         return RequestHandler.builder()
                 .requestContext(requestContext)
-                .status(StatusCode.OK)
+                .responseStatus(StatusCode.OK)
                 .db(new DbConnection())
+                .formatJson(true)
                 .build();
     }
 }

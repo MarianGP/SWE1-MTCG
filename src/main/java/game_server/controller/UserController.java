@@ -37,6 +37,7 @@ public class UserController {
                     .stack(new CardStack())
                     .deck(new CardDeck())
                     .isAdmin(false)
+                    .gamesPlayed(0)
                     .build();
 
         } catch (Exception e) {
@@ -86,6 +87,7 @@ public class UserController {
 
     public boolean setUser(String token) {
         this.user = db.getLoggedUser(token);
+
         if(this.user != null) {
             initializeStack(); //changed check for errors
             return true;
@@ -123,7 +125,7 @@ public class UserController {
             db.addOwnerToPackage(this.user.getUsername(), db.getMaxPackageId());
         }
         this.user.buyPackage(packageDB);
-        db.editUserStats(this.user); // ! CAREFUL last minute change
+        db.editUserStats(this.user);
         return "Package bought";
     }
 

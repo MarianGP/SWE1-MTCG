@@ -30,6 +30,7 @@ class DbConnectionTest {
             .stack(new CardStack())
             .deck(new CardDeck())
             .isAdmin(false)
+            .gamesPlayed(2)
             .build();
 
     User user2 = User.builder()

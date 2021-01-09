@@ -15,7 +15,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +25,7 @@ import java.util.List;
 public class CardController {
     private DbConnection db;
 
-    public CardData[] serializeCard(String jsonCardsArray) throws JsonProcessingException {
+    public CardData[] deserializeCardListToObject(String jsonCardsArray) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(
                 DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
@@ -31,7 +33,7 @@ public class CardController {
     }
 
     public boolean insertJSONCards(String jsonCardsArray, User user) throws JsonProcessingException {
-        CardData[] listCustomCard = serializeCard(jsonCardsArray);
+        CardData[] listCustomCard = deserializeCardListToObject(jsonCardsArray);
         int packageID = db.getMaxPackageId() + 1;
         for(CardData temp: listCustomCard) {
             Card card = buildCard(temp, user.getUsername(), false);
@@ -42,7 +44,7 @@ public class CardController {
         return true;
     }
 
-    private Card buildCard(CardData cardData, String username, boolean inDeck) {
+    public Card buildCard(CardData cardData, String username, boolean inDeck) {
         Card card;
         if ( cardData.getMonsterType() == null || cardData.getMonsterType().isEmpty()) {
             card = new SpellCard(
@@ -75,6 +77,34 @@ public class CardController {
         System.out.println(all);
         return all;
     }
+
+    public String getCardsListJson(List<Card> cardList) throws JsonProcessingException {
+        StringBuilder st = new StringBuilder();
+        st.append("[");
+        for(Card card: cardList) {
+            st.append(serializeCardToJson(card));
+            st.append(",");
+        }
+        st.deleteCharAt(st.length()-1);
+        st.append("]");
+
+        return String.valueOf(st);
+    }
+
+    public String serializeCardToJson(Card card) throws JsonProcessingException {
+        Map<String, String> map = new HashMap<>();
+        map.put("id", card.getCid());
+        map.put("element", String.valueOf(card.getCardElement().getElementName()));
+        map.put("name", card.getName());
+
+        String type = (card instanceof MonsterCard) ? card.getType().getName() : "";
+        map.put("monsterType", type);
+        map.put("damage", String.valueOf(card.getDamage()));
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map);
+    }
+
 
     public boolean deleteCardsList(List <Card> cardList)  {
         for(Card temp: cardList) {

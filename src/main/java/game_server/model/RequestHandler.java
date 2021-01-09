@@ -25,11 +25,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public class RequestHandler implements RequestHandling {
 
-    private StatusCode status; // * response
+    private StatusCode responseStatus;
     private HttpRequest requestContext;
     private String responseBody;
     private String[] path;
     private boolean startBattle;
+    private boolean formatJson;
 
     private DbConnection db;
     private UserController userController;
@@ -51,27 +52,11 @@ public class RequestHandler implements RequestHandling {
         return HttpResponse.builder()
                 .version(this.requestContext.getVersion())
                 .response(this.responseBody)
-                .status(this.status)
+                .status(this.responseStatus)
                 .requestHeaderPairs(this.requestContext.getHeaderPairs())
                 .player(this.userController.getUser())
                 .startBattle(startBattle)
                 .build();
-    }
-
-    public void handlePath() throws JsonProcessingException, SQLException {
-        splitURL(this.requestContext.getPath());
-
-        if (this.status != StatusCode.BADREQUEST
-            && this.requestContext.getPath().matches("(/" + this.path[1] + "/)("+ this.path[2] +")(/?)" )) {
-                selectAction(this.path[1],this.path[2], getClientToken());
-
-        } else if (this.status != StatusCode.BADREQUEST
-            && this.requestContext.getPath().matches("(/" + this.path[1] + ")(/?)") ) {
-                selectAction(this.path[1], getClientToken());
-
-        } else {
-            setResponseStatus("Wrong URL Path", StatusCode.BADREQUEST);
-        }
     }
 
     public void splitURL(String fullPath) {
@@ -84,10 +69,14 @@ public class RequestHandler implements RequestHandling {
             i++;
         }
 
-        if(this.requestContext.getPath().contains("\\?"))
-            handleUrlParameters(fullPath.split("\\?")[1]);
-
-        validateURLActions(this.path[1]);
+        if(this.requestContext.getPath().contains("?")) {
+            temp = this.path[1].split("\\?");
+            this.path[1] = temp[0];
+            this.path[2] = temp[1];
+            handleUrlParameters(temp[1]);
+        } else {
+            validateURLActions(this.path[1]);
+        }
     }
 
     public void validateURLActions(String first) {
@@ -95,6 +84,57 @@ public class RequestHandler implements RequestHandling {
         if( !Arrays.asList( allowedTables ).contains( first ) ) {
             this.path = null;
             setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void handlePath() throws JsonProcessingException, SQLException {
+        splitURL(this.requestContext.getPath());
+
+        if (this.responseStatus != StatusCode.BADREQUEST
+            && this.requestContext.getPath().matches("(/" + this.path[1] + "/)("+ this.path[2] +")(/?)" )) {
+                selectAction(this.path[1],this.path[2], getClientToken());
+
+        } else if (this.responseStatus != StatusCode.BADREQUEST
+            && ( this.requestContext.getPath().matches("(/" + this.path[1] + ")(/?)([?a-z=]*)")
+                || this.requestContext.getPath().matches("(/deck\\?format=plain)" ) )
+            ) {
+            selectAction(this.path[1], getClientToken());
+
+        } else {
+            setResponseStatus("Wrong URL Path", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void selectAction(String first, String token) throws JsonProcessingException, SQLException {
+
+        if(!this.userController.setUser(token)) { // ! user is not logged in
+            anonymousUserAction(first);
+        } else {
+            loggedUserAction(first);
+        }
+    }
+
+    public void anonymousUserAction(String first) throws JsonProcessingException, SQLException {
+
+        switch (first) {
+            case "users"    -> handleUser(this.requestContext.getBody(), this.requestContext.getMethod());
+            case "sessions" -> singIn(this.requestContext.getBody());
+            default         -> setResponseStatus("Unauthorized. Log in to access all functionalities",
+                    StatusCode.UNAUTHORIZED);
+        }
+    }
+
+    public void loggedUserAction(String first) throws JsonProcessingException, SQLException {
+
+        switch (first) {
+            case "score"    -> getScoreBoard();
+            case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
+            case "battles"  -> startBattle(getClientToken());
+            case "packages" -> insertNewPackage();
+            case "cards"    -> showUserCards(getClientToken());
+            case "deck"     -> manipulateDeck(getClientToken(), requestContext.getBody());
+            case "tradings" -> handleTradings(getClientToken());
+            default         -> setResponseStatus("Wrong URL", StatusCode.BADREQUEST);
         }
     }
 
@@ -114,47 +154,26 @@ public class RequestHandler implements RequestHandling {
     }
 
     public void tradeCards(String wantedCardId, String requestBody) {
-        String offeredCardId = requestBody.replaceAll("[\"]", "");
-        String errorMsg = tradeController.tradeCards(wantedCardId, offeredCardId, userController.getUser().getUsername());
-        if(errorMsg == null) {
-            this.responseBody = "Trade was successful";
+
+        if(requestBody.isEmpty()) {
+            String errorMsg = tradeController.buyTradedCard(wantedCardId, userController.getUser().getUsername());
+            if(errorMsg == null) {
+                this.userController.getUser().setCoins( (this.userController.getUser().getCoins() - 5) );
+                this.userController.getDb().editUserStats(this.userController.getUser());
+                this.responseBody = "Trade purchase was successful";
+            } else {
+                setResponseStatus(errorMsg, StatusCode.BADREQUEST);
+            }
         } else {
-            setResponseStatus(errorMsg, StatusCode.BADREQUEST);
-        }
-    }
-
-    public void selectAction(String first, String token) throws JsonProcessingException, SQLException {
-
-        if(!this.userController.setUser(token)) { // ! user is not logged in
-            anonymousUserAction(first);
-        } else {
-            loggedUserAction(first);
+            String offeredCardId = requestBody.replaceAll("[\"]", "");
+            String errorMsg = tradeController.tradeCards(wantedCardId, offeredCardId, userController.getUser().getUsername());
+            if(errorMsg == null) {
+                this.responseBody = "Trade was successful";
+            } else {
+                setResponseStatus(errorMsg, StatusCode.BADREQUEST);
+            }
         }
 
-    }
-
-    public void anonymousUserAction(String first) throws JsonProcessingException, SQLException {
-
-        switch (first) {
-            case "users"    -> handleUser(this.requestContext.getBody(), this.requestContext.getMethod());
-            case "sessions" -> singIn(this.requestContext.getBody());
-            default         -> setResponseStatus("Unauthorized. Log in to access all functionalities",
-                                    StatusCode.UNAUTHORIZED);
-        }
-    }
-
-    public void loggedUserAction(String first) throws JsonProcessingException, SQLException {
-
-        switch (first) {
-            case "score"    -> getScoreBoard();
-            case "stats"    -> this.responseBody = this.userController.getUser().userStats("");
-            case "battles"  -> startBattle(getClientToken());
-            case "packages" -> insertNewPackage();
-            case "cards"    -> showUserCards(getClientToken());
-            case "deck"     -> manipulateDeck(getClientToken(), requestContext.getBody());
-            case "tradings" -> handleTradings(getClientToken());
-            default         -> setResponseStatus("Wrong URL", StatusCode.BADREQUEST);
-        }
     }
 
     public void handleTradings(String token) throws JsonProcessingException, SQLException {
@@ -207,11 +226,11 @@ public class RequestHandler implements RequestHandling {
         }
     }
 
-    public void showUserCards(String token) { // ! none-admin users
+    public void showUserCards(String token) throws JsonProcessingException { // ! none-admin users
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
             if(this.userController.initializeStack()) {
                 this.responseBody = String.valueOf(cardController
-                    .getCardListStats(this.userController.getUser().getStack().getStackList(),"Stack"));
+                    .getCardsListJson(this.userController.getUser().getStack().getStackList()));
             } else {
                 setResponseStatus("Stack is empty", StatusCode.NOCONTENT);
             }
@@ -220,13 +239,13 @@ public class RequestHandler implements RequestHandling {
         }
     }
 
-    public void manipulateDeck(String token, String requestBody) {
+    public void manipulateDeck(String token, String requestBody) throws JsonProcessingException {
 
         if(this.userController.setUser(token) && !this.userController.getUser().isAdmin()) {
             if(this.userController.initializeStack()) {
                 switch (this.requestContext.getMethod()) {
                     case PUT -> initializeDeck(requestBody);
-                    case GET -> showDeckCards(false); //TODO: show in json
+                    case GET -> showDeckCards(this.formatJson); //TODO: show in json
                     default  -> setResponseStatus("Deck - This method is not allowed", StatusCode.BADREQUEST);
                 }
             } else {
@@ -237,7 +256,7 @@ public class RequestHandler implements RequestHandling {
         }
     }
 
-    public void showDeckCards(boolean formatJson) {
+    public void showDeckCards(boolean formatJson) throws JsonProcessingException {
         if(!this.userController.getUser().isAdmin()) {
             if(this.userController.getUser().getDeck().getDeckList() != null) {
                 List<Card> deck = this.userController.getUser().getDeck().getDeckList();
@@ -245,6 +264,9 @@ public class RequestHandler implements RequestHandling {
                     if(!formatJson) {
                         this.responseBody = String.valueOf(cardController
                                 .getCardListStats(deck, "Deck"));
+                    } else {
+                        this.responseBody = String.valueOf(cardController
+                                .getCardsListJson(deck));
                     }
                 } else {
                     setResponseStatus("Deck is empty", StatusCode.NOCONTENT);
@@ -360,7 +382,7 @@ public class RequestHandler implements RequestHandling {
         } else { // ! already logged
             if(this.userController.setUser(token)) {
                 this.responseBody = "Can't include token";
-            };
+            }
         }
     }
 
@@ -368,17 +390,19 @@ public class RequestHandler implements RequestHandling {
         Credentials credentials = getCredentials(requestBody);
         this.responseBody = this.userController.signIn(credentials);
         if(this.userController.getUser() == null) {
-            this.status = StatusCode.UNAUTHORIZED;
+            this.responseStatus = StatusCode.UNAUTHORIZED;
         }
     }
 
     public void setResponseStatus(String responseMsg, StatusCode code) {
-        this.status = code;
+        this.responseStatus = code;
         this.responseBody = responseMsg;
     }
 
     public void handleUrlParameters(String parameters) {
-        Map<String, String> map = getQueryMap(requestContext.getPath());
+        if(parameters.equals("format=plain"))
+            formatJson = false;
+        Map<String, String> map = getQueryMap(parameters);
     }
 
     public static Map<String, String> getQueryMap(String query) {
