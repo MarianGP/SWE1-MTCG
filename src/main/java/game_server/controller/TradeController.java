@@ -98,13 +98,27 @@ public class TradeController implements Tradable {
         return objectMapper.readValue(json, TradeData.class);
     }
 
-    public String buyTradedCard(String wantedCardId, String username) {
+    public String buyTradedCard(String wantedCardId, String username, int coins) {
+        if(coins < 5)
+            return "You don´t have enough money to buy this trade";
+
         Trade wantedCardTrade =  db.getTradeByCardId(wantedCardId);
 
         if(wantedCardTrade == null)
             return "Wanted card doesn't exist on the trading market";
 
         db.setCardOwner(wantedCardId, username);
+        db.deleteTrade(wantedCardId);
+
+        return null;
+    }
+
+    public String deleteTradedCard(String wantedCardId) {
+        Trade wantedCardTrade =  db.getTradeByCardId(wantedCardId);
+
+        if(wantedCardTrade == null)
+            return "The card you want to delete doesn't exist on the trading market";
+
         db.deleteTrade(wantedCardId);
 
         return null;

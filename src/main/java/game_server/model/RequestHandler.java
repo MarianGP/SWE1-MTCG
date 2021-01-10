@@ -145,7 +145,7 @@ public class RequestHandler implements RequestHandling {
             switch (first) {
                 case "users"        -> manipulateUserAccount(this.userController.getUser().getUsername(), second);
                 case "transactions" -> buyNewPackage(second, requestContext.getBody(), token);
-                case "tradings"     -> tradeCards(second, this.requestContext.getBody()); //TODO
+                case "tradings"     -> deleteOrTrade(second, this.requestContext.getBody()); //TODO
                 default             -> setResponseStatus("URL not allowed", StatusCode.BADREQUEST);
             }
         } else {
@@ -153,10 +153,19 @@ public class RequestHandler implements RequestHandling {
         }
     }
 
-    public void tradeCards(String wantedCardId, String requestBody) {
+    public void deleteOrTrade(String wantedCardId, String requestBody)  {
+        if(HttpMethod.DELETE == requestContext.getMethod()) {
+            deleteTrade(wantedCardId);
+        } else if (HttpMethod.POST == requestContext.getMethod()) {
+            tradeCards(wantedCardId, requestBody);
+        }
+    }
+
+    public void tradeCards(String wantedCardId, String requestBody){
 
         if(requestBody.isEmpty()) {
-            String errorMsg = tradeController.buyTradedCard(wantedCardId, userController.getUser().getUsername());
+            String errorMsg = tradeController.buyTradedCard(
+                    wantedCardId, userController.getUser().getUsername(), userController.getUser().getCoins());
             if(errorMsg == null) {
                 this.userController.getUser().setCoins( (this.userController.getUser().getCoins() - 5) );
                 this.userController.getDb().editUserStats(this.userController.getUser());
@@ -164,6 +173,7 @@ public class RequestHandler implements RequestHandling {
             } else {
                 setResponseStatus(errorMsg, StatusCode.BADREQUEST);
             }
+
         } else {
             String offeredCardId = requestBody.replaceAll("[\"]", "");
             String errorMsg = tradeController.tradeCards(wantedCardId, offeredCardId, userController.getUser().getUsername());
@@ -173,7 +183,6 @@ public class RequestHandler implements RequestHandling {
                 setResponseStatus(errorMsg, StatusCode.BADREQUEST);
             }
         }
-
     }
 
     public void handleTradings(String token) throws JsonProcessingException, SQLException {
@@ -185,6 +194,15 @@ public class RequestHandler implements RequestHandling {
             }
         } else {
             setResponseStatus("Only players own cards (not admins)", StatusCode.BADREQUEST);
+        }
+    }
+
+    public void deleteTrade(String cardId) {
+        String errorMsg = tradeController.deleteTradedCard(cardId);
+        if(errorMsg == null) {
+            this.responseBody = "Trade was deleted";
+        } else {
+            setResponseStatus(errorMsg, StatusCode.BADREQUEST);
         }
     }
 
@@ -279,15 +297,11 @@ public class RequestHandler implements RequestHandling {
 
     public void initializeDeck(String requestBody) {
         List<String> ids = parseJsonArray(requestBody);
-        if(ids.size() == 4) {
-            String errorMsg = this.userController.addCardsToDeck(ids);
-            if(errorMsg == null) {
-                this.responseBody = "New deck prepared";
-            } else {
-                setResponseStatus(  errorMsg, StatusCode.BADREQUEST);
-            }
+        String errorMsg = this.userController.addCardsToDeck(ids);
+        if(errorMsg == null && ids.size() == 4) {
+            this.responseBody = "New deck prepared";
         } else {
-            setResponseStatus("4 cards needs to be added to stack", StatusCode.BADREQUEST);
+            setResponseStatus(  errorMsg, StatusCode.BADREQUEST);
         }
     }
 

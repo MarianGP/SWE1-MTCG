@@ -26,8 +26,8 @@ class GameControllerTest {
                     "Why necessary: Is not possible to change threads using the debugger. This is the only way of debugging the battle.")
 
     void startGame() throws InterruptedException {
-        userController1.setUser("player1-mtcgToken");
-        userController2.setUser("player2-mtcgToken");
+        userController1.setUser("altenhof-mtcgToken");
+        userController2.setUser("kienboec-mtcgToken");
 
         gameController.addPlayer(userController1.getUser());
         gameController.addPlayer(userController2.getUser());
@@ -37,8 +37,6 @@ class GameControllerTest {
         } catch (IllegalArgumentException e) {
             System.out.println("Stack is empty");;
         }
-
-
 
     }
 

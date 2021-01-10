@@ -78,7 +78,7 @@ class DbConnectionTest {
     @Test
     @DisplayName("Return one logged user")
     void testGetLoggedUser() {
-        Assertions.assertEquals("stefan", db.getLoggedUser("stefan-mtcgToken").getUsername());
+        Assertions.assertEquals("test1", db.getLoggedUser("test1-mtcgToken").getUsername());
     }
 
     @Test

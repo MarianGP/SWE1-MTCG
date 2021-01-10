@@ -64,6 +64,9 @@ public class UserController {
     }
 
     public String addCardsToDeck(List<String> ids) {
+        if(ids.size() != 4) {
+            return "4 cards needs to be added to stack";
+        }
 
         db.cleanupDeck(this.user.getUsername()); // ! cleanup deck
 
@@ -122,11 +125,16 @@ public class UserController {
             if(packageDB.size() == 0) {
                 return "The are no packages available to buy";
             }
-            db.addOwnerToPackage(this.user.getUsername(), db.getMaxPackageId());
         }
-        this.user.buyPackage(packageDB);
-        db.editUserStats(this.user);
-        return "Package bought";
+
+        if(this.user.buyPackage(packageDB)){
+            db.addOwnerToPackage(this.user.getUsername(), db.getMaxPackageId());
+            db.editUserStats(this.user);
+            return "Package bought";
+        } else {
+            return "You don't have money to buy another package";
+        }
+
     }
 
     public String editUserData(String jsonEditedUser) throws JsonProcessingException {

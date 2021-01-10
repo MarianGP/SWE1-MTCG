@@ -1,11 +1,13 @@
 # Monster Trading Card Game
 
 
+
+
 ## Technical steps
 ###1) Game structure definition: Interfaces, Classes, Parameter, Enum, Parameters.
 
-- Separation of the project in 2 main sections: game, server.
-- Interfaces which define with functionality the program and its classes need to achieve.
+- Separation of the project in 2 main sections: game, rest-server.
+- Definition of interfaces.
 
 ###2) Unit test for TDD
 

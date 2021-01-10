@@ -33,7 +33,6 @@ public class Package {
             }
             this.cardsInPackage.add(temp);
         }
-
     }
 
     public Package(List<Card> packageDB){

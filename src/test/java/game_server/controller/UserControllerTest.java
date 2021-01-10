@@ -74,7 +74,7 @@ class UserControllerTest {
 
     @Test
     void testGetLoggedUser() {
-        Assertions.assertTrue(this.userController.setUser("stefan-mtcgToken"));
+        Assertions.assertTrue(this.userController.setUser("test1-mtcgToken"));
     }
 
     @Test

@@ -52,7 +52,7 @@ public class HttpResponse {
         }
         if(!response.isEmpty()) {
             addHeaderPair("Content-Length", Integer.toString(response.length()));
-            addHeaderPair("Content-Type", contentType); //"text/plain"
+            addHeaderPair("Content-Type", contentType);
         } else {
             addHeaderPair("Content-Length", "0");
         }

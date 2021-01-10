@@ -6,6 +6,7 @@ import game.cards.Card;
 import game.decks.CardDeck;
 import game.user.User;
 import game_server.db.DbConnection;
+import game_server.interfaces.Playable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Data
 @AllArgsConstructor
 
-public class GameController {
+public class GameController  implements Playable {
     private ArrayBlockingQueue<User> players;
     private static DbConnection db = new DbConnection();
     private AtomicBoolean isFinished;

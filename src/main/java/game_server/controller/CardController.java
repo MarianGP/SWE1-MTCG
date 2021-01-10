@@ -105,7 +105,6 @@ public class CardController {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map);
     }
 
-
     public boolean deleteCardsList(List <Card> cardList)  {
         for(Card temp: cardList) {
             db.deleteCard(temp.getCid());

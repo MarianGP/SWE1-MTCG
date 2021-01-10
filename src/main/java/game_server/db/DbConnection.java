@@ -83,7 +83,7 @@ public class DbConnection {
         stmt.setInt(6, player.getCoins());
         stmt.setInt(7, player.getElo());
         stmt.setBoolean(8, player.isAdmin());
-        stmt.setInt(9, player.getCoins());
+        stmt.setInt(9, 0);
 
         rows = stmt.executeUpdate();
 

@@ -2,12 +2,11 @@ package game.battle;
 
 import game.cards.Card;
 import game.cards.MonsterCard;
-import game.cards.SpellCard;
 import game.decks.CardDeck;
 import game.decks.CardStack;
+import game.enums.CardName;
 import game.enums.Element;
 import game.enums.MonsterType;
-import game.enums.CardName;
 import game.user.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +36,7 @@ class BattleTest {
 
 
     Card wizzard = new MonsterCard(MonsterType.WIZZARD, Element.FIRE, CardName.ONE, 100.0f);
-    Card ork = new MonsterCard(MonsterType.ORK, Element.FIRE, CardName.ONE, 100.0f);
-    Card dragon = new MonsterCard(MonsterType.DRAGON, Element.FIRE, CardName.ONE, 100.0f);
     Card elf = new MonsterCard(MonsterType.ELF, Element.FIRE, CardName.ONE, 120.0f);
-    Card water = new SpellCard(Element.WATER, CardName.FIVE, 50.0f);
-    Card fire = new SpellCard(Element.FIRE, CardName.FIVE, 200.0f);
-    Card normal = new SpellCard(Element.NORMAL, CardName.FIVE, 200.0f);
 
     Battle newBattle = new Battle(player1, player2, 100);
     Battle anotherBattle = new Battle(player3, player4, 100);

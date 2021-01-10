@@ -1,6 +1,7 @@
 package game.battle;
 
 import game.cards.Card;
+import game.interfaces.Defeatable;
 import game.user.User;
 import game_server.db.DbConnection;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Getter
 
-public class Battle {
+public class Battle implements Defeatable {
 
     private static DbConnection db = new DbConnection();
 

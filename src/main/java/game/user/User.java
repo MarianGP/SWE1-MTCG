@@ -38,11 +38,14 @@ public class User implements Comparable<User> {
         }
     }
 
-    public void buyPackage(List<Card> list){ // ! DB cards
+    public boolean buyPackage(List<Card> list){ // ! DB cards
         Package newPackage = new Package(list);
-        if(this.coins - newPackage.getPRICE() > 0) {
+        if(this.coins >= newPackage.getPRICE()) {
             this.coins = this.coins - newPackage.getPRICE();
             this.stack.addListToStack(newPackage.getCardsInPackage());
+            return true;
+        } else {
+            return false;
         }
     }
 

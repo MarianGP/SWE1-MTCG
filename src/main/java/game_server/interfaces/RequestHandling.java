@@ -13,7 +13,7 @@ public interface RequestHandling {
     void showUserCards(String token) throws JsonProcessingException;
     void showDeckCards(boolean formatJson) throws JsonProcessingException;
 
-    void tradeCards(String wantedCardId, String requestBody);
+    void tradeCards(String wantedCardId, String requestBody) throws JsonProcessingException, SQLException;
     void addTrade(String requestBody, String username) throws JsonProcessingException, SQLException;
     void showTrades();
 
