@@ -4,14 +4,14 @@
 
 ## Technical steps and Design
 
-###1) Game structure definition: Interfaces, Classes, Parameter, Enum, Parameters.
+### 1) Game structure definition: Interfaces, Classes, Parameter, Enum, Parameters.
 
 - Preparations of UML diagrams.
 - Separation of the project in 2 main sections: game, rest-server.
 - Definition of interfaces (functionality which would be included in each class).
 - Working with enums makes the code more readable and it's not difficult to implement.
 
-###2) Unit test for TDD
+### 2) Unit test for TDD
 
 - To guide the development of class methods.
 - To test each method and to proof after posterior changes that code didn't break.
@@ -24,27 +24,27 @@ depending on cards: instance of Cards (MonsterCard/SpellCard), Element, Type and
 - Each new connection will initiate a new thread.
 - Request data gets handled and stored in RequestContext and its information is used to handle the request.
 
-###4) Endpoints definition in RequestHandler
+### 4) Endpoints definition in RequestHandler
 
 - Accordingly to URL/Path and HttpMethod.
 - Error handling in case of unauthorized access modifying the response status (StatusCode: code, name).
 
-###5) Allow threads in the server to handle multiple client requests
+### 5) Allow threads in the server to handle multiple client requests
 
 - Implement threads and make collections and variables thread safe. To prevent race condition.
 
-###6) Creation of DB and tables for data persistence
+### 6) Creation of DB and tables for data persistence
 
 - Creation of tables and db structure for persistence of data.
 - Tables: card, session, trade, user.
 - Include db connection 
 
-###7) Definition of trading system based on requirements
+### 7) Definition of trading system based on requirements
 
 - Simple comparison between offered card features and card being traded.
 - 4 options: add new trade, delete trade, trade cards, and to buy a card being traded by paying 5 coins.
 
-###8) Election of collections
+### 8) Election of collections
 
 a) `Map`s: for storing key-value pairs `Hashmap<Key,Value>`
     
@@ -61,7 +61,7 @@ c) Arrays
 
 - `String[]` Strings of array for spliting URL
 
-###9) Files
+### 9) Files
 
 - To practice the use of files I included the user of ` FileInputStream ` to read
 the database connection properties from a separated .properties document
