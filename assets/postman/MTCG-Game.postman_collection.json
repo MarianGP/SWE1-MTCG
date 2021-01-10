@@ -1,0 +1,2589 @@
+{
+	"info": {
+		"_postman_id": "cbd9c171-cc44-41bc-a80a-b5e05f07fbe5",
+		"name": "MTCG-Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign up add new User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Signup was successful (UserController)\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Signup was successful (UserController)\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"janina\", \r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign up - Method not supported",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"This user already exist in DB. Can't signup again.\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"This user already exist in DB\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"fernanda\", \r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Non accepted Method",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Method PATCH not supported\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Method not supported\");\r",
+							"  pm.response.to.have.status(400)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"janina\", \r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \"marian\" false password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Wrong user or password\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Wrong user or password\");\r",
+							"  pm.response.to.have.status(401)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"janina\", \r\n    \"password\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \" \" empty username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Wrong user or password\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Wrong user or password\");\r",
+							"  pm.response.to.have.status(401)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"\", \r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \"admin\" correct password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login was successful: marian\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Login was successful\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\", \r\n    \"password\": \"istrator\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \"player\" correct password Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login was successful: marian\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Login was successful\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"player1\",\r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \"player2\" correct password Copy 2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login was successful: marian\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Login was successful\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"player2\",\r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login \"admin\" already logged in",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\", \r\n    \"password\": \"istrator\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/sessions",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add package not admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Only admin can add new packages: Player1 not admin\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Only admin can add new packages\");\r",
+							"  pm.response.to.have.status(401)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"North Wind\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Goblin\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Dragon\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Extrem\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"fdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new package from JSON",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package1 added to DB\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Cards added to DB\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic admin-mtcgToken",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"North Wind\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Goblin\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Dragon\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Extrem\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"fdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new package from JSON2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package2 added to DB\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Cards added to DB\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic admin-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"North Wind\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"d845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Wizzard\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"d99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Dragon\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Extrem\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new package from JSON2 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Added package1 again. This card already exists in DB\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"This card already exists in DB\");\r",
+							"  pm.response.to.have.status(400)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic admin-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"North Wind\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"d845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Goblin\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"d99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Dragon\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Extrem\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new package from JSON3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package3 added to DB\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Cards added to DB\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic admin-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"y1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"North Wind\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"y845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Goblin\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 70.0\r\n    },\r\n    {\r\n        \"id\": \"y99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Dragon\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Extrem\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"ye85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"ydfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new package from JSON4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package4 added to DB\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Cards added to DB\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic admin-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"id\": \"ry1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Normal\",\r\n        \"name\": \"Lala Land\",\r\n        \"damage\": 90.0\r\n    },\r\n    {\r\n        \"id\": \"ry845f0dc7-37d0-426e-994e-43fc3ac83c08\",\r\n        \"monsterType\": \"Wizzard\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"ry99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n        \"monsterType\": \"Knight\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Super\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"rye85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Fire\",\r\n        \"name\": \"Supreme\",\r\n        \"damage\": 100.0\r\n    },\r\n    {\r\n        \"id\": \"rydfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n        \"monsterType\": \"\",\r\n        \"element\": \"Water\",\r\n        \"name\": \"Blue\",\r\n        \"damage\": 105.0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/packages/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy created package Player2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package bought. Player2\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Package bought\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/transactions/packages",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"transactions",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy created package Again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package2 bought. Player2\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Package bought\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/transactions/packages",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"transactions",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy created package Again Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package4 bought. Player1\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Package bought\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/transactions/packages",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"transactions",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy created package Again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Package4 bought. Player1\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Package bought\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/transactions/packages",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"transactions",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy created No more available",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The are no more packages available to buy\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"The are no packages available to buy\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/transactions/packages",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"transactions",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show stack cards - Empty Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User: Test1. Has an empty stack\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Stack is empty\");\r",
+							"  pm.response.to.have.status(204)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic test1-mtcgToken",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:10001/cards/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"cards",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show stack cards - All",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Shows all cards from user :)\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic player1-mtcgToken",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:10001/cards/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"cards",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add cards to Deck - OK Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Added cards to deck. New deck prepared\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New deck prepared\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n    \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n    \"d845f0dc7-37d0-426e-994e-43fc3ac83c08\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add cards to Deck - OK Player1 Other Cards",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Chose other list of cards to add to deck. New deck prepared\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New deck prepared\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"fdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n    \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n    \"d99f8f8dc-e25e-4a95-aa2c-782823f36e2a\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add cards to Deck - Player 1 - Wrong cards from p2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Trying to add cards which dont belong to user\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Card doesn't belong to this user. Not added.\");\r",
+							"  pm.response.to.have.status(400)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n    \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\",\r\n    \"d845f0dc7-37d0-426e-994e-43fc3ac83c08\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add cards to Deck - Player1 - Only 3 cards",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Only 3 cards given to deck. Error: 4 must be added\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"4 cards needs to be added to stack\");\r",
+							"  pm.response.to.have.status(400)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    \"d1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n    \"ddfdd758f-649c-40f9-ba3a-8657f4b3439f\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add cards to Deck - OK Player2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"2nd Player: Added cards to deck. New deck prepared\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New deck prepared\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    \"y1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"ry1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\",\r\n    \"rye85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n    \"rydfdd758f-649c-40f9-ba3a-8657f4b3439f\"\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show deck cards - Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Showed deck: Player1\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show deck cards - Player2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Showed deck: Player2\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show deck cards - Player2 Plain-Text",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Showed deck: Player2\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck?format=plain",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck"
+					],
+					"query": [
+						{
+							"key": "format",
+							"value": "plain"
+						}
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show deck cards - Empty Stack",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Cant show cards. He doesn't have any cards\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Stack is empty\");\r",
+							"  pm.response.to.have.status(204)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show deck cards - Empty Deck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Cant show cards. He doesn't have any cards in deck\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"Deck is empty\");\r",
+							"  pm.response.to.have.status(204)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/deck/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"deck",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show user Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Deck showed\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Edit User - Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"successfully changes user data\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"User info update was successful (UserController)\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"4560\",\r\n    \"bio\": \"playing\",\r\n    \"image\": \"XD\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show user Test1 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User is already logged in\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Test1 Back to original",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User data back to original. Successfully changes user data\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"User info update was successful (UserController)\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"1234\",\r\n    \"bio\": null,\r\n    \"image\": \":(\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Edit - not allowed Test2 edit Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"UserTest2 tries to change Test1 info, but it's not allowed\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"You don't have access to other users' account\");\r",
+							"  pm.response.to.have.status(401)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"lol\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show user - not alloed Test2 see Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User2 cant see info from user1\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"You don't have access to other users' account\");\r",
+							"  pm.response.to.have.status(401)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show user info - Test1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Show user stats\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/users/test1",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"users",
+						"test1"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show stats - Test1 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Show user stats\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/stats",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"stats"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show scoreboard",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Show rating by Elo\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic test2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/score",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"score"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show stack cards - All Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Show user cards\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic player1-mtcgToken",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:10001/cards/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"cards",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add card to trading cart - Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"1st trade added: Player1\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New trade added\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardToTrade\": \"de85e3976-7c86-4d06-9a80-641c2019a79f\",\r\n    \"type\": \"monster\",\r\n    \"minimumDamage\": 90\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add card to trading cart - Player1 2nd",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"2nd trade added: Player1\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New trade added\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardToTrade\": \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n    \"type\": \"spell\",\r\n    \"minimumDamage\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Add card to trading cart - Player2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"1st trade added: Player2\",() => {\r",
+							"  pm.expect(pm.response.text()).to.include(\"New trade added\");\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardToTrade\": \"y99f8f8dc-e25e-4a95-aa2c-782823f36e2a\",\r\n    \"type\": \"spell\",\r\n    \"minimumDamage\": 80\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						""
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Show Trades - Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Show all available trades(3)\",() => {\r",
+							"  pm.response.to.have.status(200)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Trade his own cards Player1 - Error",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/de85e3976-7c86-4d06-9a80-641c2019a79f",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						"de85e3976-7c86-4d06-9a80-641c2019a79f"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Trade Player1 -> Player2 - Error offerd in deck",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"y1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/de85e3976-7c86-4d06-9a80-641c2019a79f",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						"de85e3976-7c86-4d06-9a80-641c2019a79f"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Trade Player1 -> Player2 - Error dont match Damage",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"y845f0dc7-37d0-426e-994e-43fc3ac83c08\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/de85e3976-7c86-4d06-9a80-641c2019a79f",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						"de85e3976-7c86-4d06-9a80-641c2019a79f"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Trade Player1 -> Player2 - Error dont match Type",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"ye85e3976-7c86-4d06-9a80-641c2019a79f\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/de85e3976-7c86-4d06-9a80-641c2019a79f",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						"de85e3976-7c86-4d06-9a80-641c2019a79f"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Trade Player1 -> Player2 - Offered not owned",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"efwefwef\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/tradings/de85e3976-7c86-4d06-9a80-641c2019a79f",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"tradings",
+						"de85e3976-7c86-4d06-9a80-641c2019a79f"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Player 2 start battle",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player2-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/battles",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"battles"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Player 1 start battle Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic player1-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/battles",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"battles"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		},
+		{
+			"name": "Log out - marian",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic marian-mtcgToken"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:10001/logout",
+					"host": [
+						"localhost"
+					],
+					"port": "10001",
+					"path": [
+						"logout"
+					]
+				},
+				"description": "Show user stack"
+			},
+			"response": []
+		}
+	]
+}
