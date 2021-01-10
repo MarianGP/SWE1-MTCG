@@ -18,7 +18,7 @@
 - Extremely important to test the attack between card and to get the expected result
 depending on cards: instance of Cards (MonsterCard/SpellCard), Element, Type and damage (complex logic).
 
-###3) Server structure definition: Server, RequestContext, RequestHandler, Response, Controllers
+### 3) Server structure definition: Server, RequestContext, RequestHandler, Response, Controllers
 
 - Connection using websockets and basic authentication.
 - Each new connection will initiate a new thread.
